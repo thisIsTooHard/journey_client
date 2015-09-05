@@ -15,8 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "stdfax.h"
 #include "session.h"
 
 namespace net
@@ -33,15 +31,16 @@ namespace net
 		portstr[3] = temp[3];
 		portstr[4] = '\0';
 
-		return init(iaddr, portstr);
+		return init(iaddr, portstr, true);
 	}
 
 	int session::init()
 	{
-		return init("localhost", "8484");
+		//royals: 192.169.80.74
+		return init("localhost", "8484", false);
 	}
 
-	int session::init(const char* iaddr, const char* port)
+	int session::init(const char* iaddr, const char* port, bool channelserver)
 	{
 		WSADATA wsa_info;
 		sock = INVALID_SOCKET;
@@ -62,7 +61,7 @@ namespace net
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
 
-		if (iaddr != "localhost")
+		if (channelserver)
 		{
 			string temp = "";
 			for (char i = 0; i < 4; i++)
@@ -72,13 +71,11 @@ namespace net
 					temp.append(".");
 			}
 
-			if (temp == "127.0.0.1")
-				temp = "localhost";
-
 			iaddr = temp.c_str();
 		}
 
 		result = getaddrinfo(iaddr, port, &hints, &addr_info);
+
 		if (result != 0) {
 			WSACleanup();
 			return 1;
@@ -112,33 +109,56 @@ namespace net
 		char recvbuf[32];
 
 		result = recv(sock, recvbuf, 32, 0);
-		if (result != 16) {
-			WSACleanup();
-			return 2;
-		}
-		packet rcv = packet(recvbuf, result);
-		char version = static_cast<char>(rcv.readshort());
-		if (version != 83)
+		if (result > 0)
 		{
-			WSACleanup();
-			return 2;
-		}
+			packet rcv = packet(recvbuf, result);
+			char version = static_cast<char>(rcv.readshort());
 
-		char* recvIv = new char[4];
-		char* sendIv = new char[4];
-		char localisation;
-		rcv.readshort();
-		rcv.readbyte();
-		sendIv[0] = rcv.readbyte();
-		sendIv[1] = rcv.readbyte();
-		sendIv[2] = rcv.readbyte();
-		sendIv[3] = rcv.readbyte();
-		recvIv[0] = rcv.readbyte();
-		recvIv[1] = rcv.readbyte();
-		recvIv[2] = rcv.readbyte();
-		recvIv[3] = rcv.readbyte();
-		localisation = rcv.readbyte();
-		encrypter = crypto(version, recvIv, sendIv, localisation);
+			switch (version)
+			{
+			case 62:
+				if (result == 15)
+				{
+					char* recvIv = new char[4];
+					char* sendIv = new char[4];
+					rcv.readshort();
+					rcv.readbyte();
+					sendIv[0] = rcv.readbyte();
+					sendIv[1] = rcv.readbyte();
+					sendIv[2] = rcv.readbyte();
+					sendIv[3] = rcv.readbyte();
+					recvIv[0] = rcv.readbyte();
+					recvIv[1] = rcv.readbyte();
+					recvIv[2] = rcv.readbyte();
+					recvIv[3] = rcv.readbyte();
+					encrypter = crypto(version, recvIv, sendIv, 8);
+				}
+				break;
+			case 83:
+				if (result == 16)
+				{
+					char* recvIv = new char[4];
+					char* sendIv = new char[4];
+					char localisation;
+					rcv.readshort();
+					rcv.readbyte();
+					sendIv[0] = rcv.readbyte();
+					sendIv[1] = rcv.readbyte();
+					sendIv[2] = rcv.readbyte();
+					sendIv[3] = rcv.readbyte();
+					recvIv[0] = rcv.readbyte();
+					recvIv[1] = rcv.readbyte();
+					recvIv[2] = rcv.readbyte();
+					recvIv[3] = rcv.readbyte();
+					localisation = rcv.readbyte();
+					encrypter = crypto(version, recvIv, sendIv, localisation);
+				}
+				break;
+			default:
+				WSACleanup();
+				return 2;
+			}
+		}
 
 		u_long iMode = 1;
 		ioctlsocket(sock, FIONBIO, &iMode);
@@ -150,10 +170,12 @@ namespace net
 
 	int session::dispatch(packet tosend)
 	{
-		sendlock.lock();
-		char* bytes = encrypter.sendencrypt(tosend.getbytes(), tosend.length());
-		int result = send(sock, bytes, tosend.length() + 4, 0);
-		sendlock.unlock();
+		int plength = tosend.length();
+
+		lock_guard<mutex> lock(sendlock);
+		char* bytes = encrypter.sendencrypt(tosend.getbytes(), plength);
+		int result = send(sock, bytes, plength + 4, 0);
+		delete bytes;
 
 		if (result == SOCKET_ERROR) {
 			int nError = WSAGetLastError();
@@ -189,7 +211,6 @@ namespace net
 	{
 		if (p_length == 0)
 		{
-			//char* recv = encrypter.recvdecrypt(buffer, result);
 			int length = (byte)buffer[0] | (byte)buffer[1] << 8 | (byte)buffer[2] << 16 | (byte)buffer[3] << 24;
 			unsigned short total = (length >> 16) ^ (length & 0xFFFF);
 			p_length = total;
@@ -198,9 +219,13 @@ namespace net
 		}
 
 		if (bufferpos == 0)
+		{
 			curp.writebytes(buffer + 4, min(result - 4, p_length + 2));
+		}
 		else
+		{
 			curp.writebytes(buffer, min(result, p_length + 2));
+		}
 
 		bufferpos += result;
 
@@ -224,5 +249,6 @@ namespace net
 		active = false;
 		closesocket(sock);
 		WSACleanup();
+		encrypter.clear();
 	}
 }

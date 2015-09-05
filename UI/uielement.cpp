@@ -21,133 +21,164 @@
 
 namespace io
 {
-	void uielement::setbutton(short id, string state)
+	void uielement::sendicon(dragicon* icon, vector2d pos)
 	{
-		buttons[id].setstate(state);
+		icon->resetdrag();
 	}
 
 	void uielement::draw(ID2D1HwndRenderTarget* target)
 	{
-		if (!visible || !active)
-			return;
-
-		for (vector<sprite>::iterator itspr = sprites.begin(); itspr != sprites.end(); itspr++)
+		if (active)
 		{
-			itspr->draw(target, position);
-		}
-		for (map<short, button>::iterator itbt = buttons.begin(); itbt != buttons.end(); itbt++)
-		{
-			itbt->second.draw(target, position);
+			for (vector<sprite>::iterator itspr = sprites.begin(); itspr != sprites.end(); ++itspr)
+			{
+				itspr->draw(target, position);
+			}
+			for (map<short, button>::iterator itbt = buttons.begin(); itbt != buttons.end(); ++itbt)
+			{
+				itbt->second.draw(target, position);
+			}
+			for (vector<dragicon>::iterator itdg = dragicons.begin(); itdg != dragicons.end(); ++itdg)
+			{
+				itdg->draw(target, position);
+			}
 		}
 	}
 
 	void uielement::update()
 	{
-		if (!visible || !active)
-			return;
-
-		for (vector<sprite>::iterator itspr = sprites.begin(); itspr != sprites.end(); itspr++)
+		if (active)
 		{
-			itspr->update();
+			for (vector<sprite>::iterator itspr = sprites.begin(); itspr != sprites.end(); ++itspr)
+			{
+				itspr->update();
+			}
 		}
 	}
 
-	void uielement::togglehide()
+	mousestate uielement::sendmouse(vector2d pos, mousestate state)
 	{
-		active = !active;
-	}
+		if (active)
+		{
+			mousestate ret = state;
+			bool drag = false;
 
-	pair<vector2d, vector2d> uielement::bounds()
-	{
-		return pair<vector2d, vector2d>(position, dimensions);
-	}
+			for (vector<dragicon>::iterator dgit = dragicons.begin(); dgit != dragicons.end(); ++dgit)
+			{
+				if (colliding(pos, dgit->bounds(), position))
+				{
+					drag = true;
 
-	bool uielement::isactive()
-	{
-		return active;
-	}
+					if (!dgit->dragged())
+					{
+						switch (state)
+						{
+						case MST_IDLE:
+						case MST_CANCLICK:
+						case MST_CANCLICK2:
+							ret = MST_CANGRAB;
+							break;
+						case MST_CLICKING:
+							dgit->setdrag(pos, position);
+							app.getui()->seticon(dgit._Ptr);
+							ret = MST_GRABBING;
+							break;
+						}
+					}
+				}
 
-	char uielement::sendmouse(vector2d pos, char state)
-	{
-		if (!active)
+				if (drag)
+				{
+					return ret;
+				}
+			}
+
+			bool anycoll = false;
+			for (map<short, button>::iterator itbt = buttons.begin(); itbt != buttons.end(); ++itbt)
+			{
+				string btst = itbt->second.getstate();
+				if (util::colliding(pos, itbt->second.bounds(), position) && itbt->second.isactive())
+				{
+					anycoll = true;
+					switch (state)
+					{
+					case MST_IDLE:
+					case MST_CANCLICK:
+						if (btst == "normal")
+						{
+							itbt->second.setstate("mouseOver");
+							ret = MST_CANCLICK;
+						}
+						break;
+					case MST_CLICKING:
+						if (btst == "normal" || btst == "mouseOver")
+						{
+							itbt->second.setstate("pressed");
+							buttonpressed(itbt->first);
+							ret = MST_CANCLICK;
+						}
+					}
+				}
+				else
+				{
+					switch (state)
+					{
+					case MST_IDLE:
+					case MST_CANCLICK:
+						if (btst == "mouseOver")
+						{
+							itbt->second.setstate("normal");
+						}
+						break;
+					}
+				}
+			}
+
+			bool anytext = false;
+			for (map<short, textfield>::iterator txtit = textfields.begin(); txtit != textfields.end(); txtit++)
+			{
+				if (util::colliding(pos, txtit->second.bounds(), position))
+				{
+					switch (state)
+					{
+					case MST_CLICKING:
+						txtit->second.setstate("active");
+						app.getui()->settextfield(&txtit->second);
+						anytext = true;
+						break;
+					}
+				}
+				else
+				{
+					switch (state)
+					{
+					case MST_CLICKING:
+						txtit->second.setstate("inactive");
+						if (!anytext)
+						{
+							app.getui()->settextfield(0);
+						}
+						break;
+					}
+				}
+			}
+
+			if (!anycoll)
+			{
+				switch (state)
+				{
+				case MST_CANCLICK:
+				case MST_CANGRAB:
+					ret = MST_IDLE;
+					break;
+				}
+			}
+
+			return ret;
+		}
+		else
+		{
 			return state;
-
-		char ret = state;
-		bool anycoll = false;
-		for (map<short, button>::iterator itbt = buttons.begin(); itbt != buttons.end(); itbt++)
-		{
-			string btst = itbt->second.getstate();
-			if (state == -1)
-			{
-				if (btst == "mouseOver")
-					itbt->second.setstate("normal");
-				continue;
-			}
-			if (util::colliding(pos, itbt->second.bounds(), position))
-			{
-				anycoll = true;
-				switch (state)
-				{
-				case 0:
-				case 1:
-					if (btst == "normal")
-					{
-						itbt->second.setstate("mouseOver");
-						ret = 1;
-					}
-					break;
-				case 12:
-					if (btst == "normal" || btst == "mouseOver")
-					{
-						itbt->second.setstate("pressed");
-						buttonpressed(itbt->first);
-					}
-				}
-			}
-			else
-			{
-				switch (state)
-				{
-				case 0:
-				case 1:
-					if (btst == "mouseOver")
-					{
-						itbt->second.setstate("normal");
-					}
-					break;
-				}
-			}
 		}
-		bool anytext = false;
-		for (map<short, textfield>::iterator txtit = textfields.begin(); txtit != textfields.end(); txtit++)
-		{
-			if (util::colliding(pos, txtit->second.bounds(), position))
-			{
-				switch (state)
-				{
-				case 12:
-					txtit->second.setstate("active");
-					app.getui()->settextfield(&txtit->second);
-					anytext = true;
-					break;
-				}
-			}
-			else
-			{
-				switch (state)
-				{
-				case 12:
-					txtit->second.setstate("inactive");
-					if (!anytext)
-						app.getui()->settextfield(NULL);
-					break;
-				}
-			}
-		}
-		if (!anycoll && state == 1)
-		{
-			ret = 0;
-		}
-		return ret;
 	}
 }

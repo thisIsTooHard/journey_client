@@ -30,7 +30,8 @@ namespace graphics
 		txc_white,
 		txc_yellow,
 		txc_blue,
-		txc_red
+		txc_red,
+		txc_brown
 	};
 
 	class textlabel
@@ -39,6 +40,7 @@ namespace graphics
 		textlabel(IDWriteTextFormat*, textcolor, string);
 		textlabel() {}
 		~textlabel() {}
+		void draw(string, ID2D1HwndRenderTarget*, vector2d);
 		void draw(ID2D1HwndRenderTarget*, vector2d);
 		void settext(string s) { text = s; }
 		void setmarker(bool b) { marker = b; }

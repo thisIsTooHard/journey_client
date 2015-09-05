@@ -16,14 +16,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "stdfax.h"
 #include "maplechar.h"
+#include "playereffects.h"
 #include "inventory.h"
 #include "footholdtree.h"
 #include "laddersropes.h"
 #include "moveinfo.h"
+#include "skillbook.h"
 
 using namespace std;
+using namespace character;
 
 namespace gameplay
 {
@@ -53,13 +55,6 @@ namespace gameplay
 		mst_climb
 	};
 
-	struct skill
-	{
-		char level;
-		char masterlevel;
-		long expiration;
-	};
-
 	struct startedquest
 	{
 		string questdata;
@@ -72,11 +67,12 @@ namespace gameplay
 	public:
 		player() {}
 		~player() {}
-		player(maplechar*, inventory, int, map<int, pair<pair<int, int>, long>>, map<int, short>, map<int, pair<string, pair<short, string>>>, map<int, long>, pair<vector<int>, vector<int>>, int, map<short, char>, map<short, string>);
-		maplestats* getstats();
-		inventory* getinventory();
-		vector2d getposition();
-		int getdamage() { return basedamage; }
+		player(maplechar*, inventory, int, skillbook, map<int, pair<string, pair<short, string>>>, map<int, int64_t>, pair<vector<int>, vector<int>>, int, map<short, char>, map<short, string>);
+		maplestats* getstats() { return &stats; }
+		playereffects* geteffects() { return &effects; }
+		inventory* getinventory() { return &invent; }
+		skillbook* getskills() { return &skills; }
+		vector2d getposition() { return position; }
 		bool onladderrope() { return state == mst_climb; }
 		bool getleft() { return fleft; }
 		void setposition(vector2d);
@@ -89,19 +85,18 @@ namespace gameplay
 		void key_down(bool);
 		void key_up(bool);
 		bool attack(int);
+		void setactions(vector<string>);
 		void setexpression(char);
-		void updateskill(int, int, int, long);
 		void draw(ID2D1HwndRenderTarget*, vector2d);
 		movep_info update();
 	private:
 		maplestats stats;
 		maplelook look;
 		inventory invent;
-		int basedamage;
-		map<int, pair<pair<int, int>, long>> skills;
-		map<int, short> cooldowns;
+		skillbook skills;
+		playereffects effects;
 		map<int, pair<string, pair<short, string>>> quests;
-		map<int, long> completedquests;
+		map<int, int64_t> completedquests;
 		pair<vector<int>, vector<int>> trockmaps;
 		int bookcover;
 		map<short, char> bookcards;

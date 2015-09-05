@@ -21,9 +21,8 @@
 
 namespace io
 {
-	worldselect::worldselect(char num, char* chloads)
+	worldselect::worldselect(char num, vector<char> chloads)
 	{
-		app.getimgcache()->clearcache(ict_login);
 		app.getimgcache()->setmode(ict_login);
 		nl::nx::view_file("UI");
 		nl::nx::view_file("Back");
@@ -35,7 +34,11 @@ namespace io
 		sprites.push_back(sprite(animation(worlds.resolve("layer:bg")), vector2d(650, 45)));
 		sprites.push_back(sprite(animation(login.resolve("Common/frame")), vector2d(400, 290)));
 
+		byte defworld = config.getdefworld();
+		byte defch = config.getdefch();
+
 		buttons.insert(make_pair(BT_WORLDSEL0, button(worlds.resolve("button:15"), 650, 20)));
+		buttons[BT_WORLDSEL0].setstate("pressed");
 
 		sprites.push_back(sprite(animation(worlds.resolve("button:16/normal")), vector2d(650, 74)));
 
@@ -55,8 +58,10 @@ namespace io
 				texture(channels.resolve("button:" + to_string(i) + "/normal/0")),
 				texture(channels.resolve("button:" + to_string(i) + "/keyFocused/0")),
 				200, 170);
-			if (i == 0)
+			if (i == defch)
+			{
 				chi.setstate("pressed");
+			}
 			buttons.insert(make_pair(BT_CHANNELSEL0 + i, chi));
 		}
 
@@ -68,9 +73,8 @@ namespace io
 		position = vector2d(0, 0);
 		dimensions = vector2d(800, 600);
 		active = true;
-		visible = true;
-		worldid = 0;
-		channelid = 0;
+		worldid = defworld;
+		channelid = defch;
 	}
 
 	void worldselect::buttonpressed(short id)
@@ -81,9 +85,10 @@ namespace io
 			for (map<short, button>::iterator itbt = buttons.begin(); itbt != buttons.end(); itbt++)
 			{
 				if (itbt->first != id && itbt->first >= BT_WORLDSEL0 && itbt->first <= BT_WORLDSEL19 && itbt->second.getstate() == "pressed")
+				{
 					itbt->second.setstate("normal");
+				}
 			}
-			return;
 		}
 		else if (id >= BT_CHANNELSEL0 && id <= BT_CHANNELSEL16)
 		{
@@ -91,9 +96,10 @@ namespace io
 			for (map<short, button>::iterator itbt = buttons.begin(); itbt != buttons.end(); itbt++)
 			{
 				if (itbt->first != id && itbt->first >= BT_CHANNELSEL0 && itbt->first <= BT_CHANNELSEL16 && itbt->second.getstate() == "pressed")
+				{
 					itbt->second.setstate("normal");
+				}
 			}
-			return;
 		}
 		else if (id == BT_GOWORLD)
 		{

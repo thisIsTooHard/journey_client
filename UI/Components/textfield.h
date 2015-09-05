@@ -36,6 +36,7 @@ namespace io
 		void setstate(string);
 		void sendchar(char);
 		void setbg(texture, int, int);
+		void settext(string s) { content.settext(s); }
 		string getstate() { return state; }
 		string text() { return content.gettext(); }
 	private:

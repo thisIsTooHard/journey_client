@@ -32,6 +32,7 @@ namespace io
 		nametag(IDWriteTextFormat* fnt, textcolor col, vector<texture> t, string n, vector2d p);
 		nametag(IDWriteTextFormat*, textcolor, pair<vector<texture>, vector<texture>>, string, vector2d, bool);
 		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void setstate(bool a) { active = a; }
 	private:
 		textlabel content;
 		pair<vector<texture>, vector<texture>> tag;

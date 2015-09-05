@@ -59,7 +59,7 @@ namespace gameplay
 	{
 		if (playerchar.attack(skillid))
 		{
-			if (skillid == -1)
+			if (skillid == 0)
 			{
 				bool left = playerchar.getleft();
 
@@ -76,7 +76,7 @@ namespace gameplay
 				}
 
 				attackinfo attack;
-				attack.mastery = 0.5f; //todo: get from char
+				attack.mastery = playerchar.getstats()->getmastery();
 				attack.skill = 0;
 				attack.maxattacked = 1;
 				attack.display = 50;
@@ -86,12 +86,57 @@ namespace gameplay
 				attack.numdamage = 1;
 				attack.stance = 1; //maybe body animation?
 
-				map_objects.getmobs()->sendattack(&attack, playerchar.getdamage(), attackrange);
+				map_objects.getmobs()->sendattack(&attack, playerchar.getstats()->getdamage(), attackrange);
 				packet_c.close_attack(attack);
 			}
 			else
 			{
-				//get skill
+				if (!skillcache.count(skillid))
+				{
+					skillcache[skillid] = skill(skillid);
+				}
+
+				char skill_l = playerchar.getskills()->getlevel(skillid);
+				bool left = playerchar.getleft();
+
+				if (skill_l > 0)
+				{
+					skillinfo skill_i = skillcache[skillid].getlevel(skill_l);
+
+					skillcache[skillid].addeffects(playerchar.geteffects(), !left);
+					playerchar.setactions(skillcache[skillid].getactions());
+
+					if (skillcache[skillid].isattack())
+					{
+						attackinfo attack;
+						attack.mastery = playerchar.getstats()->getmastery();
+						attack.skill = skillid;
+						attack.maxattacked = skill_i.mobs;
+						attack.numdamage = skill_i.attacks;
+						attack.direction = (left) ? 1 : 0;
+						attack.stance = 1;
+						attack.speed = 2;
+						attack.charge = 0;
+						attack.display = 50;
+
+						pair<vector2d, vector2d> attackrange = skill_i.range;
+						if (left)
+						{
+							attackrange.first = playerchar.getposition() + attackrange.first;
+							attackrange.second = playerchar.getposition() + attackrange.second;
+						}
+						else
+						{
+							attackrange.first = playerchar.getposition() - attackrange.first;
+							attackrange.second = playerchar.getposition() - attackrange.second;
+						}
+
+						int damage = static_cast<int>(static_cast<float>(playerchar.getstats()->getdamage() * skill_i.damage) / 100);
+
+						map_objects.getmobs()->sendattack(&attack, damage, attackrange);
+						packet_c.close_attack(attack);
+					}
+				}
 			}
 		}
 	}
@@ -151,17 +196,18 @@ namespace gameplay
 	void playfield::setfield(int mapid, char pid)
 	{
 		step = GST_TRANSITION;
-		//bgm.Cleanup();
 
 		map_objects.clear();
 		portals.clear();
+
+		string oldbgm = map_info.getbgm();
 
 		app.getimgcache()->setmode(ict_map);
 		nl::nx::view_file("Map");
 
 		string fullname;
 		string strid = to_string(mapid);
-		char extend = 9 - strid.length();
+		size_t extend = 9 - strid.length();
 		for (char i = 0; i < extend; i++)
 		{
 			fullname.append("0");
@@ -227,11 +273,39 @@ namespace gameplay
 		view.setbounds(map_info.getwalls(), map_info.getborders());
 
 		string path = map_info.getbgm();
-		wstring stemp = wstring(path.begin(), path.end());
 
-		//bgm.Load(stemp.c_str());
-		//bgm.Play();
+		if (path != oldbgm)
+		{
+			bgm.Cleanup();
+
+			wstring stemp = wstring(path.begin(), path.end());
+			bgm.Load(stemp.c_str());
+			bgm.SetVolume((100 * config.getbgmvolume()) - 10000);
+			bgm.Play();
+		}
 
 		step = GST_GAME;
+	}
+
+	void playfield::playbgm(string path)
+	{
+		bgm.Cleanup();
+
+		wstring stemp = wstring(path.begin(), path.end());
+		bgm.Load(stemp.c_str());
+		bgm.SetVolume((100 * config.getbgmvolume()) - 10000);
+		bgm.Play();
+	}
+
+	void playfield::playsound(string path)
+	{
+		sounds.push_back(Mp3());
+
+		wstring stemp = wstring(path.begin(), path.end());
+		if (sounds.back().Load(stemp.c_str()))
+		{
+			sounds.back().SetVolume((100 * config.getsfxvolume()) - 10000);
+			sounds.back().Play();
+		}
 	}
 }

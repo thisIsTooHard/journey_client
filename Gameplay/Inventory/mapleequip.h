@@ -47,7 +47,7 @@ namespace gameplay
 	public:
 		mapleequip() {}
 		~mapleequip() {}
-		mapleequip(short, char, int, bool, long, long, char, char, map<equipstat, short>,string, short, char, short, int);
+		mapleequip(short, char, int, bool, int64_t, int64_t, char, char, map<equipstat, short>, string, short, char, short, int);
 		short getstat(equipstat es) { return stats[es]; }
 	private:
 		char slots;

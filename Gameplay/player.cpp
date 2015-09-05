@@ -19,7 +19,7 @@
 
 namespace gameplay
 {
-	player::player(maplechar* ch, inventory inv, int meso, map<int, pair<pair<int, int>, long>> skil, map<int, short> cd, map<int, pair<string, pair<short, string>>> quest, map<int, long> cquest, pair<vector<int>, vector<int>> trock, int cov, map<short, char> mb, map<short, string> area)
+	player::player(maplechar* ch, inventory inv, int meso, skillbook skl, map<int, pair<string, pair<short, string>>> quest, map<int, int64_t> cquest, pair<vector<int>, vector<int>> trock, int cov, map<short, char> mb, map<short, string> area)
 	{
 		look = ch->copylook();
 		stats = ch->copystats();
@@ -28,8 +28,7 @@ namespace gameplay
 
 		recalcstats(true);
 
-		skills = skil;
-		cooldowns = cd;
+		skills = skl;
 		quests = quest;
 		completedquests = cquest;
 		trockmaps = trock;
@@ -54,29 +53,9 @@ namespace gameplay
 		}
 	}
 
-	maplestats* player::getstats()
-	{
-		return &stats;
-	}
-
-	inventory* player::getinventory()
-	{
-		return &invent;
-	}
-
-	vector2d player::getposition()
-	{
-		return position;
-	}
-
-	void player::updateskill(int id, int lv, int mlv, long expi)
-	{
-		skills[id] = pair<pair<int, int>, long>(make_pair(lv, mlv), expi);
-	}
-
 	void player::setposition(vector2d pos)
 	{
-		position = pos;
+		position = pos - vector2d(0, 15);
 		fx = static_cast<float>(position.x());
 		fy = static_cast<float>(position.y());
 
@@ -105,7 +84,10 @@ namespace gameplay
 		fy = fy + vspeed;
 
 		position = vector2d(static_cast<int>(fx), static_cast<int>(fy));
-		look.draw(target, parentpos + position);
+		vector2d absp = parentpos + position;
+
+		look.draw(target, absp);
+		effects.draw(target, absp);
 	}
 
 	movep_info player::update()
@@ -113,6 +95,7 @@ namespace gameplay
 		movep_info ret;
 
 		bool anidone = look.update();
+		effects.update();
 
 		float fspeed = walkSpeed * static_cast<float>(speed) / 100;
 
@@ -508,6 +491,12 @@ namespace gameplay
 		}
 	}
 
+	void player::setactions(vector<string> act)
+	{
+		state = mst_attack;
+		look.setactions(act);
+	}
+
 	void player::recalcstats(bool param)
 	{
 		speed = 100;
@@ -515,7 +504,7 @@ namespace gameplay
 
 		invent.recalcstats();
 
-		basedamage = static_cast<int>((static_cast<float>(5 * stats.getstat(LEVEL))/100) * invent.gettotal(ES_WATK) * invent.getwepmult());
+		stats.setdamage(static_cast<int>((static_cast<float>(5 * stats.getstat(LEVEL))/100) * invent.gettotal(ES_WATK) * invent.getwepmult()));
 	}
 
 	void player::setlr(ladderrope lr)

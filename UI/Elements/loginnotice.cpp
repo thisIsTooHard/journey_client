@@ -53,7 +53,6 @@ namespace io
 		dimensions = vector2d(362, 219);
 		type = param;
 		active = true;
-		visible = true;
 	}
 
 	void loginnotice::buttonpressed(short id)
@@ -64,7 +63,11 @@ namespace io
 			quit();
 			return;
 		case BT_LOGINNOTICEOK:
-			app.getui()->getelement(UI_LOGIN)->setbutton(BT_LOGIN, "normal");
+			uielement* login = app.getui()->getelement(UI_LOGIN);
+			if (login)
+			{
+				login->setbutton(BT_LOGIN, "normal");
+			}
 			active = false;
 			return;
 		}

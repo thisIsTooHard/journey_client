@@ -22,7 +22,7 @@ namespace net
 {
 	void packetcreator::init(session* srv)
 	{
-		server = srv;
+		server = unique_ptr<session>(srv);
 	}
 
 	void packetcreator::c_login(string account, string pass)
@@ -78,6 +78,30 @@ namespace net
 	{
 		packet p = packet(PLAYER_LOGIN);
 		p.writeint(cid);
+		server->dispatch(p);
+	}
+
+	void packetcreator::checkcharname(string name)
+	{
+		packet p = packet(CHECK_CHARNAME);
+		p.writestr(name);
+		server->dispatch(p);
+	}
+
+	void packetcreator::createchar(string name, int job, int face, int hair, int hairc, int skin, int top, int bot, int shoes, int weapon, bool female)
+	{
+		packet p = packet(CREATE_CHAR);
+		p.writestr(name);
+		p.writeint(job);
+		p.writeint(face);
+		p.writeint(hair);
+		p.writeint(hairc);
+		p.writeint(skin);
+		p.writeint(top);
+		p.writeint(bot);
+		p.writeint(shoes);
+		p.writeint(weapon);
+		p.writebl(female);
 		server->dispatch(p);
 	}
 

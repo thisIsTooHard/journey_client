@@ -19,11 +19,7 @@
 
 namespace gameplay
 {
-	mapleitem::mapleitem() {}
-
-	mapleitem::~mapleitem() {}
-
-	mapleitem::mapleitem(int id, short c, short p, char typ, bool cs, long uq, long exp, std::string own, short fl)
+	mapleitem::mapleitem(int id, short c, short p, char typ, bool cs, int64_t uq, int64_t exp, string own, short fl)
 	{
 		itemid = id;
 		count = c;
@@ -36,7 +32,7 @@ namespace gameplay
 		flag = fl;
 	}
 
-	mapleitem::mapleitem(int id, short p, char typ, bool cs, long uq, long exp, std::string name, char lv, short close, char full)
+	mapleitem::mapleitem(int id, short p, char typ, bool cs, int64_t uq, int64_t exp, string name, char lv, short close, char full)
 	{
 		itemid = id;
 		count = 1;

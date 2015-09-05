@@ -19,19 +19,7 @@
 
 namespace gameplay
 {
-	world::~world() {}
-
-	world::world()
-	{
-		id = -1;
-		flag = 0;
-		channels = 0;
-		chloads = new char[channels];
-		name = "";
-		eventmsg = "";
-	}
-
-	world::world(char i, std::string n, char f, std::string m, char ch, char* chl)
+	world::world(char i, std::string n, char f, std::string m, char ch, vector<char> chl)
 	{
 		id = i;
 		flag = f;
@@ -51,7 +39,7 @@ namespace gameplay
 		return channels;
 	}
 
-	char* world::getchloads()
+	vector<char> world::getchloads()
 	{
 		return chloads;
 	}

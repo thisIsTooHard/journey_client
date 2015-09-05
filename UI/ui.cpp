@@ -22,35 +22,49 @@
 #include "loginnotice.h"
 #include "worldselect.h"
 #include "charselect.h"
+#include "charcreation.h"
 #include "statusbar.h"
+#include "statusmenu.h"
+#include "keyconfig.h"
+#include "statsinfo.h"
 #include "equipinventory.h"
 
 namespace io
 {
-	void ui::init()
+	void ui::init(imagecache* img)
 	{
-		uilock = SRWLOCK_INIT;
-
-		mouse.init();
+		mouse.init(img);
 		base.init();
 
+		field.playbgm("Sound\\BgmUI.img\\BgmUI.img\\Title.mp3");
+
+		activetext = 0;
+		activeicon = 0;
 		shift = false;
 		actionsenabled = true;
+		active = true;
 	}
 
-	void ui::add(char type)
+	ui::~ui()
 	{
-		add(type, 0);
+		elements.clear();
 	}
 
-	void ui::add(char type, char param)
+	void ui::add(uielements type, char param)
 	{
-		if (elements[type])
+		if (elements.contains(type))
 		{
-			remove(type);
+			switch (type)
+			{
+			case UI_STATSINFO:
+			case UI_EQUIPS:
+			case UI_SYSTEM:
+			case UI_KEYCONFIG:
+				elements.pushtotop(type);
+				elements.get(type)->togglehide();
+				return;
+			}
 		}
-
-		AcquireSRWLockExclusive(&uilock);
 
 		uielement* toadd = 0;
 		switch (type)
@@ -70,39 +84,47 @@ namespace io
 		case UI_CHARSEL:
 			toadd = new charselect(field.getaccount()->getslots(), field.getaccount()->getchars());
 			break;
+		case UI_CREATECHAR:
+			toadd = new charcreation(field.getaccount()->isfemale());
+			break;
 		case UI_STATUSBAR:
 			toadd = new statusbar(field.getplayer()->getstats());
+			break;
+		case UI_SYSTEM:
+			toadd = new statusmenu();
+			break;
+		case UI_KEYCONFIG:
+			toadd = new keyconfig(keys.getkeys(), field.getplayer()->getinventory());
+			break;
+		case UI_STATSINFO:
+			toadd = new statsinfo(field.getplayer()->getstats());
 			break;
 		case UI_EQUIPS:
 			toadd = new equipinventory(field.getplayer()->getinventory());
 			break;
 		}
-		elements[type] = toadd;
-
-		ReleaseSRWLockExclusive(&uilock);
+		elements.add(type, toadd);
 	}
 
-	void ui::remove(char type)
+	void ui::remove(uielements type)
 	{
-		AcquireSRWLockExclusive(&uilock);
-
-		delete elements[type];
-		elements.erase(type);
-
-		ReleaseSRWLockExclusive(&uilock);
+		elements.removekey(type);
 	}
 
 	void ui::draw(ID2D1HwndRenderTarget* target)
 	{
 		field.draw(target);
 		base.draw(target, field.getviewpos());
-		if (TryAcquireSRWLockShared(&uilock))
+		if (active)
 		{
-			for (map<char, uielement*>::iterator elit = elements.begin(); elit != elements.end(); elit++)
+			for (int i = 0; i < elements.getend(); i++)
 			{
-				elit->second->draw(target);
+				elements.getnext(i)->draw(target);
 			}
-			ReleaseSRWLockShared(&uilock);
+			if (activeicon)
+			{
+				activeicon->dragdraw(target, mouse.getposition());
+			}
 		}
 		mouse.draw(target);
 	}
@@ -111,148 +133,190 @@ namespace io
 	{
 		field.update();
 		base.update();
-		if (TryAcquireSRWLockShared(&uilock))
+		if (active)
 		{
-			for (map<char, uielement*>::iterator elit = elements.begin(); elit != elements.end(); elit++)
+			for (int i = 0; i < elements.getend(); i++)
 			{
-				elit->second->update();
+				elements.getnext(i)->update();
 			}
-			ReleaseSRWLockShared(&uilock);
 		}
 		mouse.update();
 	}
 
-	void ui::sendmouse(vector2d pos)
-	{
-		sendmouse(mouse.getstate(), pos);
-	}
-
 	void ui::sendkey(WPARAM keycode, bool down)
 	{
-		if (!actionsenabled)
-			return;
-
-		if (activetext != 0)
+		if (actionsenabled)
 		{
-			if (down)
+			if (activetext)
 			{
-				if (keycode == VK_SHIFT)
-					shift = true;
-				else if (keycode == VK_BACK)
-					activetext->sendchar(0);
+				if (down)
+				{
+					switch (keycode)
+					{
+					case VK_SHIFT:
+						shift = true;
+						break;
+					case VK_BACK:
+						activetext->sendchar(0);
+						break;
+					}
+				}
+				else
+				{
+					if (keycode > 47 && keycode < 64)
+					{
+						char letter = static_cast<char>(keycode);
+						if (!shift)
+						{
+							activetext->sendchar(letter);
+						}
+					}
+					else if (keycode > 64 && keycode < 91)
+					{
+						char letter = static_cast<char>(keycode);
+						if (!shift)
+						{
+							letter += 32;
+						}
+						activetext->sendchar(letter);
+					}
+
+					switch (keycode)
+					{
+					case VK_SHIFT:
+						shift = false;
+						break;
+					case VK_LEFT:
+						activetext->sendchar(1);
+						break;
+					case VK_RIGHT:
+						activetext->sendchar(2);
+						break;
+					}
+				}
 			}
 			else
 			{
-				if ((keycode > 47 && keycode < 64) || (keycode > 64 && keycode < 91))
+				switch (keycode)
 				{
-					char letter = (char)keycode;
-					if (!shift)
-						letter += 32;
-					activetext->sendchar(letter);
-				}
-				else if (keycode == VK_SHIFT)
-					shift = false;
-				else if (keycode == VK_LEFT)
-					activetext->sendchar(1);
-				else if (keycode == VK_RIGHT)
-					activetext->sendchar(2);
-			}
-			return;
-		}
-		switch (keycode)
-		{
-		case VK_LEFT:
-			field.getplayer()->key_left(down);
-			break;
-		case VK_RIGHT:
-			field.getplayer()->key_right(down);
-			break;
-		case VK_UP:
-			actionsenabled = field.moveup(down);
-			break;
-		case VK_DOWN:
-			field.getplayer()->key_down(down);
-			break;
-		default:
-			pair<keytype, int> mapping = keys.getaction(keycode);
-			keytype type = mapping.first;
-			int action = mapping.second;
-			switch (type)
-			{
-			case KT_SKILL:
-				break;
-			case KT_ITEM:
-				break;
-			case KT_CASH:
-				break;
-			case KT_MENU:
-				if (down)
-				{
-					char elemtype = -1;
-					switch (action)
+				case VK_LEFT:
+					field.getplayer()->key_left(down);
+					break;
+				case VK_RIGHT:
+					field.getplayer()->key_right(down);
+					break;
+				case VK_UP:
+					actionsenabled = field.moveup(down);
+					break;
+				case VK_DOWN:
+					field.getplayer()->key_down(down);
+					break;
+				default:
+					pair<keytype, int> mapping = keys.getaction(static_cast<char>(keycode));
+					keytype type = mapping.first;
+					int action = mapping.second;
+					switch (type)
 					{
-					case KA_INVENTORY:
-						elemtype = UI_INVENTORY;
+					case KT_SKILL:
+						field.useattack(action);
 						break;
-					case KA_EQUIPS:
-						elemtype = UI_EQUIPS;
+					case KT_ITEM:
 						break;
-					}
+					case KT_CASH:
+						break;
+					case KT_MENU:
+						if (down)
+						{
+							char elemtype = -1;
+							switch (action)
+							{
+							case KA_CHARSTATS:
+								elemtype = UI_STATSINFO;
+								break;
+							case KA_EQUIPS:
+								elemtype = UI_EQUIPS;
+								break;
+							}
 
-					if (elemtype != -1)
-					{
-						if (elements[elemtype])
-							elements[elemtype]->togglehide();
-						else
-							add(elemtype);
+							if (elemtype != -1)
+							{
+								add(static_cast<uielements>(elemtype));
+							}
+						}
+						break;
+					case KT_ACTION:
+						switch (action)
+						{
+						case KA_JUMP:
+							field.getplayer()->key_jump(down);
+							break;
+						case KA_SIT:
+							break;
+						case KA_ATTACK:
+							field.useattack(0);
+							break;
+						}
+						break;
+					case KT_FACE:
+						field.getplayer()->setexpression(action - 100);
+						break;
+					case KT_MACRO:
+						break;
 					}
 				}
-				break;
-			case KT_ACTION:
-				switch (action)
-				{
-				case KA_JUMP:
-					field.getplayer()->key_jump(down);
-					break;
-				case KA_SIT:
-					break;
-				case KA_ATTACK:
-					field.useattack(-1);
-					break;
-				}
-				break;
-			case KT_FACE:
-				field.getplayer()->setexpression(action - 100);
-				break;
-			case KT_MACRO:
-				break;
 			}
 		}
 	}
 
-	void ui::sendmouse(char param, vector2d pos)
+	void ui::sendmouse(mousestate param, vector2d pos)
 	{
-		mouse.update(pos);
+		mouse.setposition(pos);
+
+		if (activeicon)
+		{
+			if (param == MST_IDLE)
+			{
+				uielement* front = 0;
+				for (int i = 0; i < elements.getend(); i++)
+				{
+					uielement* elit = elements.getnext(i);
+					if (util::colliding(pos, elit->bounds()) && elit->isactive())
+					{
+						front = elit;
+					}
+				}
+
+				if (front)
+				{
+					front->sendicon(activeicon, pos);
+					activeicon = 0;
+				}
+				else
+				{
+					activeicon->resetdrag();
+				}
+			}
+		}
 
 		uielement* front = 0;
 		if (actionsenabled)
 		{
-			if (TryAcquireSRWLockShared(&uilock))
+			for (int i = 0; i < elements.getend(); i++)
 			{
-				for (map<char, uielement*>::iterator elit = elements.begin(); elit != elements.end(); elit++)
+				uielement* elit = elements.getnext(i);
+				if (util::colliding(pos, elit->bounds()) && elit->isactive())
 				{
-					if (util::colliding(pos, elit->second->bounds()) && elit->second->isactive())
+					if (front)
 					{
-						if (front != 0)
-							front->sendmouse(pos, -1);
-						front = elit->second;
+						front->sendmouse(pos, MST_IDLE);
 					}
+
+					front = elit;
 				}
-				ReleaseSRWLockShared(&uilock);
 			}
 		}
 
-		if (front != 0)
+		if (front)
 		{
 			mouse.setstate(front->sendmouse(pos, param));
 		}
@@ -260,33 +324,10 @@ namespace io
 		{
 			mouse.setstate(param);
 
-			if (mouse.getstate() == 1)
-				mouse.setstate(0);
+			if (mouse.getstate() == MST_CANCLICK || mouse.getstate() == MST_CANGRAB)
+			{
+				mouse.setstate(MST_IDLE);
+			}
 		}
-	}
-
-	uielement* ui::getelement(char type)
-	{
-		return elements[type];
-	}
-
-	keyboard* ui::getkeyboard()
-	{
-		return &keys;
-	}
-
-	void ui::settextfield(textfield* txt)
-	{
-		activetext = txt;
-	}
-
-	void ui::enableactions()
-	{
-		actionsenabled = true;
-	}
-
-	void ui::disableactions()
-	{
-		actionsenabled = false;
 	}
 }

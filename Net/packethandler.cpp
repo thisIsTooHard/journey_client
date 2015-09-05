@@ -69,10 +69,10 @@ namespace net
 			char flag = recv.readbyte();
 			string svrmsg = recv.readascii();
 			char channels = recv.readbyte();
-			char* chloads = new char[channels];
+			vector<char> chloads;
 			for (char i = 0; i < channels; i++)
 			{
-				chloads[i] = recv.readbyte();
+				chloads.push_back(recv.readbyte());
 			}
 			app.getui()->getfield()->getworlds()->insert(make_pair(id, world(id, name, flag, svrmsg, channels, chloads)));
 			app.getui()->remove(UI_LOGIN);
@@ -81,112 +81,141 @@ namespace net
 		}
 	};
 
+	maplestats getmstats(packet* recv)
+	{
+		int id = recv->readint();
+		string name = recv->readpadascii(13);
+		bool female = recv->readbool();
+		char skin = recv->readbyte();
+		int face = recv->readint();
+		int hair = recv->readint();
+		vector<int64_t> pets;
+		for (char i = 0; i < 3; i++)
+		{
+			pets.push_back(recv->readlong());
+		}
+
+		map<maplestat, short> stats;
+		stats[LEVEL] = recv->readshort();
+		stats[JOB] = recv->readshort();
+		stats[STR] = recv->readshort();
+		stats[DEX] = recv->readshort();
+		stats[INT_] = recv->readshort();
+		stats[LUK] = recv->readshort();
+		stats[HP] = recv->readshort();
+		stats[MAXHP] = recv->readshort();
+		stats[MP] = recv->readshort();
+		stats[MAXMP] = recv->readshort();
+		stats[AP] = recv->readshort();
+		stats[SP] = recv->readshort();
+
+		int exp = recv->readint();
+		short fame = recv->readshort();
+		int mapid = recv->readint();
+		char spawnp = recv->readbyte();
+		return maplestats(id, name, female, skin, face, hair, exp, fame, stats, make_pair(mapid, spawnp), pets);
+	}
+
+	maplelook getmlook(packet* recv)
+	{
+		lookinfo info;
+		info.female = recv->readbool();
+		info.skin = recv->readbyte();
+		info.faceid = recv->readint();
+		recv->readbyte();
+		info.hairid = recv->readint();
+
+		byte slot = recv->readbyte();
+		while (slot != 0xFF)
+		{
+			info.equips[slot] = recv->readint();
+			slot = recv->readbyte();
+		}
+
+		slot = recv->readbyte();
+		while (slot != 0xFF)
+		{
+			info.maskedequips[slot] = recv->readint();
+			slot = recv->readbyte();
+		}
+
+		info.maskedequips[-111] = recv->readint();
+
+		for (char i = 0; i < 3; i++)
+		{
+			info.petids.push_back(recv->readint());
+		}
+
+		return maplelook(info);
+	}
+
+	void addcharentry(packet* recv)
+	{
+		maplestats mstats = getmstats(recv);
+		maplelook mlook = getmlook(recv);
+		maplechar mchar = maplechar(mstats, mlook);
+
+		bool viewall = recv->readbool();
+		bool gm = recv->readbool();
+		if (!gm)
+		{
+			bool ranked = recv->readbool();
+			int rank = recv->readint();
+			int rankmv = recv->readint();
+			int jobrank = recv->readint();
+			int jobrankmv = recv->readint();
+			char rankmc = (rankmv > 0) ? '+' : (rankmv < 0) ? '-' : '=';
+			char jobrankmc = (jobrankmv > 0) ? '+' : (jobrankmv < 0) ? '-' : '=';
+			mchar.setrankinfo(rank, rankmc, jobrank, jobrankmc);
+		}
+		app.getui()->getfield()->getaccount()->addchar(mchar);
+	}
+
 	class charlist_h : public vhandler
 	{
 		void charlist_h::handle(packet recv)
 		{
 			char numchars = recv.readbyte();
-			vector<maplechar> maplechars;
 			for (char i = 0; i < numchars; i++)
 			{
-				maplechars.push_back(getmchar(&recv));
-				bool viewall = recv.readbool();
-				bool gm = recv.readbool();
-				if (gm)
-				{
-					continue;
-				}
-				bool ranked = recv.readbool();
-				int rank = recv.readint();
-				int rankmv = recv.readint();
-				int jobrank = recv.readint();
-				int jobrankmv = recv.readint();
+				addcharentry(&recv);
 			}
 			char pic = recv.readbyte();
 			char slots = recv.readbyte();
-			app.getui()->getfield()->getaccount()->addchars(maplechars, pic, slots);
+			app.getui()->getfield()->getaccount()->setpicslots(pic, slots);
 			app.getui()->remove(UI_WORLDSELECT);
 			app.getui()->add(UI_CHARSEL);
 			app.getui()->enableactions();
 		}
+	};
 
-		maplechar getmchar(packet* recv)
+	class charname_response_h : public vhandler
+	{
+		void charname_response_h::handle(packet recv)
 		{
-			maplestats mstats = getmstats(recv);
-			maplelook mlook = getmlook(recv);
-			return maplechar(mstats, mlook);
+			string name = recv.readascii();
+			bool used = recv.readbool();
+			app.getui()->getelement(UI_CREATECHAR)->sendbool(used);
+			if (used)
+			{
+				app.getui()->add(UI_LOGINNOTICE, 5);
+			}
 		}
+	};
 
-		maplestats getmstats(packet* recv)
+	class add_newchar_entry_h : public vhandler
+	{
+		void add_newchar_entry_h::handle(packet recv)
 		{
-			int id = recv->readint();
-			string name = recv->readpadascii(13);
-			bool female = recv->readbool();
-			char skin = recv->readbyte();
-			int face = recv->readint();
-			int hair = recv->readint();
-			vector<long> pets;
-			for (char i = 0; i < 3; i++)
+			char stuff = recv.readbyte();
+			if (stuff == 0)
 			{
-				pets.push_back(recv->readlong());
+				addcharentry(&recv);
+				app.getui()->remove(UI_CREATECHAR);
+				app.getui()->add(UI_CHARSEL);
 			}
-
-			map<maplestat, short> stats;
-			stats[LEVEL] = recv->readshort();
-			stats[JOB] = recv->readshort();
-			stats[STR] = recv->readshort();
-			stats[DEX] = recv->readshort();
-			stats[INT_] = recv->readshort();
-			stats[LUK] = recv->readshort();
-			stats[HP] = recv->readshort();
-			stats[MAXHP] = recv->readshort();
-			stats[MP] = recv->readshort();
-			stats[MAXMP] = recv->readshort();
-			stats[AP] = recv->readshort();
-			stats[SP] = recv->readshort();
-
-			int exp = recv->readint();
-			short fame = recv->readshort();
-			int mapid = recv->readint();
-			char spawnp = recv->readbyte();
-			return maplestats(id, name, female, skin, face, hair, exp, fame, stats, make_pair(mapid, spawnp), pets);
 		}
-
-		maplelook getmlook(packet* recv)
-		{
-			bool female = recv->readbool();
-			char skin = recv->readbyte();
-			int face = recv->readint();
-			recv->readbyte();
-			int hair = recv->readint();
-
-			map<char, int> equips;
-			byte slot = recv->readbyte();
-			while (slot != 0xFF)
-			{
-				equips[slot] = recv->readint();
-				slot = recv->readbyte();
-			}
-
-			map<char, int> mskequips;
-			slot = recv->readbyte();
-			while (slot != 0xFF)
-			{
-				mskequips[slot] = recv->readint();
-				slot = recv->readbyte();
-			}
-
-			mskequips[-111] = recv->readint();
-
-			vector<int> petids;
-			for (char i = 0; i < 3; i++)
-			{
-				petids.push_back(recv->readint());
-			}
-
-			return maplelook(female, skin, face, hair, equips, mskequips, petids);
-		}
-	}; 
+	};
 	
 	class delchar_response_h : public vhandler
 	{
@@ -258,46 +287,45 @@ namespace net
 			inventory inv = getinventory(&recv);
 			recv.readbyte();
 
-			map<int, pair<pair<int, int>, long>> skills;
+			map<int, int> levels;
+			map<int, int> m_levels;
+			map<int, int> cooldowns;
+			map<int, int64_t> expirations;
+
 			short size = recv.readshort();
-			int skillid, level, masterlevel;
-			long expire;
 			for (short i = 0; i < size; i++)
 			{
-				skillid = recv.readint();
-				level = recv.readint();
-				expire = recv.readlong();
+				int skillid = recv.readint();
+				levels[skillid] = recv.readint();
+				expirations[skillid] = recv.readlong();
+
 				bool fourthjob = recv.readbool();
 				if (fourthjob)
 				{
-					masterlevel = recv.readint();
+					m_levels[skillid] = recv.readint();
 				}
 				else
 				{
-					masterlevel = -1;
+					m_levels[skillid] = -1;
 				}
-				skills.insert(make_pair(skillid, pair<pair<int, int>, long>(pair<int, int>(level, masterlevel), expire)));
 			}
-			map<int, short> cooldowns;
 			size = recv.readshort();
-			short cdtime;
 			for (short i = 0; i < size; i++)
 			{
-				skillid = recv.readint();
-				cdtime = recv.readint();
-				cooldowns.insert(make_pair(skillid, cdtime));
+				int skillid = recv.readint();
+				cooldowns[skillid] = recv.readint();
 			}
+			skillbook skills = skillbook(levels, m_levels, cooldowns, expirations);
 
 			map<int, pair<string, pair<short, string>>> quests;
 			size = recv.readshort();
-			short qid;
-			string qdata;
-			short infon;
-			string qprogress;
 			for (short i = 0; i < size; i++)
 			{
-				qid = recv.readshort();
-				qdata = recv.readascii();
+				short qid = recv.readshort();
+				string qdata = recv.readascii();
+				short infon;
+				string qprogress;
+
 				bool info = recv.readbool();
 				if (info)
 				{
@@ -311,12 +339,12 @@ namespace net
 				}
 				quests.insert(make_pair(qid, pair<string, pair<short, string>>(qdata, pair<short, string>(infon, qprogress))));
 			}
-			map<int, long> completedquests;
+			map<int, int64_t> completedquests;
 			size = recv.readshort();
 			for (short i = 0; i < size; i++)
 			{
-				qid = recv.readshort();
-				expire = recv.readlong();
+				short qid = recv.readshort();
+				int64_t expire = recv.readlong();
 				completedquests.insert(make_pair(qid, expire));
 			}
 
@@ -336,7 +364,7 @@ namespace net
 			char mblv;
 			for (short i = 0; i < size; i++)
 			{
-				qid = recv.readshort();
+				short qid = recv.readshort();
 				mblv = recv.readbyte();
 				bookcards.insert(make_pair(qid, mblv));
 			}
@@ -345,16 +373,16 @@ namespace net
 			size = recv.readshort();
 			for (short i = 0; i < size; i++)
 			{
-				qid = recv.readshort();
-				qdata = recv.readascii();
+				short qid = recv.readshort();
+				string qdata = recv.readascii();
 				areainfo.insert(make_pair(qid, qdata));
 			}
 
-			long timestamp = recv.readlong();
+			int64_t timestamp = recv.readlong();
 			app.getui()->remove(UI_CHARSEL);
 			app.getimgcache()->clearcache(ict_login);
 			app.getui()->add(UI_STATUSBAR);
-			app.getui()->getfield()->setplayer(player(app.getui()->getfield()->getaccount()->getplayer(), inv, meso, skills, cooldowns, quests, completedquests, trockmaps, bookcover, bookcards, areainfo));
+			app.getui()->getfield()->setplayer(player(app.getui()->getfield()->getaccount()->getplayer(), inv, meso, skills, quests, completedquests, trockmaps, bookcover, bookcards, areainfo));
 			pair<int, char> spawninfo = app.getui()->getfield()->getplayer()->getstats()->getspawninfo();
 			app.getui()->getfield()->setfield(spawninfo.first, spawninfo.second);
 			app.getui()->enableactions();
@@ -380,13 +408,13 @@ namespace net
 					char type = recv->readbyte();
 					int id = recv->readint();
 					bool cash = recv->readbool();
-					long uniqueid = -1;
+					int64_t uniqueid = -1;
 					if (cash)
 					{
 						uniqueid = recv->readlong();
 						recv->readbyte();
 					}
-					long expire = recv->readlong();
+					int64_t expire = recv->readlong();
 					char slots = recv->readbyte();
 					char level = recv->readbyte();
 					map<equipstat, short> stats;
@@ -443,14 +471,14 @@ namespace net
 					char type = recv->readbyte();
 					int id = recv->readint();
 					bool cash = recv->readbool();
-					long uniqueid = -1;
+					int64_t uniqueid = -1;
 					bool pet = false;
 					if (cash)
 					{
 						uniqueid = recv->readlong();
 						pet = recv->readbool();
 					}
-					long expire = recv->readlong();
+					int64_t expire = recv->readlong();
 					string petname;
 					char petlevel;
 					short closeness;
@@ -594,8 +622,8 @@ namespace net
 			int skillid = recv.readint();
 			int level = recv.readint();
 			int masterlevel = recv.readint();
-			long expire = recv.readlong();
-			app.getui()->getfield()->getplayer()->updateskill(skillid, level, masterlevel, expire);
+			int64_t expire = recv.readlong();
+			app.getui()->getfield()->getplayer()->getskills()->updateskill(skillid, level, masterlevel, expire);
 		}
 	};
 
@@ -643,7 +671,7 @@ namespace net
 					//move
 					break;
 				case 3:
-					app.getui()->getfield()->getplayer()->getinventory()->removeitem(invtype, pos);
+					app.getui()->getfield()->getplayer()->getinventory()->removeitem(static_cast<inventorytype>(invtype), pos);
 					break;
 				}
 			}
@@ -757,7 +785,7 @@ namespace net
 			char channel = recv.readbyte();
 			int mapid = recv.readint();
 			char portalid = recv.readbyte();
-			long timestamp = recv.readlong();
+			int64_t timestamp = recv.readlong();
 			if (channel == app.getui()->getfield()->getchannel())
 			{
 				app.getimgcache()->clearcache(ict_map);
@@ -787,6 +815,15 @@ namespace net
 				int time = recv.readint();
 			}
 			//TO DO
+		}
+	};
+
+	class toggle_ui_h : public vhandler
+	{
+		void toggle_ui_h::handle(packet recv)
+		{
+			bool enable = recv.readbool();
+			app.getui()->setactive(enable);
 		}
 	};
 
@@ -847,10 +884,13 @@ namespace net
 
 			if (!meso)
 			{
-				long expire = recv.readlong();
+				int64_t expire = recv.readlong();
 			}
 			bool playerdrop = recv.readbool();
-			app.getui()->getfield()->getmapobjects()->additemdrop(oid, itemdrop(itemid, meso, dropfrom, dropto, oid, owner, pickuptype, playerdrop));
+			app.getimgcache()->setmode(ict_sys);
+			itemdrop toadd = itemdrop(itemid, meso, dropfrom, dropto, oid, owner, pickuptype, playerdrop);
+			app.getimgcache()->unlock();
+			app.getui()->getfield()->getmapobjects()->additemdrop(oid, toadd);
 		}
 	};
 
@@ -923,11 +963,55 @@ namespace net
 		}
 	};
 
+	class give_buff_h : public vhandler
+	{
+		void give_buff_h::handle(packet recv)
+		{
+			int64_t mask = recv.readlong();
+			bool debuff = mask == 0;
+			if (debuff)
+			{
+				mask = recv.readlong();
+			}
+			//TO DO
+		}
+	};
+
+	class field_effect_h : public vhandler
+	{
+		void field_effect_h::handle(packet recv)
+		{
+			char mode = recv.readbyte();
+			if (mode == 1)
+			{
+				//tremble effect
+			}
+			else if (mode == 3)
+			{
+				//show effect
+			}
+			else if (mode == 4)
+			{
+				//play sound
+			}
+			else if (mode == 5)
+			{
+				//boss hp bar
+			}
+			else if (mode == 6)
+			{
+				//play music
+			}
+		}
+	};
+
 	packethandler::packethandler()
 	{
 		handlers.insert(make_pair(LOGIN_RESULT, unique_ptr<vhandler>(new login_result_h())));
 		handlers.insert(make_pair(SERVERLIST, unique_ptr<vhandler>(new serverl_h())));
 		handlers.insert(make_pair(CHARLIST, unique_ptr<vhandler>(new charlist_h())));
+		handlers.insert(make_pair(CHARNAME_RESPONSE, unique_ptr<vhandler>(new charname_response_h())));
+		handlers.insert(make_pair(ADD_NEWCHAR_ENTRY, unique_ptr<vhandler>(new add_newchar_entry_h())));
 		handlers.insert(make_pair(DELCHAR_RESPONSE, unique_ptr<vhandler>(new delchar_response_h())));
 		handlers.insert(make_pair(SERVER_IP, unique_ptr<vhandler>(new server_ip_h())));
 		handlers.insert(make_pair(BUDDY_LIST, unique_ptr<vhandler>(new buddylist_h())));
@@ -937,6 +1021,7 @@ namespace net
 		handlers.insert(make_pair(WARP_TO_MAP, unique_ptr<vhandler>(new warp_to_map_h())));
 		handlers.insert(make_pair(MODIFY_INVENTORY, unique_ptr<vhandler>(new modify_inventory_h())));
 		handlers.insert(make_pair(STATS_CHANGED, unique_ptr<vhandler>(new stats_changed_h())));
+		handlers.insert(make_pair(GIVE_BUFF, unique_ptr<vhandler>(new give_buff_h())));
 		handlers.insert(make_pair(UPDATE_SKILLS, unique_ptr<vhandler>(new update_skills_h())));
 		handlers.insert(make_pair(SHOW_STATUS_INFO, unique_ptr<vhandler>(new show_status_info_h())));
 		handlers.insert(make_pair(MEMO_RESULT, unique_ptr<vhandler>(new memo_result_h())));
@@ -945,6 +1030,9 @@ namespace net
 		handlers.insert(make_pair(SKILL_MACROS, unique_ptr<vhandler>(new skill_macros_h())));
 		handlers.insert(make_pair(FAMILY_PRIV_LIST, unique_ptr<vhandler>(new family_plist_h())));
 		handlers.insert(make_pair(CHARINFO, unique_ptr<vhandler>(new charinfo_h())));
+		handlers.insert(make_pair(FIELD_EFFECT, unique_ptr<vhandler>(new field_effect_h())));
+		handlers.insert(make_pair(LOCK_UI, unique_ptr<vhandler>(new unhandled()))); //not sure what this does
+		handlers.insert(make_pair(TOGGLE_UI, unique_ptr<vhandler>(new toggle_ui_h())));
 		handlers.insert(make_pair(SPAWN_MOB, unique_ptr<vhandler>(new spawn_mob_h())));
 		handlers.insert(make_pair(MOVE_MOB, unique_ptr<vhandler>(new move_mob_h())));
 		handlers.insert(make_pair(KILL_MOB, unique_ptr<vhandler>(new kill_mob_h)));
@@ -970,6 +1058,7 @@ namespace net
 
 	void packethandler::process(packet recv)
 	{
+		lock_guard<mutex> lock(processlock);
 		short opcode = recv.readshort();
 		handlers[opcode]->handle(recv);
 	}

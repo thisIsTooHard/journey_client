@@ -23,7 +23,7 @@ namespace program
 	{
 		imgfactory = unique_ptr<IWICImagingFactory>(imf);
 		target = 0;
-		imgcon = ict_login;
+		imgcon = ict_sys;
 	}
 
 	pair<imgcontext, size_t> imagecache::createimage(bitmap bmp)

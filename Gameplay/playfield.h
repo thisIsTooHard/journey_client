@@ -28,7 +28,10 @@
 #include "footholdtree.h"
 #include "laddersropes.h"
 #include "mapportals.h"
-//#include "Mp3.h"
+#include "skill.h"
+#include "Mp3.h"
+
+using namespace action;
 
 namespace gameplay
 {
@@ -53,6 +56,8 @@ namespace gameplay
 		void setworldchannel(char wld, char chd) { worldid = wld; channelid = chd; }
 		bool moveup(bool);
 		void useattack(int);
+		void playbgm(string);
+		void playsound(string);
 		player* getplayer() { return &playerchar; }
 		account* getaccount() { return &m_account; }
 		mapobjects* getmapobjects() { return &map_objects; }
@@ -71,7 +76,9 @@ namespace gameplay
 		mapportals portals;
 		account m_account;
 		gamestep step;
-		//Mp3 bgm;
+		map<int, skill> skillcache;
+		Mp3 bgm;
+		vector<Mp3> sounds;
 		map<char, world> worlds;
 		char worldid;
 		char channelid;

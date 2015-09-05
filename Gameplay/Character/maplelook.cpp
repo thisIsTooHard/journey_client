@@ -20,51 +20,31 @@
 
 namespace gameplay
 {
-	maplelook::maplelook(bool fm, char sk, int fc, int hr, map<char, int> eqs, map<char, int> mskeqs, vector<int> pets)
+	maplelook::maplelook(lookinfo i)
 	{
-		female = fm;
-		skin = sk;
-		faceid = fc;
-		hairid = hr;
-		equips = eqs;
-		maskedequips = mskeqs;
-		petids = pets;
-		twohweapon = false;
-		if (twohweapon)
-			state = "stand2";
-		else
-			state = "stand1";
-		expression = "default";
-		faceframe = 0;
+		info = i;
+		position = vector2d();
+		action = "";
+		actionframe = 0;
 		frame = 0;
 		elapsed = 0;
-		elapsedf = 0;
-		position = vector2d(0, 0);
 		faceleft = true;
+		loaded = false;
 	}
 
-	string maplelook::getstate()
+	void maplelook::init(map<string, map<char, short>> dl, map<string, map<char, bodyaction>> ba, map<string, map<char, map<charlayer, map<string, vector2d>>>> bhm)
 	{
-		return state;
-	}
-
-	void maplelook::addsprites(charsprites t, map<string, map<char, short>> bd, map<string, map<char, short>> fd, map<string, map<char, pair<string, char>>> ba, map<string, map<char, map<charlayers, map<string, vector2d>>>> bhm)
-	{
-		sprites = t;
-		bodydelays = bd;
-		facedelays = fd;
+		delays = dl;
 		bodyactions = ba;
 		bodyheadmap = bhm;
+		state = clothes["Weapon"].istwo_h() ? "stand2" : "stand1";
+		loaded = true;
 	}
 
 	void maplelook::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
 	{
-		map<charlayers, texture> textures = sprites.textures[state][frame];
-		textures.insert(make_pair(CL_FACE, sprites.textures[expression][faceframe][CL_FACE]));
-
-		for (map<charlayers, texture>::iterator txtit = textures.begin(); txtit != textures.end(); ++txtit)
+		if (loaded)
 		{
-			charlayers chl = txtit->first;
 			vector2d absp = parentpos + position;
 
 			if (!faceleft)
@@ -73,22 +53,38 @@ namespace gameplay
 					D2D1::Matrix3x2F::Scale(
 					D2D1::Size(-1.0f, 1.0f),
 					D2D1::Point2F(
-					(float)absp.x(),
-					(float)absp.y())));
+					static_cast<float>(absp.x()),
+					static_cast<float>(absp.y()))));
 			}
 
-			char fr = frame;
-			if (chl == CL_FACE)
-			{
-				vector2d shf = bodyheadmap[state][frame][CL_HEAD]["neck"] - bodyheadmap[state][frame][CL_BODY]["neck"] - bodyheadmap[state][frame][CL_HEAD]["brow"];
-				txtit->second.shift(vector2d() - shf);
-				txtit->second.draw(absp);
-				txtit->second.shift(shf);
-			}
-			else
-			{
-				txtit->second.draw(absp);
-			}
+			hair.draw(CL_HAIRBBODY, state, frame, absp);
+			clothes["Cape"].draw(CL_CAPE, state, frame, absp);
+			body.draw(CL_BODY, state, frame, absp);
+			clothes["Shoes"].draw(CL_SHOES, state, frame, absp);
+			clothes["Pants"].draw(CL_PANTS, state, frame, absp);
+			clothes["Coat"].draw(CL_TOP, state, frame, absp);
+			clothes["Longcoat"].draw(CL_MAIL, state, frame, absp);
+			body.draw(CL_LHAND, state, frame, absp);
+			clothes["Glove"].draw(CL_GLOVE, state, frame, absp);
+			hair.draw(CL_HAIR, state, frame, absp);
+			clothes["Earrings"].draw(CL_EARRINGS, state, frame, absp);
+			body.draw(CL_HEAD, state, frame, absp);
+			face.draw(absp - bodyheadmap[state][frame][CL_HEAD]["neck"] + bodyheadmap[state][frame][CL_BODY]["neck"] + bodyheadmap[state][frame][CL_HEAD]["brow"]);
+			hair.draw(CL_HAIRSHADE, state, frame, absp);
+			clothes["FaceAcc"].draw(CL_FACEACC, state, frame, absp);
+			clothes["EyeAcc"].draw(CL_EYEACC, state, frame, absp);
+			clothes["Shield"].draw(CL_SHIELD, state, frame, absp);
+			clothes["Weapon"].draw(CL_WEAPON, state, frame, absp);
+			body.draw(CL_ARM, state, frame, absp);
+			clothes["Coat"].draw(CL_MAILARM, state, frame, absp);
+			body.draw(CL_RHAND, state, frame, absp);
+			hair.draw(CL_HAIROHEAD, state, frame, absp);
+			clothes["Cap"].draw(CL_HAT, state, frame, absp);
+			body.draw(CL_ARMOHAIR, state, frame, absp);
+			clothes["Weapon"].draw(CL_WEAPONOHAND, state, frame, absp);
+			clothes["Glove"].draw(CL_RGLOVE, state, frame, absp);
+			clothes["Weapon"].draw(CL_WEAPONOGLOVE, state, frame, absp);
+			body.draw(CL_HANDOWEP, state, frame, absp);
 
 			if (!faceleft)
 			{
@@ -96,8 +92,8 @@ namespace gameplay
 					D2D1::Matrix3x2F::Scale(
 					D2D1::Size(1.0f, 1.0f),
 					D2D1::Point2F(
-					(float)absp.x(),
-					(float)absp.y())));
+					static_cast<float>(absp.x()),
+					static_cast<float>(absp.y()))));
 			}
 		}
 	}
@@ -106,95 +102,106 @@ namespace gameplay
 	{
 		bool aniend = false;
 
-		elapsed += 16;
-
-		short delay = bodydelays[state][frame];
-		if (elapsed > delay)
+		if (loaded)
 		{
-			elapsed -= delay;
-			frame = (bodydelays[state].count(frame + 1))? frame + 1 : 0;
+			elapsed += 16;
 
-			if (frame == 0)
+			if (actions.empty())
 			{
-				aniend = true;
+				short delay = delays[state][frame];
 
-				if (state == "stabO1")
+				if (elapsed > delay)
 				{
-					state = "stand1";
+					elapsed -= delay;
+					frame = (delays[state].count(frame + 1)) ? frame + 1 : 0;
+
+					if (frame == 0)
+					{
+						aniend = true;
+
+						if (state == "stabO1")
+						{
+							state = "stand1";
+						}
+					}
 				}
 			}
-		}
-
-		elapsedf += 16;
-
-		delay = facedelays[expression][faceframe];
-		if (elapsedf > delay)
-		{
-			elapsedf -= delay;
-			faceframe = (facedelays[expression].count(faceframe + 1)) ? faceframe + 1 : 0;
-			if (faceframe == 0)
+			else
 			{
-				if (expression == "default")
-					expression = "blink";
-				else
-					expression = "default";
+				short delay = bodyactions[action][actionframe].delay;
+
+				if (elapsed > delay)
+				{
+					elapsed -= delay;
+					actionframe = bodyactions[action].count(actionframe + 1) ? actionframe + 1 : 0;
+
+					if (actionframe > 0)
+					{
+						frame = bodyactions[action][actionframe].frame;
+						state = bodyactions[action][actionframe].state;
+					}
+					else
+					{
+						actions.erase(actions.begin());
+						if (actions.empty())
+						{
+							aniend = true;
+							action = "";
+							frame = 0;
+							state = "stand1";
+						}
+						else
+						{
+							action = actions[0];
+							state = bodyactions[action][actionframe].state;
+							frame = bodyactions[action][actionframe].frame;
+						}
+					}
+				}
 			}
+
+			face.update();
 		}
-
+		
 		return aniend;
-	}
-
-	void maplelook::setposition(vector2d pos)
-	{
-		position = pos;
-	}
-
-	void maplelook::setfleft(bool fleft)
-	{
-		faceleft = fleft;
-		scalex = (fleft) ? 1.0f : -1.0f;
 	}
 
 	void maplelook::setstate(string st)
 	{
-		if (st == "stand1" && twohweapon)
-			st = "stand2";
-
-		if (state != st)
+		if (actions.empty())
 		{
-			frame = 0;
-			elapsed = 0;
-			state = st;
+			if (clothes["Weapon"].istwo_h())
+			{
+				if (st == "stand1")
+				{
+					st = "stand2";
+				}
+				else if (st == "walk1")
+				{
+					st = "walk2";
+				}
+			}
+
+			if (state != st)
+			{
+				frame = 0;
+				elapsed = 0;
+				state = st;
+			}
 		}
 	}
 
-	void maplelook::setexpression(char exp)
+	void maplelook::setactions(vector<string> acts)
 	{
-		elapsedf = 0;
-		faceframe = 0;
-		switch (exp)
+		if (acts.size() > 0)
 		{
-		case 0:
-			expression = "hit";
-			break;
-		case 1:
-			expression = "smile";
-			break;
-		case 2:
-			expression = "troubled";
-			break;
-		case 3:
-			expression = "cry";
-			break;
-		case 4:
-			expression = "angry";
-			break;
-		case 5:
-			expression = "bewildered";
-			break;
-		case 6:
-			expression = "stunned";
-			break;
+			elapsed = 0;
+			actionframe = 0;
+			actions = acts;
+			action = acts[0];
+			actions.erase(actions.begin());
+			state = bodyactions[action][actionframe].state;
+			frame = bodyactions[action][actionframe].frame;
 		}
 	}
 }

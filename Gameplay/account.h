@@ -25,6 +25,20 @@ namespace gameplay
 {
 	class account
 	{
+	public:
+		account();
+		~account();
+		void init(int, string, char, bool, bool, short);
+		void addchars(vector<maplechar>, char, char);
+		int charcount();
+		char getslots();
+		void selectchar(int);
+		void clear();
+		bool isfemale() { return female; }
+		void addchar(maplechar m) { maplechars.push_back(m); }
+		void setpicslots(char p, char s) { pic = p; slots = s; }
+		maplechar* getplayer();
+		vector<maplechar>* getchars();
 	private:
 		vector<maplechar> maplechars;
 		int accid;
@@ -36,16 +50,5 @@ namespace gameplay
 		char pic;
 		char slots;
 		char selected;
-	public:
-		account();
-		~account();
-		void init(int, string, char, bool, bool, short);
-		void addchars(vector<maplechar>, char, char);
-		int charcount();
-		char getslots();
-		void selectchar(int);
-		void clear();
-		maplechar* getplayer();
-		vector<maplechar>* getchars();
 	};
 }

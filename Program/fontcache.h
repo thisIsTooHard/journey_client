@@ -28,7 +28,8 @@ namespace program
 		DWF_CENTER,
 		DWF_RIGHT,
 		DWF_LARGE,
-		dwf_small_r
+		dwf_small_r,
+		dwf_small_c
 	};
 
 	class fontcache

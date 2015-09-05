@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
-// Copyright Â© 2015 SYJourney                                               //
+// Copyright © 2015 SYJourney                                               //
 //                                                                          //
 // This program is free software: you can redistribute it and/or modify     //
 // it under the terms of the GNU Affero General Public License as           //
@@ -38,10 +38,16 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <random>
 
 #pragma comment(lib, "Dwrite")
 
 #define byte unsigned char
+
+#define vectornode nl::node::type::vector
+#define bitmapnode nl::node::type::bitmap
+#define integernode nl::node::type::integer
+#define stringnode nl::node::type::string
 
 namespace nl 
 {
@@ -49,15 +55,4 @@ namespace nl
 	class file;
 	class bitmap;
 	class audio;
-}
-
-namespace data
-{
-	enum cachemode : char
-	{
-		CM_LOGIN,
-		CM_SYS,
-		CM_MAP,
-		CM_MOB
-	};
 }

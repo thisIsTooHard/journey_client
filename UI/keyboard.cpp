@@ -23,12 +23,12 @@ namespace io
 	{
 		keytable = new char[90] 
 		{
-			0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, // number keys, up to key 10
-			0, 0, 0, 0, 0, 'Q', 'W', 'E', 'R', 'T', 'Z', 'U', 'I', 'O', 'P', 0, 0, //first letter row, up to key 27
-			VK_CONTROL, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 0, 0, 0, 0,  //second row, up to 41
+			0, 0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, // number keys, up to key 0
+			0, 0, 0, 0, 'Q', 'W', 'E', 'R', 'T', 'Z', 'U', 'I', 'O', 'P', 0, 0, 0, //first letter row, up to key 27
+			VK_CONTROL, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 0, 0, 0,  //second row, up to 41
 			VK_SHIFT, 0, 'Y', 'X', 'C', 'V', 'B', 'N', 'M', 0, 0, 0, 0, 0, VK_MENU, VK_SPACE, 0, //third row, up to 58
 			VK_F1, VK_F2, VK_F3, VK_F4, VK_F5, VK_F6, VK_F7, VK_F8, VK_F9, VK_F10, VK_F11, VK_F12,
-			VK_HOME, 0, VK_PRIOR, 0, 0, 0, 0, 0, 0, VK_END, 0, VK_NEXT, VK_INSERT, VK_DELETE, 0, 0, 0
+			VK_HOME, 0, VK_PRIOR, 0, 0, 0, 0, VK_END, 0, VK_NEXT, VK_INSERT, VK_DELETE, 0, 0, 0
 		};
 	}
 
@@ -44,6 +44,7 @@ namespace io
 			int action = keyit->second.second;
 
 			keymap[kcode] = make_pair(ktype, action);
+			maplekeys[keyit->first] = make_pair(ktype, action);
 		}
 	}
 

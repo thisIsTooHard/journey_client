@@ -32,21 +32,50 @@ namespace graphics
 
 	void textlabel::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
 	{
+		draw(text, target, parentpos);
+	}
+
+	void textlabel::draw(string txt, ID2D1HwndRenderTarget* target, vector2d parentpos)
+	{
 		vector2d absp = position + parentpos;
 
-		string temp = text;
+		string temp = txt;
 
 		if (marker)
 		{
 			temp.append("|");
 		}
 
-		D2D1_RECT_F layoutRect = D2D1::RectF(
-			static_cast<FLOAT>(absp.x()),
-			static_cast<FLOAT>(absp.y()),
-			static_cast<FLOAT>(absp.x() + (font->GetFontSize() * temp.length())),
-			static_cast<FLOAT>(absp.y() + font->GetFontSize())
-			);
+		D2D1_RECT_F layoutRect;
+		switch (font->GetTextAlignment())
+		{
+		case DWRITE_TEXT_ALIGNMENT_LEADING:
+			layoutRect = D2D1::RectF(
+				static_cast<FLOAT>(absp.x()),
+				static_cast<FLOAT>(absp.y()),
+				static_cast<FLOAT>(absp.x() + (font->GetFontSize() * temp.length())),
+				static_cast<FLOAT>(absp.y() + font->GetFontSize())
+				);
+			break;
+		case DWRITE_TEXT_ALIGNMENT_TRAILING:
+			layoutRect = D2D1::RectF(
+				static_cast<FLOAT>(absp.x() - (font->GetFontSize() * temp.length())),
+				static_cast<FLOAT>(absp.y()),
+				static_cast<FLOAT>(absp.x()),
+				static_cast<FLOAT>(absp.y() + font->GetFontSize())
+				);
+			break;
+		case DWRITE_TEXT_ALIGNMENT_CENTER:
+			layoutRect = D2D1::RectF(
+				static_cast<FLOAT>(absp.x() - static_cast<float>(font->GetFontSize() * temp.length()) / 2),
+				static_cast<FLOAT>(absp.y()),
+				static_cast<FLOAT>(absp.x() + static_cast<float>(font->GetFontSize() * temp.length()) / 2),
+				static_cast<FLOAT>(absp.y() + font->GetFontSize())
+				);
+			break;
+		default:
+			return;
+		}
 
 		wstring wide_string(temp.begin(), temp.end());
 
@@ -62,6 +91,9 @@ namespace graphics
 				break;
 			case txc_yellow:
 				target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Yellow), &brush);
+				break;;
+			case txc_brown:
+				target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Brown), &brush);
 				break;
 			}
 		}

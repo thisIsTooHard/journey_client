@@ -34,12 +34,6 @@ namespace io
 
 	class button
 	{
-	private:
-		map<string, texture> sprites;
-		vector2d position;
-		vector2d dimension;
-		string state;
-		char bttype;
 	public:
 		button(node, int, int);
 		button(texture, texture, int, int);
@@ -48,8 +42,18 @@ namespace io
 		~button() {}
 		pair<vector2d, vector2d> bounds();
 		void draw(ID2D1HwndRenderTarget*, vector2d);
-		void setstate(string);
-		string getstate();
+		void setstate(string s) { state = s; }
+		void setposition(vector2d p) { position = p; }
+		void setactive(bool a) { active = a; }
+		bool isactive() { return active; }
+		string getstate() { return state; }
+	private:
+		map<string, texture> sprites;
+		vector2d position;
+		vector2d dimension;
+		string state;
+		char bttype;
+		bool active;
 	};
 }
 

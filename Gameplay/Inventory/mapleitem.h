@@ -18,27 +18,30 @@
 #pragma once
 #include "stdfax.h"
 
+using namespace std;
+
 namespace gameplay
 {
 	class mapleitem
 	{
 	public:
-		mapleitem();
-		~mapleitem();
-		mapleitem(int, short, short, char, bool, long, long, std::string, short);
-		mapleitem(int, short, char, bool, long, long, std::string, char, short, char);
+		mapleitem() {}
+		~mapleitem() {}
+		mapleitem(int, short, short, char, bool, int64_t, int64_t, string, short);
+		mapleitem(int, short, char, bool, int64_t, int64_t, string, char, short, char);
 		int getid() { return itemid; }
+		short getcount() { return count; }
 	protected:
 		int itemid;
 		short count;
 		short pos;
 		char type;
 		bool cash;
-		long uniqueid;
-		long expire;
-		std::string owner;
+		int64_t uniqueid;
+		int64_t expire;
+		string owner;
 		short flag;
-		std::string petname;
+		string petname;
 		char petlevel;
 		short closeness;
 		char fullness;

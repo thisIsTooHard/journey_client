@@ -31,10 +31,13 @@ namespace program
 
 		result = initfactories();
 
+		nl::nx::load_all();
+
 		imgcache.init(image_factory);
 		fonts.init(dwrite_factory);
 
-		uinterface.init();
+		lookf.init();
+		uinterface.init(&imgcache);
 		uinterface.add(UI_LOGIN);
 
 		if (result == 0)
@@ -125,23 +128,19 @@ namespace program
 		if (message == WM_CREATE)
 		{
 			LPCREATESTRUCT pcs = (LPCREATESTRUCT)lParam;
-			winapp *app = (winapp *)pcs->lpCreateParams;
+			winapp* app = (winapp *)pcs->lpCreateParams;
 
 			::SetWindowLongPtrW(
 				hwnd,
 				GWLP_USERDATA,
-				PtrToUlong(app)
+				(long long)app
 				);
 
 			result = 1;
 		}
 		else
 		{
-			winapp *app = reinterpret_cast<winapp *>(static_cast<LONG_PTR>(
-				::GetWindowLongPtrW(
-				hwnd,
-				GWLP_USERDATA
-				)));
+			winapp* app = reinterpret_cast<winapp*>(::GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 
 			bool wasHandled = false;
 
@@ -166,7 +165,6 @@ namespace program
 					wasHandled = true;
 					break;
 				case WM_DESTROY:
-					//exitgame = true;
 					result = 1;
 					wasHandled = true;
 					break;
@@ -184,7 +182,7 @@ namespace program
 					switch (wParam)
 					{
 					case MK_LBUTTON:
-						app->getui()->sendmouse(12, vector2d(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+						app->getui()->sendmouse(MST_CLICKING, vector2d(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
 						break;
 					}
 					result = 0;
@@ -193,7 +191,7 @@ namespace program
 				case WM_LBUTTONUP:
 					if (wParam != MK_LBUTTON)
 					{
-						app->getui()->sendmouse(0, vector2d(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+						app->getui()->sendmouse(MST_IDLE, vector2d(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
 					}
 					result = 0;
 					wasHandled = true;

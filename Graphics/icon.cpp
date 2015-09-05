@@ -23,8 +23,6 @@ namespace graphics
 {
 	icon::icon(int itemid, bool r)
 	{
-		app.getimgcache()->setmode(ict_sys);
-
 		bool equip = itemid < 2000000;
 		string category;
 
@@ -101,7 +99,6 @@ namespace graphics
 
 			nx::unview_file("Item");
 		}
-		app.getimgcache()->unlock();
 
 		pos = vector2d();
 		raw = r;

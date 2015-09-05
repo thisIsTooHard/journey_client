@@ -62,6 +62,6 @@ namespace io
 			tag.second[2].draw(bgpos + vector2d(8 + 9 * i, 0));
 		}
 
-		content.draw(target, absp + vector2d(-13, 0));
+		content.draw(target, absp + vector2d(78, 0));
 	}
 }

@@ -36,6 +36,8 @@ namespace net
 		SERVER_REQUEST = 11,
 		SELECT_CHAR = 19,
 		PLAYER_LOGIN = 20,
+		CHECK_CHARNAME = 21,
+		CREATE_CHAR = 22,
 		DELETE_CHAR = 23,
 		PONG = 24,
 		CHANGEMAP = 38,
@@ -47,7 +49,7 @@ namespace net
 	class packetcreator
 	{
 	private:
-		session* server;
+		unique_ptr<session> server;
 	public:
 		packetcreator() {}
 		~packetcreator() {}
@@ -60,6 +62,8 @@ namespace net
 		void deletechar(string, int);
 		void selectchar(int);
 		void playerlogin(int);
+		void checkcharname(string);
+		void createchar(string, int, int, int, int, int, int, int, int, int, bool);
 		void moveplayer(movep_info);
 		void changemap(bool, int, string, bool);
 		void close_attack(attackinfo);

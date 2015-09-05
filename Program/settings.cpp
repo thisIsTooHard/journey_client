@@ -27,37 +27,59 @@ namespace program
 		sfxvolume = 50;
 		saveacc = false;
 		defaultacc = "";
+		defaultworld = 0;
+		defaultchannel = 0;
+		defaultchar = 0;
+		equipsinvpos = vector2d(100, 200);
+		statsinfopos = vector2d(250, 300);
+		inventorypos = vector2d(150, 250);
+		questinfopos = vector2d(350, 150);
 
-		std::ifstream config;
-		std::string line;
+		ifstream config;
+		string line;
 		config.open("Settings");
 		if (config.is_open()) {
-			while (std::getline(config, line))
+			while (getline(config, line))
 			{
 				switch (line[0])
 				{
 				case '0':
-					fullscreen = std::stoi(line.substr(1)) == 1;
+					fullscreen = stoi(line.substr(1)) == 1;
 					break;
 				case '1':
-					bgmvolume = std::stoi(line.substr(1));
+					bgmvolume = stoi(line.substr(1));
 					if (bgmvolume > 100)
 						bgmvolume = 100;
 					else if (bgmvolume < 0)
 						bgmvolume = 0;
 					break;
 				case '2':
-					sfxvolume = std::stoi(line.substr(1));
+					sfxvolume = stoi(line.substr(1));
 					if (sfxvolume > 100)
 						sfxvolume = 100;
 					else if (sfxvolume < 0)
 						sfxvolume = 0;
 					break;
 				case '3':
-					saveacc = std::stoi(line.substr(1)) == 1;
+					saveacc = stoi(line.substr(1)) == 1;
 					break;
 				case '4':
 					defaultacc = line.substr(1);
+					break;
+				case '5':
+					defaultworld = stoi(line.substr(1));
+					break;
+				case '6':
+					defaultchannel = stoi(line.substr(1));
+					break;
+				case '7':
+					defaultchar = stoi(line.substr(1));
+					break;
+				case '8':
+					statsinfopos = vector2d(stoi(line.substr(1)), statsinfopos.y());
+					break;
+				case '9':
+					statsinfopos = vector2d(statsinfopos.x(), stoi(line.substr(1)));
 					break;
 				}
 			}
@@ -65,22 +87,8 @@ namespace program
 		config.close();
 	}
 
-	settings::~settings()
-	{
-	}
-
-	void settings::save(char no, std::string param)
+	void settings::save(char no, string param)
 	{
 
-	}
-
-	bool settings::accsaved()
-	{
-		return saveacc;
-	}
-
-	std::string settings::getdefaultacc()
-	{
-		return defaultacc;
 	}
 }

@@ -28,16 +28,16 @@ namespace gameplay
 		char id;
 		char flag;
 		char channels;
-		char* chloads;
+		vector<char> chloads;
 		string name;
 		string eventmsg;
 	public:
-		world();
-		~world();
-		world(char, string, char, string, char, char*);
+		world() {}
+		~world() {}
+		world(char, string, char, string, char, vector<char>);
 		char getid();
 		char getchannels();
-		char* getchloads();
+		vector<char> getchloads();
 	};
 }
 

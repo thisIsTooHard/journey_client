@@ -19,6 +19,7 @@
 #include "ui.h"
 #include "imagecache.h"
 #include "fontcache.h"
+#include "audiomanager.h"
 #include "lookfactory.h"
 #include <d2d1.h>
 #include <d2d1helper.h>
@@ -41,6 +42,7 @@ namespace program
 		fontcache* getfonts() { return &fonts; }
 		imagecache* getimgcache() { return &imgcache; }
 		lookfactory* getlookfactory() { return &lookf; }
+		audiomanager* getaudio() { return &audio; }
 	private:
 		long initfactories();
 		void draw();
@@ -49,6 +51,7 @@ namespace program
 		fontcache fonts;
 		lookfactory lookf;
 		imagecache imgcache;
+		audiomanager audio;
 		HWND window;
 		ID2D1Factory* d2d_factory;
 		IWICImagingFactory* image_factory;

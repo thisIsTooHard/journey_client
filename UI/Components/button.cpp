@@ -28,6 +28,7 @@ namespace io
 		position = vector2d(x, y);
 		state = "normal";
 		bttype = BTT_REGULAR;
+		active = true;
 	}
 	
 	button::button(texture s1, texture s2, int x, int y)
@@ -37,6 +38,7 @@ namespace io
 		position = vector2d(x, y);
 		state = "normal";
 		bttype = BTT_ONESPRITE;
+		active = true;
 	}
 
 	button::button(int x, int y, int w, int h)
@@ -45,45 +47,43 @@ namespace io
 		dimension = vector2d(w, h);
 		state = "normal";
 		bttype = BTT_AREA;
+		active = true;
 	}
 
-	std::pair<vector2d, vector2d> button::bounds()
+	pair<vector2d, vector2d> button::bounds()
 	{
 		if (bttype == BTT_AREA)
-			return std::pair<vector2d, vector2d>(position, dimension);
+		{
+			return pair<vector2d, vector2d>(position, dimension);
+		}
 		else
-			return std::pair<vector2d, vector2d>(position - sprites["normal"].getorigin(), (sprites["normal"].getdimension()));
+		{
+			return pair<vector2d, vector2d>(position - sprites["normal"].getorigin(), (sprites["normal"].getdimension()));
+		}
 	}
 
 	void button::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
 	{
-		vector2d absp = position + parentpos;
-
-		if (bttype == BTT_ONESPRITE)
+		if (active)
 		{
-			if (state == "normal")
+			vector2d absp = position + parentpos;
+
+			if (bttype == BTT_ONESPRITE)
 			{
-				sprites["normal"].draw(absp);
+				if (state == "normal")
+				{
+					sprites["normal"].draw(absp);
+				}
+				else if (state == "pressed" || state == "mouseOver")
+				{
+					sprites["normal"].draw(absp);
+					sprites["select"].draw(absp);
+				}
 			}
-			else if (state == "pressed" || state == "mouseOver")
+			else if (bttype == BTT_REGULAR)
 			{
-				sprites["normal"].draw(absp);
-				sprites["select"].draw(absp);
+				sprites[state].draw(absp);
 			}
 		}
-		else if (bttype == BTT_REGULAR)
-		{
-			sprites[state].draw(absp);
-		}
-	}
-
-	std::string button::getstate()
-	{
-		return state;
-	}
-
-	void button::setstate(std::string st)
-	{
-		state = st;
 	}
 }

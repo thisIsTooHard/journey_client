@@ -29,14 +29,27 @@ namespace graphics
 
 	texture::texture(node src)
 	{
+		node originnode = src["origin"];
+		if (originnode.data_type() == nl::node::type::vector)
+		{
+			origin = vector2d(originnode.x(), originnode.y());
+		}
+		else
+		{
+			origin = vector2d();
+		}
+
+		if (src["source"].istype(stringnode))
+		{
+			string link = src["source"].get_string();
+			string file = link.substr(0, link.find('/'));
+			link = link.substr(link.find('/') + 1);
+			src = nx::nodes[file].resolve(link);
+		}
+
 		bitmap bmp = src.get_bitmap();
 		source = app.getimgcache()->createimage(bmp);
 		dimension = vector2d(bmp.width(), bmp.height());
-		node originnode = src["origin"];
-		if (originnode.data_type() == nl::node::type::vector)
-			origin = vector2d(originnode.x(), originnode.y());
-		else
-			origin = vector2d();
 	}
 
 	void texture::draw(vector2d position)

@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-
 #include "Journey.h"
 
 HANDLE gTimerStopEvent;
@@ -107,6 +106,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 			CoUninitialize();
 		}
+
+		server.close();
 	}
 	else
 	{

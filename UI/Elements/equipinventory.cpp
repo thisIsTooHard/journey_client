@@ -41,6 +41,8 @@ namespace io
 
 		invent = inv;
 
+		app.getimgcache()->setmode(ict_sys);
+
 		for (short i = 0; i < 14; i++)
 		{
 			mapleequip* todraw = invent->getequip(i);
@@ -51,7 +53,6 @@ namespace io
 			}
 		}
 
-		app.getimgcache()->setmode(ict_sys);
 		nl::nx::view_file("UI");
 
 		node source = nl::nx::nodes["UI"].resolve("UIWindow2.img/Equip/character");
@@ -75,7 +76,6 @@ namespace io
 		position = vector2d(0, 0);
 		dimensions = vector2d(184, 290);
 		active = true;
-		visible = true;
 		showpet = false;
 	}
 
@@ -87,10 +87,10 @@ namespace io
 
 	void equipinventory::draw(ID2D1HwndRenderTarget* target)
 	{
+		uielement::draw(target);
+
 		if (active)
 		{
-			uielement::draw(target);
-
 			for (map<short, icon>::iterator eqit = equips.begin(); eqit != equips.end(); ++eqit)
 			{
 				eqit->second.draw(position + iconpositions[eqit->first], 1.0f);

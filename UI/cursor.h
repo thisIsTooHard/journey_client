@@ -43,20 +43,20 @@ namespace io
 
 	class cursor
 	{
+	public:
+		cursor();
+		~cursor() {}
+		void init(imagecache*);
+		void draw(ID2D1HwndRenderTarget*);
+		void setstate(mousestate s) { state = s; }
+		void update() { sprites[state].update(); }
+		void setposition(vector2d p) { position = p; }
+		mousestate getstate() { return state; }
+		vector2d getposition() { return position; }
 	private:
 		mousestate state;
 		map<mousestate, animation> sprites;
 		vector2d position;
-	public:
-		cursor();
-		~cursor();
-		void init();
-		void update(vector2d);
-		void update();
-		void draw(ID2D1HwndRenderTarget*);
-		char getstate();
-		vector2d getposition();
-		void setstate(char);
 	};
 }
 

@@ -19,11 +19,6 @@
 
 namespace net
 {
-	packet::packet()
-	{
-		opcode = 0;
-	}
-
 	packet::packet(short opc)
 	{
 		writesh(opc);
@@ -38,47 +33,46 @@ namespace net
 		opcode = readshort();
 	}
 
-	packet::~packet() {}
-
 	template<class T>
-	T packet::readbytes(int size)
+	T packet::readbytes()
 	{
+		char size = sizeof(T) / sizeof(char);
 		if (bytes.size() < size)
 			throw new runtime_error("packet error: stack underflow");
-		long all = 0;
-		for (int i = 0; i < size; i++)
+
+		size_t all = 0;
+		for (char i = 0; i < size; i++)
 		{
-			int num = ((byte) bytes.back()) * pow(256, i);
+			all += static_cast<byte>(bytes.back()) * pow(256, i);
 			bytes.pop_back();
-			all = all + num;
 		}
-		auto ret = all;
-		return ret;
+
+		return static_cast<T>(all);
 	}
 
 	char packet::readbyte()
 	{
-		return readbytes<char>(1);
+		return readbytes<char>();
 	}
 
 	bool packet::readbool()
 	{
-		return readbytes<char>(1) == 1;
+		return readbytes<char>() == 1;
 	}
 
 	short packet::readshort()
 	{
-		return readbytes<short>(2);
+		return readbytes<short>();
 	}
 
 	int packet::readint()
 	{
-		return readbytes<int>(4);
+		return readbytes<int>();
 	}
 
-	long packet::readlong()
+	int64_t packet::readlong()
 	{
-		return readbytes<long>(8);
+		return readbytes<int64_t>();
 	}
 
 	string packet::readascii()
@@ -125,8 +119,8 @@ namespace net
 
 	vector2d packet::readpoint()
 	{
-		short x = readbytes<short>(2);
-		short y = readbytes<short>(2);
+		short x = readbytes<short>();
+		short y = readbytes<short>();
 		return vector2d(x, y);
 	}
 
@@ -147,7 +141,7 @@ namespace net
 		return opcode;
 	}
 
-	void packet::writebytes(char* recv, int length)
+	void packet::writebytes(const char* recv, int length)
 	{
 		for (int i = length - 1; i >= 0; i--)
 		{
@@ -155,9 +149,18 @@ namespace net
 		}
 	}
 
+	void packet::writelg(int64_t lg)
+	{
+		for (char i = 0; i < 4; i++)
+		{
+			bytes.push_back(static_cast<char>(lg));
+			lg = lg >> 8;
+		}
+	}
+
 	void packet::writeint(int integer)
 	{
-		for (int i = 0; i < 4; i++)
+		for (char i = 0; i < 4; i++)
 		{
 			bytes.push_back(static_cast<char>(integer));
 			integer = integer >> 8;
@@ -166,7 +169,7 @@ namespace net
 
 	void packet::writesh(short sh)
 	{
-		for (int i = 0; i < 2; i++)
+		for (char i = 0; i < 2; i++)
 		{
 			bytes.push_back(static_cast<char>(sh));
 			sh = sh >> 8;

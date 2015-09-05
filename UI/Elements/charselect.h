@@ -19,6 +19,7 @@
 #include "uielement.h"
 #include "charset.h"
 #include "maplechar.h"
+#include "nametag.h"
 
 using namespace gameplay;
 
@@ -26,19 +27,24 @@ namespace io
 {
 	class charselect : public uielement
 	{
-	private:
-		vector<maplestats*> stats;
-		vector<maplelook> looks;
-		vector<nametag> nametags;
-		charset lvset;
-		charset statset;
-		char selected;
 	public:
 		charselect(char, vector<maplechar>*);
 		~charselect() {}
 		void draw(ID2D1HwndRenderTarget*);
 		void update();
 		void buttonpressed(short);
+	private:
+		vector<maplestats> stats;
+		vector<maplelook> looks;
+		vector<nametag> nametags;
+		vector<pair<pair<int, char>, pair<int, char>>> rankinfo;
+		textlabel name;
+		textlabel job;
+		map<char, texture> rankmove;
+		charset lvset;
+		charset statset;
+		char page;
+		char selected;
 	};
 }
 

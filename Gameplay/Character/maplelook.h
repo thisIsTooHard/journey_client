@@ -16,72 +16,24 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "stdfax.h"
-#include "texture.h"
+#include "facetype.h"
+#include "bodytype.h"
+#include "hairstyle.h"
+#include "clothing.h"
 
-using namespace graphics;
-using namespace std;
-using namespace util;
+using namespace character;
 
 namespace gameplay
 {
-	enum charlayers : char
+	struct bodyaction
 	{
-		CL_BASE,
-		CL_HAIRBBODY,
-		CL_CAPE,
-		CL_BODY,
-		CL_SHOES,
-		CL_PANTS,
-		CL_TOP,
-		CL_MAIL,
-		CL_ARM,
-		CL_MAILARM,
-		CL_LHAND,
-		CL_GLOVE,
-		CL_HAIR,
-		CL_EARRINGS,
-		CL_ARMOHAIR,
-		CL_HEAD,
-		CL_FACE,
-		CL_HAIRSHADE,
-		CL_FACEACC,
-		CL_EYEACC,
-		CL_HAIROHEAD,
-		CL_HAT,
-		CL_SHIELD,
-		CL_WEAPON,
-		CL_RHAND,
-		CL_WEAPONOHAND,
-		CL_RGLOVE,
-		CL_WEAPONOGLOVE,
-		CL_HANDOWEP
+		string state;
+		char frame;
+		short delay;
 	};
 
-	struct charsprites
+	struct lookinfo
 	{
-		map<string, map<char, map<charlayers, texture>>> textures;
-
-		void insert (charsprites& cs)
-		{
-			for (map<string, map<char, map<charlayers, texture>>>::iterator insit = textures.begin(); insit != textures.end(); insit++)
-			{
-				string state = insit->first;
-				for (map<char, map<charlayers, texture>>::iterator insit_b = insit->second.begin(); insit_b != insit->second.end(); insit_b++)
-				{
-					char frame = insit_b->first;
-					textures[state][frame].insert(cs.textures[state][frame].begin(), cs.textures[state][frame].end());
-				}
-			}
-		}
-	};
-
-	typedef struct charsprites charsprites;
-
-	class maplelook
-	{
-	public:
-		bool twohweapon;
 		bool female;
 		char skin;
 		int faceid;
@@ -89,32 +41,52 @@ namespace gameplay
 		map<char, int> equips;
 		map<char, int> maskedequips;
 		vector<int> petids;
+	};
+
+	class maplelook
+	{
+	public:
 		maplelook() {}
 		~maplelook() {}
-		maplelook(bool, char, int, int, map<char, int>, map<char, int>, vector<int>);
-		string getstate();
-		void addsprites(charsprites, map<string, map<char, short>>, map<string, map<char, short>>, map<string, map<char, pair<string, char>>>, map<string, map<char, map<charlayers, map<string, vector2d>>>>);
+		maplelook(lookinfo);
+		void init(map<string, map<char, short>>, map<string, map<char, bodyaction>>, map<string, map<char, map<charlayer, map<string, vector2d>>>>);
 		void draw(ID2D1HwndRenderTarget*, vector2d);
 		bool update();
-		void setposition(vector2d);
-		void setfleft(bool);
 		void setstate(string);
-		void setexpression(char);
+		void setactions(vector<string>);
+		void setposition(vector2d p) { position = p; }
+		void setfleft(bool f) { faceleft = f; }
+		void addcloth(clothing c) { clothes[c.gettype()] = c; }
+		void removecloth(string s) { clothes.erase(s); }
+		void setface(facetype f) { face = f; }
+		void sethair(hairstyle h) { hair = h; }
+		void setbody(bodytype b) { body = b; }
+		void setexpression(char c) { face.setexp(c); }
+		bool isloaded() { return loaded; }
+		string getstate() { return state; }
+		lookinfo* getinfo() { return &info; }
+		bodytype* getbody() { return &body; }
+		facetype* getface() { return &face; }
+		hairstyle* gethair() { return &hair; }
+		clothing* getcloth(string s) { return &clothes[s]; }
 	private:
-		map<string, map<char, short>> bodydelays;
-		map<string, map<char, short>> facedelays;
-		map<string, map<char, pair<string, char>>> bodyactions;
-		map<string, map<char, map<charlayers, map<string, vector2d>>>> bodyheadmap;
-		charsprites sprites;
+		map<string, map<char, short>> delays;
+		map<string, map<char, bodyaction>> bodyactions;
+		map<string, map<char, map<charlayer, map<string, vector2d>>>> bodyheadmap;
+		lookinfo info;
+		bodytype body;
+		facetype face;
+		hairstyle hair;
+		map<string, clothing> clothes;
+		bool loaded;
+		bool faceleft;
 		vector2d position;
-		string expression;
+		vector<string> actions;
+		string action;
 		string state;
 		char frame;
-		char faceframe;
+		char actionframe;
 		short elapsed;
-		short elapsedf;
-		bool faceleft;
-		float scalex;
 	};
 }
 

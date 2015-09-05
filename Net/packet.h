@@ -30,17 +30,17 @@ namespace net
 		vector<char> bytes;
 		short opcode;
 	public:
-		packet();
+		packet() {}
+		~packet() {}
 		packet(short);
 		packet(char*, int);
-		~packet();
 		template <class T>
-		T readbytes(int);
+		T readbytes();
 		char readbyte();
 		bool readbool();
 		short readshort();
 		int readint();
-		long readlong();
+		int64_t readlong();
 		string readascii();
 		string readntascii();
 		string readpadascii(char);
@@ -48,12 +48,12 @@ namespace net
 		char* getbytes();
 		int length();
 		short getopc();
-		void writebytes(char*, int);
+		void writebytes(const char*, int);
 		void writebl(bool);
 		void writech(char);
 		void writesh(short);
 		void writeint(int);
-		void writelg(long);
+		void writelg(int64_t);
 		void writestr(string);
 
 		template <class T>

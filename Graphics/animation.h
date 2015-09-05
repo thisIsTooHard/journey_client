@@ -34,6 +34,7 @@ namespace graphics
 		void draw(ID2D1HwndRenderTarget*, vector2d, float);
 		bool update() { return update(DPF); }
 		bool update(short);
+		bool isloaded() { return textures[0].isloaded(); }
 		void setframe(byte);
 		vector2d getdimension(byte);
 	protected:

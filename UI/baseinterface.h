@@ -18,6 +18,7 @@
 #pragma once
 #include "uielement.h"
 #include "charset.h"
+#include "nametag.h"
 
 namespace io
 {

@@ -24,9 +24,6 @@ namespace gameplay
 {
 	class maplechar
 	{
-	private:
-		maplestats stats;
-		maplelook look;
 	public:
 		maplechar() {}
 		~maplechar() {}
@@ -35,6 +32,14 @@ namespace gameplay
 		maplestats* getstats();
 		maplestats copystats();
 		maplelook copylook();
+		void setrankinfo(int r, char rm, int jr, char jrm) { rank = make_pair(r, rm); jobrank = make_pair(jr, jrm); }
+		pair<int, char> getrank() { return rank; }
+		pair<int, char> getjobrank() { return jobrank; }
+	private:
+		maplestats stats;
+		maplelook look;
+		pair<int, char> rank;
+		pair<int, char> jobrank;
 	};
 }
 

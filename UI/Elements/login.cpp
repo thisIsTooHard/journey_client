@@ -74,19 +74,21 @@ namespace io
 		position = vector2d(0, 0);
 		dimensions = vector2d(800, 600);
 		active = true;
-		visible = true;
 	}
 
 	void login::draw(ID2D1HwndRenderTarget* target)
 	{
 		uielement::draw(target);
 
-		saveidcheck.setframe((saveid) ? 0 : 1);
-		saveidcheck.draw(target, position);
-
-		for (std::map<short, textfield>::iterator ittxt = textfields.begin(); ittxt != textfields.end(); ittxt++)
+		if (active)
 		{
-			ittxt->second.draw(target, position);
+			saveidcheck.setframe((saveid) ? 0 : 1);
+			saveidcheck.draw(target, position);
+
+			for (std::map<short, textfield>::iterator ittxt = textfields.begin(); ittxt != textfields.end(); ittxt++)
+			{
+				ittxt->second.draw(target, position);
+			}
 		}
 	}
 
@@ -94,9 +96,12 @@ namespace io
 	{
 		uielement::update();
 
-		for (std::map<short, textfield>::iterator ittxt = textfields.begin(); ittxt != textfields.end(); ittxt++)
+		if (active)
 		{
-			ittxt->second.update();
+			for (std::map<short, textfield>::iterator ittxt = textfields.begin(); ittxt != textfields.end(); ittxt++)
+			{
+				ittxt->second.update();
+			}
 		}
 	}
 

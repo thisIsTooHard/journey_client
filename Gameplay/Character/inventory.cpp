@@ -15,7 +15,9 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
+#pragma once
 #include "inventory.h"
+#include "gameconstants.h"
 
 namespace gameplay
 {
@@ -52,30 +54,78 @@ namespace gameplay
 		ReleaseSRWLockShared(&itemlock);
 	}
 
-	void inventory::removeitem(char type, short slot)
+	void inventory::removeitem(inventorytype type, short slot)
 	{
 		AcquireSRWLockExclusive(&itemlock);
 		switch (type)
 		{
-		case IT_EQUIPS:
+		case ivt_equips:
 			equipped.erase(slot);
 			break;
-		case IT_EQUIP:
+		case ivt_equip:
 			equips.erase(slot);
 			break;
-		case IT_USE:
+		case ivt_use:
 			useitems.erase(slot);
 			break;
-		case IT_SETUP:
+		case ivt_setup:
 			setupitems.erase(slot);
 			break;
-		case IT_ETC:
+		case ivt_etc:
 			etcitems.erase(slot);
 			break;
-		case IT_CASH:
+		case ivt_cash:
 			cashitems.erase(slot);
 			break;
 		}
 		ReleaseSRWLockExclusive(&itemlock);
+	}
+
+	short inventory::countitem(int id)
+	{
+		short ret = 1;
+
+		inventorytype type = util::getinvtype(id);
+		switch (type)
+		{
+		case ivt_use:
+			for (map<char, mapleitem>::iterator ivit = useitems.begin(); ivit != useitems.end(); ++ivit)
+			{
+				if (ivit->second.getid() == id)
+				{
+					ret += ivit->second.getcount();
+				}
+			}
+			break;
+		case ivt_setup:
+			for (map<char, mapleitem>::iterator ivit = setupitems.begin(); ivit != setupitems.end(); ++ivit)
+			{
+				if (ivit->second.getid() == id)
+				{
+					ret += ivit->second.getcount();
+				}
+			}
+			break;
+		case ivt_etc:
+			for (map<char, mapleitem>::iterator ivit = etcitems.begin(); ivit != etcitems.end(); ++ivit)
+			{
+				if (ivit->second.getid() == id)
+				{
+					ret += ivit->second.getcount();
+				}
+			}
+			break;
+		case ivt_cash:
+			for (map<char, mapleitem>::iterator ivit = cashitems.begin(); ivit != cashitems.end(); ++ivit)
+			{
+				if (ivit->second.getid() == id)
+				{
+					ret += ivit->second.getcount();
+				}
+			}
+			break;
+		}
+
+		return ret;
 	}
 }

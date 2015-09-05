@@ -18,8 +18,12 @@
 #pragma once
 #include "stdfax.h"
 
+using namespace std;
+
 namespace net
 {
+	const char jrkey[13] = { 33, 101, 54, 27, 11, 7, 78, 62, 119, 120, 47, 85, 93 };
+
 	class crypto
 	{
 	private:
@@ -27,14 +31,13 @@ namespace net
 		char* sendIv;
 		char version;
 		char localisation;
-		char* jrkey;
 	public:
-		crypto();
+		crypto() {}
+		~crypto() {}
 		crypto(char, char*, char*, char);
-		~crypto();
+		void clear();
 		char* sendencrypt(char*, int);
-		char* recvdecrypt(char*, int);
-		char* updateiv(char*);
+		void updateiv();
 	};
 }
 

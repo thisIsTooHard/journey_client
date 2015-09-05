@@ -65,7 +65,6 @@ namespace io
 		position = vector2d(512, 590);
 		dimensions = vector2d(1366, 80);
 		active = true;
-		visible = true;
 		stats = pstats;
 	}
 
@@ -73,16 +72,19 @@ namespace io
 	{
 		uielement::draw(target);
 
-		exp.draw(target, position, stats->getexp(), stats->getexpneeded());
-		hp.draw(target, position, stats->getstat(HP), stats->getstat(MAXHP));
-		mp.draw(target, position, stats->getstat(MP), stats->getstat(MAXMP));
+		if (active)
+		{
+			exp.draw(target, position, stats->getexp(), stats->getexpneeded());
+			hp.draw(target, position, stats->getstat(HP), stats->getstat(MAXHP));
+			mp.draw(target, position, stats->getstat(MP), stats->getstat(MAXMP));
 
-		string exppercent = to_string(((double)stats->getexp()) / (((double)stats->getexpneeded())) * 100);
-		statset.draw(to_string(stats->getexp()) + "[" + exppercent.substr(0, exppercent.find('.') + 3) + "%]", cha_right, position + vector2d(47, -13));
-		statset.draw("[" + to_string(stats->getstat(HP)) + "/" + to_string(stats->getstat(MAXHP)) + "]", cha_right, position + vector2d(-124, -29));
-		statset.draw("[" + to_string(stats->getstat(MP)) + "/" + to_string(stats->getstat(MAXMP)) + "]", cha_right, position + vector2d(47, -29));
+			string exppercent = to_string(((double)stats->getexp()) / (((double)stats->getexpneeded())) * 100);
+			statset.draw(to_string(stats->getexp()) + "[" + exppercent.substr(0, exppercent.find('.') + 3) + "%]", cha_right, position + vector2d(47, -13));
+			statset.draw("[" + to_string(stats->getstat(HP)) + "/" + to_string(stats->getstat(MAXHP)) + "]", cha_right, position + vector2d(-124, -29));
+			statset.draw("[" + to_string(stats->getstat(MP)) + "/" + to_string(stats->getstat(MAXMP)) + "]", cha_right, position + vector2d(47, -29));
 
-		lvset.draw(to_string(stats->getstat(LEVEL)), cha_left, position + vector2d(-495, -25));
+			lvset.draw(to_string(stats->getstat(LEVEL)), cha_left, position + vector2d(-495, -25));
+		}
 	}
 
 	void statusbar::update()
@@ -94,10 +96,17 @@ namespace io
 	{
 		switch (id)
 		{
-		case BT_MENU:
-			quit();
+		case BT_SYSOP:
+			app.getui()->add(UI_SYSTEM);
+			break;
+		case BT_STATS:
+			app.getui()->add(UI_STATSINFO);
+			break;
+		case BT_EQUIPS:
+			app.getui()->add(UI_EQUIPS);
 			break;
 		}
+		buttons[id].setstate("mouseOver");
 	}
 
 	pair<vector2d, vector2d> statusbar::bounds()

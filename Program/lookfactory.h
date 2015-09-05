@@ -16,10 +16,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "stdfax.h"
 #include "maplelook.h"
 
-using namespace std;
 using namespace gameplay;
 
 namespace program
@@ -29,22 +27,21 @@ namespace program
 	public:
 		lookfactory() {}
 		~lookfactory() {}
+		void init();
 		void loadcharlook(maplelook*);
+		bodytype getbody(char);
+		hairstyle gethair(int);
+		facetype getface(int);
+		clothing getcloth(int);
 	private:
 		void initbodyinfo();
-		void initfaceinfo();
-		void addbodytype(char);
-		void addhairstyle(int);
-		void addface(int);
-		void addclothes(int);
-		map<char, charsprites> bodytypes;
-		map<int, charsprites> faces;
-		map<int, charsprites> hairstyles;
-		map<int, charsprites> clothes;
-		map<string, map<char, short>> facedelays;
+		map<int, facetype> faces;
+		map<char, bodytype> bodytypes;
+		map<int, hairstyle> hairstyles;
+		map<int, clothing> clothes;
 		map<string, map<char, short>> bodydelays;
-		map<string, map<char, pair<string, char>>> bodyactions;
-		map<string, map<char, map<charlayers, map<string, vector2d>>>> bodyheadmap;
+		map<string, map<char, bodyaction>> bodyactions;
+		map<string, map<char, map<charlayer, map<string, vector2d>>>> bodyheadmap;
 	};
 }
 

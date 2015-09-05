@@ -41,7 +41,10 @@ namespace io
 
 		if (content.gettext() == "" && state == "inactive")
 		{
-			bg.draw(absp + bgposition);
+			if (bg.isloaded())
+			{
+				bg.draw(absp + bgposition);
+			}
 		}
 		else
 		{
@@ -86,21 +89,25 @@ namespace io
 	{
 		if (letter == 0 && markpos > 0)
 		{
-			markpos--;
-			content.settext(content.gettext().erase(markpos, 1));
+			markpos--; 
+			string text = content.gettext();
+			text.pop_back();
+			content.settext(text);
 		}
 		else if (letter > 2 && content.gettext().length() < maxlength)
 		{
-			content.settext(content.gettext().insert(markpos, &letter));
+			string text = content.gettext();
+			text.push_back(letter);
+			content.settext(text);
 			markpos++;
 		}
 		else if (letter == 1 && markpos > 0)
 		{
-			markpos -= 1;
+			//markpos -= 1;
 		}
 		else if (letter == 2 && markpos < content.gettext().length())
 		{
-			markpos += 1;
+			//markpos += 1;
 		}
 	}
 }

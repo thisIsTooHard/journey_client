@@ -56,7 +56,6 @@ namespace io
 		position = vector2d();
 		dimensions = vector2d();
 		active = true;
-		visible = true;
 		dmglock = SRWLOCK_INIT;
 	}
 
@@ -80,56 +79,59 @@ namespace io
 
 	void baseinterface::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
 	{
-		if (TryAcquireSRWLockShared(&dmglock))
+		if (active)
 		{
-			for (vector<dmgeffect>::iterator dmgit = dmgeffects.begin(); dmgit != dmgeffects.end(); ++dmgit)
+			if (TryAcquireSRWLockShared(&dmglock))
 			{
-				char numv = dmgit->visible;
-				dmgit->position = vector2d(dmgit->position.x(), static_cast<int>(dmgit->fy));
+				for (vector<dmgeffect>::iterator dmgit = dmgeffects.begin(); dmgit != dmgeffects.end(); ++dmgit)
+				{
+					char numv = dmgit->visible;
+					dmgit->position = vector2d(dmgit->position.x(), static_cast<int>(dmgit->fy));
 
-				if (dmgit->toplayer)
-				{
-					for (char i = 0; i < numv; i++)
-					{
-						playerdmgset.draw(to_string(dmgit->numbers[i]), 22, cha_center, dmgit->position + vector2d(0, 30 * i) + viewpos, dmgit->alpha);
-					}
-				}
-				else
-				{
-					if (dmgit->crit)
+					if (dmgit->toplayer)
 					{
 						for (char i = 0; i < numv; i++)
 						{
-							critset.draw(to_string(dmgit->numbers[i]), 24, cha_center, dmgit->position + vector2d(0, 30 * i) + viewpos, dmgit->alpha);
+							playerdmgset.draw(to_string(dmgit->numbers[i]), 22, cha_center, dmgit->position + vector2d(0, 30 * i) + viewpos, dmgit->alpha);
 						}
 					}
 					else
 					{
-						for (char i = 0; i < numv; i++)
+						if (dmgit->crit)
 						{
-							dmgset.draw(to_string(dmgit->numbers[i]), 22, cha_center, dmgit->position + vector2d(0, 30 * i) + viewpos, dmgit->alpha);
+							for (char i = 0; i < numv; i++)
+							{
+								critset.draw(to_string(dmgit->numbers[i]), 24, cha_center, dmgit->position + vector2d(0, 30 * i) + viewpos, dmgit->alpha);
+							}
+						}
+						else
+						{
+							for (char i = 0; i < numv; i++)
+							{
+								dmgset.draw(to_string(dmgit->numbers[i]), 22, cha_center, dmgit->position + vector2d(0, 30 * i) + viewpos, dmgit->alpha);
+							}
 						}
 					}
 				}
+				ReleaseSRWLockShared(&dmglock);
 			}
-			ReleaseSRWLockShared(&dmglock);
-		}
 
-		vector2d infotop = vector2d(375, 510 - (statusinfos.size() * 16));
-		for (char i = 0; i < statusinfos.size(); i++)
-		{
-			statusinfo sfit = statusinfos[i];
-			if (sfit.white)
+			vector2d infotop = vector2d(790, 510 - (static_cast<int>(statusinfos.size()) * 16));
+			for (char i = 0; i < statusinfos.size(); i++)
 			{
-				infotextw.settext(sfit.text);
-				infotextw.setalpha(sfit.alpha);
-				infotextw.draw(target, infotop + vector2d(0, 16 * i));
-			}
-			else
-			{
-				infotexty.settext(sfit.text);
-				infotexty.setalpha(sfit.alpha);
-				infotexty.draw(target, infotop + vector2d(0, 16 * i));
+				statusinfo sfit = statusinfos[i];
+				if (sfit.white)
+				{
+					infotextw.settext(sfit.text);
+					infotextw.setalpha(sfit.alpha);
+					infotextw.draw(target, infotop + vector2d(0, 16 * i));
+				}
+				else
+				{
+					infotexty.settext(sfit.text);
+					infotexty.setalpha(sfit.alpha);
+					infotexty.draw(target, infotop + vector2d(0, 16 * i));
+				}
 			}
 		}
 	}
@@ -148,7 +150,8 @@ namespace io
 				{
 					dmgit->alpha = static_cast<float>((dmgit->position.y() - dmgit->destination.y())) / (30 * dmgit->numbers.size() - 15);
 				}
-				dmgit->visible = max(dmgit->numbers.size() - (dmgit->position.y() - dmgit->destination.y()) / 30, 1);
+				dmgit->visible = max(dmgit->numbers.size() - (dmgit->destination.y() - dmgit->position.y()) / 30, 1);
+				dmgit->visible = min(dmgit->visible, dmgit->numbers.size());
 
 				if (dmgit->position.y() <= dmgit->destination.y())
 				{

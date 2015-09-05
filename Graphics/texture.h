@@ -39,6 +39,8 @@ namespace graphics
 		void draw(vector2d, vector2d);
 		void draw(vector2d, vector2d, float);
 		void shift(vector2d);
+		void setorigin(vector2d v) { origin = v; }
+		bool isloaded() { return dimension != vector2d(); }
 		vector2d getdimension() { return dimension; }
 		vector2d getorigin() { return origin; }
 	private:

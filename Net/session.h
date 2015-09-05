@@ -49,7 +49,7 @@ namespace net
 		session() {}
 		~session() {}
 		int init();
-		int init(const char*, const char*);
+		int init(const char*, const char*, bool);
 		int reconnect(char*, short);
 		int dispatch(packet);
 		int receive();

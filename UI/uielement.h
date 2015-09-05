@@ -17,11 +17,11 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "stdfax.h"
+#include "cursor.h"
 #include "button.h"
 #include "textfield.h"
+#include "dragicon.h"
 #include "collision.h"
-#include "maplelook.h"
-#include "nametag.h"
 #include "sprite.h"
 
 using namespace std;
@@ -37,8 +37,12 @@ namespace io
 		UI_WORLDSELECT,
 		UI_CHARSEL,
 		UI_CHARDELCONFIRM,
+		UI_CREATECHAR,
 		UI_BASEINTERFACE,
 		UI_STATUSBAR,
+		UI_SYSTEM,
+		UI_KEYCONFIG,
+		UI_STATSINFO,
 		UI_QUESTS,
 		UI_INVENTORY,
 		UI_EQUIPS
@@ -46,74 +50,149 @@ namespace io
 
 	enum buttonid : short
 	{
-		BT_LOGIN = 0,
-		BT_NEW = 1,
-		BT_HOMEPAGE = 2,
-		BT_PWDLOST = 3,
-		BT_QUIT = 4,
-		BT_LOGINBANOK = 5,
-		BT_LOGINNOTICEOK = 6,
-		BT_LOGINLOST = 7,
-		BT_SAVEID = 8,
-		BT_WORLDSEL0 = 9,
-		BT_WORLDSEL19 = 29,
-		BT_CHANNELSEL0 = 30,
-		BT_CHANNELSEL16 = 47,
-		BT_GOWORLD = 48,
-		BT_ARBEIT = 49,
-		BT_CHARCARD = 50,
-		BT_DELCHAR = 51,
-		BT_NEWCHAR = 52,
-		BT_SELCHAR = 53,
-		BT_DELCHARCA = 54,
-		BT_DELCHARCON = 55,
-		BT_CHAR0 = 56,
-		BT_CHAR7 = 63,
-		BT_CASHSHOP = 64,
-		BT_TRADE = 65,
-		BT_MENU = 66,
-		BT_SYSOP = 67,
-		BT_CHANNEL = 68,
-		BT_CHARINFO = 69,
-		BT_STATS = 70,
-		BT_QUEST = 71,
-		BT_INVENTORY = 72,
-		BT_SKILL = 73,
-		BT_FARM = 74,
-		BT_KEYMAP = 75,
-		BT_CALLGM = 76,
-		BT_CHAT = 77,
-		BT_EQUIPS = 78,
-		BT_PETEQUIP = 85
+		BT_LOGIN,
+		BT_NEW,
+		BT_HOMEPAGE,
+		BT_PWDLOST,
+		BT_QUIT,
+		BT_LOGINBANOK,
+		BT_LOGINNOTICEOK,
+		BT_LOGINLOST,
+		BT_SAVEID,
+		BT_WORLDSEL0,
+		BT_WORLDSEL1,
+		BT_WORLDSEL2,
+		BT_WORLDSEL3,
+		BT_WORLDSEL4,
+		BT_WORLDSEL5,
+		BT_WORLDSEL6,
+		BT_WORLDSEL7,
+		BT_WORLDSEL8,
+		BT_WORLDSEL9,
+		BT_WORLDSEL10,
+		BT_WORLDSEL11,
+		BT_WORLDSEL12,
+		BT_WORLDSEL13,
+		BT_WORLDSEL14,
+		BT_WORLDSEL15,
+		BT_WORLDSEL16,
+		BT_WORLDSEL17,
+		BT_WORLDSEL18,
+		BT_WORLDSEL19,
+		BT_CHANNELSEL0,
+		BT_CHANNELSEL1,
+		BT_CHANNELSEL2,
+		BT_CHANNELSEL3,
+		BT_CHANNELSEL4,
+		BT_CHANNELSEL5,
+		BT_CHANNELSEL6,
+		BT_CHANNELSEL7,
+		BT_CHANNELSEL8,
+		BT_CHANNELSEL9,
+		BT_CHANNELSEL10,
+		BT_CHANNELSEL11,
+		BT_CHANNELSEL12,
+		BT_CHANNELSEL13,
+		BT_CHANNELSEL14,
+		BT_CHANNELSEL15,
+		BT_CHANNELSEL16,
+		BT_GOWORLD,
+		BT_ARBEIT,
+		BT_CHARCARD,
+		BT_DELCHAR,
+		BT_NEWCHAR,
+		BT_SELCHAR,
+		BT_DELCHARCA,
+		BT_DELCHARCON,
+		BT_PAGEL,
+		BT_PAGER,
+		BT_CHARC_OK,
+		BT_CHARC_CANCEL,
+		BT_CHARC_FACEL,
+		BT_CHARC_FACER,
+		BT_CHARC_HAIRL,
+		BT_CHARC_HAIRR,
+		BT_CHARC_HAIRCL,
+		BT_CHARC_HAIRCR,
+		BT_CHARC_SKINL,
+		BT_CHARC_SKINR,
+		BT_CHARC_TOPL,
+		BT_CHARC_TOPR,
+		BT_CHARC_BOTL,
+		BT_CHARC_BOTR,
+		BT_CHARC_SHOESL,
+		BT_CHARC_SHOESR,
+		BT_CHARC_WEPL,
+		BT_CHARC_WEPR,
+		BT_CHARC_GENDERL,
+		BT_CHARC_GEMDERR,
+		BT_CHAR0,
+		BT_CHAR1,
+		BT_CHAR2,
+		BT_CHAR3,
+		BT_CHAR4,
+		BT_CHAR5,
+		BT_CHAR6,
+		BT_CHAR7,
+		BT_CASHSHOP,
+		BT_TRADE,
+		BT_MENU,
+		BT_SYSOP,
+		BT_CHANNEL,
+		BT_CHARINFO,
+		BT_STATS,
+		BT_QUEST,
+		BT_INVENTORY,
+		BT_SKILL,
+		BT_FARM,
+		BT_KEYMAP,
+		BT_CALLGM,
+		BT_CHAT,
+		BT_EQUIPS,
+		BT_PETEQUIP,
+		BT_CHANGECH,
+		BT_KEYCONFIG,
+		BT_OPTIONS,
+		BT_JOYPAD,
+		BT_GOPTIONS,
+		BT_QUITGAME,
+		BT_KEYS_CANCEL,
+		BT_KEYS_CLEAR,
+		BT_KEYS_OK,
+		BT_KEYS_DEFAULT,
+		BT_KEYS_QUICK
 	};
 
 	enum textfieldid : short
 	{
-		TXT_ACC = 0,
-		TXT_PASS = 1
+		TXT_ACC,
+		TXT_PASS,
+		TXT_NAMECHAR
 	};
 
 	class uielement
 	{
-	protected:
-		map<short, button> buttons;
-		map<short, textfield> textfields;
-		vector<sprite> sprites;
-		vector2d position;
-		vector2d dimensions;
-		bool active;
-		bool visible;
 	public:
 		uielement() {}
 		virtual ~uielement() {}
 		virtual void buttonpressed(short) {}
 		virtual void draw(ID2D1HwndRenderTarget*);
 		virtual void update();
-		virtual pair<vector2d, vector2d> bounds();
-		void setbutton(short, string);
-		void togglehide();
-		char sendmouse(vector2d, char);
-		bool isactive();
+		virtual void sendicon(dragicon*, vector2d);
+		virtual void sendbool(bool b) {}
+		mousestate sendmouse(vector2d, mousestate);
+		virtual pair<vector2d, vector2d> bounds() { return pair<vector2d, vector2d>(position, dimensions); }
+		void setbutton(short i, string s) { if (buttons.count(i)) buttons[i].setstate(s); }
+		void togglehide() { active = !active; }
+		bool isactive() { return active; }
+	protected:
+		map<short, button> buttons;
+		map<short, textfield> textfields;
+		vector<dragicon> dragicons;
+		vector<sprite> sprites;
+		vector2d position;
+		vector2d dimensions;
+		bool active;
 	};
 }
 

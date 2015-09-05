@@ -19,7 +19,6 @@
 #include "packetcreator.h"
 #include "winapp.h"
 #include "settings.h"
-#include "imagecache.h"
 
 using namespace program;
 using namespace net;

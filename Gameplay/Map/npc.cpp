@@ -29,7 +29,7 @@ namespace gameplay
 
 		string fullname;
 		string strid = to_string(id);
-		char extend = 7 - strid.length();
+		size_t extend = 7 - strid.length();
 		for (char i = 0; i < extend; i++)
 		{
 			fullname.append("0");

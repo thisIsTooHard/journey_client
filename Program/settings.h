@@ -19,6 +19,9 @@
 #include "stdfax.h"
 #include "vector2d.h"
 
+using namespace std;
+using namespace util;
+
 namespace program
 {
 	class settings
@@ -28,17 +31,30 @@ namespace program
 		byte bgmvolume;
 		byte sfxvolume;
 		bool saveacc;
-		std::string defaultacc;
-		byte defaultchar;
+		string defaultacc;
+		byte defaultworld;
 		byte defaultchannel;
-		util::vector2d inventorypos;
-		util::vector2d questinfopos;
+		byte defaultchar;
+		vector2d equipsinvpos;
+		vector2d statsinfopos;
+		vector2d inventorypos;
+		vector2d questinfopos;
 	public:
 		settings();
-		~settings();
-		void save(char, std::string);
-		bool accsaved();
-		std::string getdefaultacc();
+		~settings() {}
+		void save(char, string);
+		bool getfullscreen() { return fullscreen; }
+		byte getbgmvolume() { return bgmvolume; }
+		byte getsfxvolume() { return sfxvolume; }
+		bool accsaved() { return saveacc; }
+		string getdefaultacc() { return defaultacc; }
+		byte getdefworld() { return defaultworld; }
+		byte getdefch() { return defaultchannel; }
+		byte getdefchar() { return defaultchar; }
+		vector2d geteqspos() { return equipsinvpos; }
+		vector2d getstatspos() { return statsinfopos; }
+		vector2d getinvpos() { return inventorypos; }
+		vector2d getquestspos() { return questinfopos; }
 	};
 }
 

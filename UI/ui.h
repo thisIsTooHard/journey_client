@@ -16,12 +16,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "stdfax.h"
+#include "safeptrmap.h"
 #include "playfield.h"
 #include "uielement.h"
 #include "cursor.h"
 #include "keyboard.h"
 #include "baseinterface.h"
+#include "dragicon.h"
 
 using namespace std;
 using namespace util;
@@ -33,33 +34,35 @@ namespace io
 	{
 	public:
 		ui() {}
-		~ui() {}
-		void init();
+		~ui();
+		void init(imagecache*);
 		void draw(ID2D1HwndRenderTarget*);
 		void update();
-		void enableactions();
-		void disableactions();
-		void add(char);
-		void add(char, char);
-		void remove(char);
-		void sendmouse(vector2d);
-		void sendmouse(char, vector2d);
+		void add(uielements t) { add(t, 0); }
+		void add(uielements, char);
+		void remove(uielements);
 		void sendkey(WPARAM, bool);
-		void settextfield(textfield*);
-		uielement* getelement(char);
-		textfield* getactivetext();
-		keyboard* getkeyboard();
+		void sendmouse(mousestate, vector2d);
+		void setactive(bool a) { active = a; }
+		void sendmouse(vector2d p) { sendmouse(mouse.getstate(), p); }
+		void enableactions() { actionsenabled = true; }
+		void disableactions() { actionsenabled = false; }
+		void settextfield(textfield* t) { activetext = t; }
+		void seticon(dragicon* a) { activeicon = a; }
+		uielement* getelement(uielements t) { return elements.get(t); }
+		keyboard* getkeyboard() { return &keys; }
 		playfield* getfield() { return &field; }
 		baseinterface* getbase() { return &base; }
 	private:
-		map<char, uielement*> elements;
+		safeptrmap<uielements, uielement*> elements;
 		playfield field;
 		baseinterface base;
 		cursor mouse;
 		keyboard keys;
 		textfield* activetext;
-		SRWLOCK uilock;
+		dragicon* activeicon;
 		bool shift;
+		bool active;
 		bool actionsenabled;
 	};
 }

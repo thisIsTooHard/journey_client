@@ -23,7 +23,7 @@ namespace io
 	class worldselect : public uielement
 	{
 	public:
-		worldselect(char, char*);
+		worldselect(char, vector<char>);
 		~worldselect() {}
 		void buttonpressed(short);
 	private:
