@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
-// Copyright © 2015 SYJourney                                               //
+// Copyright Â© 2015 SYJourney                                               //
 //                                                                          //
 // This program is free software: you can redistribute it and/or modify     //
 // it under the terms of the GNU Affero General Public License as           //
@@ -31,7 +31,10 @@ namespace util
 			top = 0;
 		}
 
-		~safeptrmap() {}
+		~safeptrmap() 
+		{
+			clear();
+		}
 
 		V get(K key)
 		{
@@ -127,11 +130,11 @@ namespace util
 
 		void clear()
 		{
-			top = 0;
 			for (int i = 0; i < top; i++)
 			{
 				delete stdmap[keys[i]];
 			}
+			top = 0;
 			stdmap.clear();
 			keys.clear();
 		}
