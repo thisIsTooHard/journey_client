@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,32 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "world.h"
 
-using namespace program;
-using namespace net;
+namespace gameplay
+{
+	world::world(char i, std::string n, char f, std::string m, char ch, vector<char> chl)
+	{
+		id = i;
+		flag = f;
+		channels = ch;
+		chloads = chl;
+		name = n;
+		eventmsg = m;
+	}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	char world::getid()
+	{
+		return id;
+	}
 
-extern int result;
-extern byte mapleversion;
+	char world::getchannels()
+	{
+		return channels;
+	}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;
+	vector<char> world::getchloads()
+	{
+		return chloads;
+	}
+}

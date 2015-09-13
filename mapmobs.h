@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,30 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "mob.h"
+#include "safemap.h"
 
-using namespace program;
-using namespace net;
+using namespace util;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace gameplay
+{
+	class mapmobs
+	{
+	public:
+		mapmobs() {}
+		~mapmobs() {}
+		void addmob(int, int, bool, vector2d, char, short, char, bool, char);
+		void sendattack(attackinfo*, rectangle2d);
+		void sendmobhp(int, char);
+		void movemob(int, char, bool);
+		void killmob(int, char);
+		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void update();
+		void clear();
+		void setfh(footholdtree* f) { footholds = f; }
+	private:
+		safemap<int, mob> mobs;
+		footholdtree* footholds;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

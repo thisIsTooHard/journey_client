@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,75 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "portal.h"
 
-using namespace program;
-using namespace net;
+namespace gameplay
+{
+	portal::portal(){}
+	portal::~portal(){}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	portal::portal(portaltype tp, string name, int tid, bool in, string tpn, animation ani, vector2d pos)
+	{
+		type = tp;
+		pname = name;
+		targetid = tid;
+		intermap = in;
+		targetpname = tpn;
+		anim = ani;
+		position = pos;
+		touched = false;
+	}
 
-extern int result;
-extern byte mapleversion;
+	void portal::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	{
+		if (type == PT_REGULAR)
+		{
+			anim.draw(target, position + parentpos);
+		}
+		else if (type == PT_HIDDEN || type == PT_SCRIPTED_HIDDEN)
+		{
+			if (touched)
+			{
+				anim.draw(target, position + parentpos);
+			}
+		}
+	}
 
-extern void quit();
+	void portal::update()
+	{
+		anim.update(8);
+	}
 
-const int SCREENW = 816;
-const int SCREENH = 624;
+	void portal::settouch(bool t)
+	{
+		touched = t;
+	}
+
+	vector2d portal::getposition()
+	{
+		return position;
+	}
+
+	vector2d portal::getdimension()
+	{
+		return vector2d(30, 50);
+	}
+
+	portaltype portal::gettype()
+	{
+		return type;
+	}
+
+	pair<int, string> portal::getwarpinfo()
+	{
+		if (intermap)
+			return make_pair(targetid, targetpname);
+		else
+			return make_pair(targetid, pname);
+	}
+
+	string portal::getname()
+	{
+		return pname;
+	}
+}

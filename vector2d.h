@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,36 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include <cmath>
 
-using namespace program;
-using namespace net;
+namespace util
+{
+	class vector2d
+	{
+	private:
+		int a;
+		int b;
+	public:
+		vector2d();
+		vector2d(int);
+		vector2d(int, int);
+		~vector2d();
+		int x();
+		int y();
+		int length();
+		int center();
+		bool contains(int);
+		bool straight();
+		bool overlaps(vector2d);
+		bool iswithin(vector2d, vector2d);
+		vector2d operator + (vector2d);
+		vector2d operator - (vector2d);
+		vector2d operator * (vector2d);
+		vector2d operator / (vector2d);
+		bool operator == (vector2d);
+		bool operator != (vector2d);
+		void setx(int v) { a = v; }
+		void sety(int v) { b = v; }
+	};
+}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
-
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "vector2d.h"
 
-using namespace program;
-using namespace net;
+using namespace util;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace action
+{
+	class moveobject
+	{
+	public:
+		moveobject(vector2d);
+		moveobject() {}
+		virtual ~moveobject() {}
+		virtual bool update();
+		virtual vector2d getposition();
+	protected:
+		float fx;
+		float fy;
+		float hspeed;
+		float vspeed;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

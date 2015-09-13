@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,39 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "texture.h"
 
-using namespace program;
-using namespace net;
+using namespace std;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace graphics
+{
+	const short DPF = 16;
+	const short DEF_DELAY = 60;
 
-extern int result;
-extern byte mapleversion;
+	class animation
+	{
+	public:
+		animation() {}
+		animation(node);
+		~animation() {}
+		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(ID2D1HwndRenderTarget*, vector2d, float);
+		void setframe(byte);
+		short gettotaldelay();
+		vector2d getdimension(byte);
+		bool update(short);
+		bool update() { return update(DPF); }
+		bool isloaded() { return textures[0].isloaded(); }
+		bool isanimated() { return textures.size() > 1; }
+	protected:
+		map<byte, texture> textures;
+		map<byte, short> delays;
+		map<byte, pair<byte, byte>> alphablends;
+		byte frame;
+		byte last_f;
+		short elapsed;
+		float alphastep;
+		float alpha;
+	};
+}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

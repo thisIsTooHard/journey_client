@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,30 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "moveobject.h"
 
-using namespace program;
-using namespace net;
+namespace action
+{
+	moveobject::moveobject(vector2d pos)
+	{
+		fx = static_cast<float>(pos.x());
+		fy = static_cast<float>(pos.y());
+		hspeed = 0;
+		vspeed = 0;
+	}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	bool moveobject::update()
+	{
+		fx += hspeed;
+		fy += vspeed;
 
-extern int result;
-extern byte mapleversion;
+		return false;
+	}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;
+	vector2d moveobject::getposition()
+	{
+		int posx = static_cast<int>(fx);
+		int posy = static_cast<int>(fy);
+		return vector2d(posx, posy);
+	}
+}

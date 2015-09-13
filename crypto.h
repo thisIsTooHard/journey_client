@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,37 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "packet.h"
+#include "AES.h"
 
-using namespace program;
-using namespace net;
+using namespace std;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace net
+{
+	const bool MAPLECRYPTO = true;
 
-extern int result;
-extern byte mapleversion;
+	class crypto
+	{
+	public:
+		crypto() {}
+		~crypto() {}
+		void init(vector<byte>, vector<byte>, byte, byte);
+		void sendencrypt(packet*);
+		void recvdecrypt(char*, int, bool);
+		int getlength(char*);
+		void mapleencrypt(char*, int);
+		void mapledecrypt(char*, int);
+		void aescrypt(char*, int, bool);
+		char rollleft(char, int);
+		char rollright(char, int);
+		void updateiv(bool);
+	private:
+		vector<byte> recviv;
+		vector<byte> sendiv;
+		byte version;
+		byte localisation;
+		AES cipher;
+		mutex decryptlock;
+	};
+}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

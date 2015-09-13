@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,39 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "texture.h"
+#include "textlabel.h"
 
-using namespace program;
-using namespace net;
+using namespace graphics;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace io
+{
+	class textfield
+	{
+	public:
+		textfield(dwfonts, textcolor, string, vector2d, int);
+		textfield() {}
+		~textfield() {}
+		pair<vector2d, vector2d> bounds();
+		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void update();
+		void setstate(string);
+		void sendchar(char);
+		void setbg(texture, int, int);
+		void settext(string s) { content.settext(s); }
+		string getstate() { return state; }
+		string text() { return content.gettext(); }
+	private:
+		texture bg;
+		textlabel content;
+		vector2d position;
+		string state;
+		vector2d bgposition;
+		int maxlength;
+		int markpos;
+		bool showmark;
+		short elapsed;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

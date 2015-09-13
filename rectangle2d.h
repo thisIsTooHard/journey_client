@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,29 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "vector2d.h"
 
-using namespace program;
-using namespace net;
+namespace util
+{
+	class rectangle2d
+	{
+	public:
+		rectangle2d(int, int, int, int);
+		rectangle2d(vector2d, vector2d);
+		rectangle2d();
+		~rectangle2d() {}
+		bool contains(vector2d);
+		bool contains(int, vector2d);
+		void setlt(vector2d l) { lt = l; }
+		void setrb(vector2d r) { rb = r; }
+		void shift(vector2d v) { lt = lt + v; rb = rb + v; }
+		void shiftlt(vector2d l) { lt = lt + l; }
+		void shiftrb(vector2d r) { rb = rb + r; }
+		vector2d getlt() { return lt; }
+		vector2d getrb() { return rb; }
+	private:
+		vector2d lt;
+		vector2d rb;
+	};
+}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
-
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

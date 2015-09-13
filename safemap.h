@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,105 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
 
-using namespace program;
-using namespace net;
+using namespace std;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace util
+{
+	template <typename K, typename V>
+	class safemap
+	{
+	public:
+		safemap() 
+		{ 
+			top = 0; 
+		}
+		
+		~safemap() {}
+		
+		V* get(K key) 
+		{ 
+			return &stdmap[key]; 
+		}
 
-extern int result;
-extern byte mapleversion;
+		V* getnext(int i)
+		{
+			if (i >= top)
+			{
+				return 0;
+			}
+			else
+			{
+				K key = keys[i];
+				return &stdmap[key];
+			}
+		}
 
-extern void quit();
+		int getend() 
+		{ 
+			return top; 
+		}
 
-const int SCREENW = 816;
-const int SCREENH = 624;
+		bool contains(K k) 
+		{ 
+			return stdmap.count(k) > 0; 
+		}
+
+		void add(K key, V value)
+		{
+			if (!stdmap.count(key))
+			{
+				stdmap[key] = value;
+				keys.push_back(key);
+				top += 1;
+			}
+		}
+
+		void remove(int i)
+		{
+			if (top > 0 && i < top)
+			{
+				if (stdmap.count(keys[i]))
+				{
+					top -= 1;
+					stdmap.erase(keys[i]);
+					keys.erase(keys.begin() + i);
+				}
+			}
+		}
+
+		void removekey(K key)
+		{
+			if (stdmap.count(key))
+			{
+				int index = -1;
+				for (int i = 0; i < top; i++)
+				{
+					if (keys[i] == key)
+					{
+						index = i;
+						break;
+					}
+				}
+
+				if (index >= 0)
+				{
+					remove(index);
+				}
+			}
+		}
+
+		void clear()
+		{
+			top = 0;
+			stdmap.clear();
+			keys.clear();
+		}
+	private:
+		vector<K> keys;
+		map<K, V> stdmap;
+		int top;
+	};
+}
+

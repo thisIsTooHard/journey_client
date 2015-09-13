@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,65 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "vector2d.h"
 
-using namespace program;
-using namespace net;
+using namespace util;
+using namespace std;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace graphics
+{
+	enum dwfonts
+	{
+		DWF_12L,
+		DWF_12C,
+		DWF_12R,
+		DWF_14L,
+		DWF_14C,
+		DWF_14R,
+		DWF_20C
+	};
 
-extern int result;
-extern byte mapleversion;
+	enum textcolor
+	{
+		TXC_BLACK,
+		TXC_WHITE,
+		TXC_YELLOW,
+		TXC_BLUE,
+		TXC_RED,
+		TXC_BROWN
+	};
 
-extern void quit();
+	enum textbg
+	{
+		TXB_NONE,
+		TXB_NAMETAG
+	};
 
-const int SCREENW = 816;
-const int SCREENH = 624;
+	class textlabel
+	{
+	public:
+		textlabel(dwfonts, textcolor, string, textbg);
+		textlabel(dwfonts, textcolor, string);
+		textlabel() {}
+		~textlabel();
+		void draw(string, ID2D1HwndRenderTarget*, vector2d);
+		void draw(ID2D1HwndRenderTarget*, vector2d);
+		float getlength() { return (font->GetFontSize() - 8.0f) * text.length() + 10.0f; }
+		void settext(string s) { text = s; }
+		void setmarker(bool b) { marker = b; }
+		void setalpha(float a) { alpha = a; }
+		string gettext() { return text; }
+	private:
+		IDWriteTextFormat* font;
+		ID2D1SolidColorBrush* brush;
+		ID2D1SolidColorBrush* bgbrush;
+		textcolor color;
+		textbg back;
+		string text;
+		float alpha;
+		bool marker;
+		vector2d position;
+	};
+}
+

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,22 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
 
-using namespace program;
-using namespace net;
+using namespace std;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace character
+{
+	class questlog
+	{
+	public:
+		questlog(map<short, string>, map<short, pair<short, string>>, map<short, int64_t>);
+		questlog() {}
+		~questlog() {}
+	private:
+		map<short, string> started;
+		map<short, pair<short, string>> progress;
+		map<short, int64_t> completed;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

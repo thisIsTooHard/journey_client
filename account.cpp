@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,30 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "account.h"
 
-using namespace program;
-using namespace net;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace gameplay
+{
+	void account::init(int id, std::string name, char gm, bool fem, bool mute, short pn)
+	{
+		accid = id;
+		accname = name;
+		gmlevel = gm;
+		female = fem;
+		muted = mute;
+		pin = pn;
+		selected = 0;
+	}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;
+	void account::selectchar(int cid)
+	{
+		selected = 0;
+		for (vector<maplechar>::iterator mchar = maplechars.begin(); mchar != maplechars.end(); mchar++)
+		{
+			if (mchar->getstats()->getid() == cid)
+				break;
+			selected++;
+		}
+	}
+}

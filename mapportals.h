@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,31 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "collision.h"
+#include "portal.h"
+#include "node.h"
 
-using namespace program;
-using namespace net;
+using namespace util;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace gameplay
+{
+	class mapportals
+	{
+	public:
+		mapportals();
+		~mapportals() {}
+		void init();
+		void clear();
+		void addportal(char, portaltype, string, int, bool, string, vector2d);
+		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void update(vector2d);
+		vector2d getspawnpoint(char);
+		vector2d getspawnpoint(string);
+		pair<int, string> getportal(vector2d);
+	private:
+		map<char, portal> portals;
+		map<portaltype, animation> animations;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

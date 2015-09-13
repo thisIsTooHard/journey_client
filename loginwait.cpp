@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "loginwait.h"
+#include "Journey.h"
 
-using namespace program;
-using namespace net;
+namespace io
+{
+	loginwait::loginwait()
+	{
+		app.getimgcache()->setmode(ict_login);
+		nl::nx::view_file("UI");
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+		node loading = nl::nx::nodes["UI"].resolve("Login.img/Notice/Loading/");
 
-extern int result;
-extern byte mapleversion;
+		sprites.push_back(sprite(animation(loading.resolve("backgrnd")), vector2d()));
+		sprites.push_back(sprite(animation(loading.resolve("circle")), vector2d(125, 72)));
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;
+		nl::nx::unview_file("UI");
+		app.getimgcache()->unlock();
+		position = vector2d(292, 200);
+		dimensions = vector2d(282, 144);
+		active = true;
+	}
+}

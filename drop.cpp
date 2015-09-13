@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,59 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "drop.h"
 
-using namespace program;
-using namespace net;
+namespace maplemap
+{
+	void drop::expire(char type)
+	{
+		switch (type)
+		{
+		case 0:
+			state = DST_EXPIRE;
+			break;
+		case 1:
+			state = DST_INACTIVE;
+			break;
+		case 2:
+			state = DST_PICKEDUP;
+			break;
+		}
+	}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	bool drop::update()
+	{
+		if (state == DST_DROPPED)
+		{
+			bool groundhit = gravityobject::update();
 
-extern int result;
-extern byte mapleversion;
+			if (groundhit)
+			{
+				state = DST_FLOATING;
+				hspeed = 0;
+				vspeed = 0;
+				basey = fy;
+			}
+		}
 
-extern void quit();
+		if (state == DST_FLOATING)
+		{
+			float shift = cos(moved) - 1.0f;
+			fy = basey + 2.5f + shift * 5.0f;
+			moved = (moved < 360.0f) ? moved + 0.025f : 0.0f;
+		}
 
-const int SCREENW = 816;
-const int SCREENH = 624;
+		if (state == DST_PICKEDUP)
+		{
+			alpha -= 0.025f;
+			if (alpha < 0.025f)
+			{
+				alpha = 0.0f;
+				state = DST_INACTIVE;
+				return true;
+			}
+		}
+
+		return false;
+	}
+}

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,46 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "charsprites.h"
+#include "mapleequip.h"
 
-using namespace program;
-using namespace net;
+using namespace gameplay;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace character
+{
+	class clothing : public charsprites
+	{
+	public:
+		clothing(int, map<string, map<byte, map<charlayer, map<string, vector2d>>>>*);
+		clothing() {}
+		~clothing() {}
+		string gettype() { return type; }
+		string getname() { return name; }
+		string getdesc() { return desc; }
+		bool istwo_h() { return (type == "Weapon") ? twohanded : false; }
+		byte getwspeed() { return (type == "Weapon") ? attackspeed : 0; }
+		byte getattack() { return (type == "Weapon") ? attack : 0; }
+	private:
+		pair<texture, texture> icon;
+		string type;
+		string name;
+		string desc;
+		bool cash;
+		bool tradeable;
+		int price;
+		byte slots;
+		short reqlevel;
+		short reqjob;
+		short reqstr;
+		short reqdex;
+		short reqint;
+		short reqluk;
+		map<equipstat, short> defstats;
+		string afterimage;
+		string sfx;
+		byte attackspeed;
+		byte attack;
+		bool twohanded;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

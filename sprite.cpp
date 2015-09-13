@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,51 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "sprite.h"
 
-using namespace program;
-using namespace net;
+namespace graphics
+{
+	sprite::sprite(animation ani, vector2d pos)
+	{
+		anim = ani;
+		position = pos;
+		visible = true;
+		flipped = false;
+	}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	sprite::sprite(animation ani, vector2d pos, bool vis, bool flp)
+	{
+		anim = ani;
+		position = pos;
+		visible = vis;
+		flipped = flp;
+	}
 
-extern int result;
-extern byte mapleversion;
+	void sprite::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	{
+		if (visible)
+		{
+			if (flipped)
+			{
+				target->SetTransform(
+					D2D1::Matrix3x2F::Scale(
+					D2D1::Size(-1.0f, 1.0f),
+					D2D1::Point2F(
+					(float)(parentpos + position).x(),
+					(float)(parentpos + position).y())));
+			}
 
-extern void quit();
+			anim.draw(target, position + parentpos);
 
-const int SCREENW = 816;
-const int SCREENH = 624;
+			if (flipped)
+			{
+				target->SetTransform(
+					D2D1::Matrix3x2F::Scale(
+					D2D1::Size(1.0f, 1.0f),
+					D2D1::Point2F(
+					(float)(parentpos + position).x(),
+					(float)(parentpos + position).y())));
+			}
+		}
+	}
+}

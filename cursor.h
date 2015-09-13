@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,47 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "animation.h"
 
-using namespace program;
-using namespace net;
+using namespace std;
+using namespace graphics;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace io
+{
+	enum mousestate : char {
+		MST_IDLE = 0,
+		MST_CANCLICK = 1,
+		MST_GAME = 2,
+		MST_HOUSE = 3,
+		MST_CANCLICK2 = 4,
+		MST_CANGRAB = 5,
+		MST_GIFT = 6,
+		MST_VSCROLL = 7,
+		MST_HSCROLL = 8,
+		MST_VSCROLLIDLE = 9,
+		MST_HSCROLLIDLE = 10,
+		MST_GRABBING = 11,
+		MST_CLICKING = 12,
+		MST_RCLICK = 13
+	};
 
-extern int result;
-extern byte mapleversion;
+	class cursor
+	{
+	public:
+		cursor();
+		~cursor() {}
+		void init(imagecache*);
+		void draw(ID2D1HwndRenderTarget*);
+		void setstate(mousestate s) { state = s; }
+		void update() { sprites[state].update(); }
+		void setposition(vector2d p) { position = p; }
+		mousestate getstate() { return state; }
+		vector2d getposition() { return position; }
+	private:
+		mousestate state;
+		map<mousestate, animation> sprites;
+		vector2d position;
+	};
+}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

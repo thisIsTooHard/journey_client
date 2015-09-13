@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,23 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "background.h"
 
-using namespace program;
-using namespace net;
+namespace gameplay
+{
+	class mapbackgrounds
+	{
+	public:
+		mapbackgrounds(nl::node, vector2d, vector2d);
+		mapbackgrounds() {}
+		~mapbackgrounds() {}
+		void drawbackgrounds(ID2D1HwndRenderTarget*, vector2d);
+		void drawforegrounds(ID2D1HwndRenderTarget*, vector2d);
+		void update();
+	private:
+		vector<background> backgrounds;
+		vector<background> foregrounds;
+	};
+}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
-
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

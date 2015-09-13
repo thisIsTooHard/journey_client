@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,33 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "uielement.h"
+#include "maplestats.h"
+#include "charset.h"
+#include "uibar.h"
 
-using namespace program;
-using namespace net;
+using namespace gameplay;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace io
+{
+	class statusbar : public uielement
+	{
+	private:
+		maplestats* stats;
+		uibar exp;
+		uibar hp;
+		uibar mp;
+		charset statset;
+		charset lvset;
+		textlabel name;
+		textlabel job;
+	public:
+		statusbar(maplestats*);
+		~statusbar() {}
+		void draw(ID2D1HwndRenderTarget*);
+		void update();
+		void buttonpressed(short);
+		pair<vector2d, vector2d> bounds();
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

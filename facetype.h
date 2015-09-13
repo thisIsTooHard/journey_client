@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,33 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "texture.h"
 
-using namespace program;
-using namespace net;
+using namespace graphics;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace character
+{
+	class facetype
+	{
+	public:
+		facetype(int, map<string, map<byte, vector2d>>);
+		facetype() {}
+		~facetype() {}
+		void draw(vector2d);
+		void update();
+		void setexp(char);
+		byte getframe() { return frame; }
+		string getname() { return name; }
+		string getexp() { return expression; }
+		vector2d getshift(string s, byte f) { return facepos[s][f]; }
+	private:
+		map<string, map<byte, texture>> textures;
+		map<string, map<byte, short>> delays;
+		map<string, map<byte, vector2d>> facepos;
+		string expression;
+		short elapsed;
+		byte frame;
+		string name;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

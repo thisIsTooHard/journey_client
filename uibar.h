@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "texture.h"
 
-using namespace program;
-using namespace net;
+using namespace graphics;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace io
+{
+	class uibar
+	{
+	public:
+		uibar() {}
+		uibar(texture, texture, texture, int, vector2d);
+		~uibar() {}
+		void draw(ID2D1HwndRenderTarget*, vector2d, int, int);
+	private:
+		texture front;
+		texture barmid;
+		texture barend;
+		int barmax;
+		vector2d position;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

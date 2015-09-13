@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,37 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "rectangle2d.h"
 
-using namespace program;
-using namespace net;
+namespace util
+{
+	rectangle2d::rectangle2d(int l, int r, int t, int b)
+	{
+		lt = vector2d(l, t);
+		rb = vector2d(t, b);
+	}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	rectangle2d::rectangle2d(vector2d v1, vector2d v2)
+	{
+		lt = v1;
+		rb = v2;
+	}
 
-extern int result;
-extern byte mapleversion;
+	rectangle2d::rectangle2d()
+	{
+		lt = vector2d();
+		rb = vector2d();
+	}
 
-extern void quit();
+	bool rectangle2d::contains(vector2d v)
+	{
+		return v.x() >= lt.x() && v.x() <= rb.x() && v.y() >= lt.y() && v.y() <= rb.y();
+	}
 
-const int SCREENW = 816;
-const int SCREENH = 624;
+	bool rectangle2d::contains(int x, vector2d ver)
+	{
+		vector2d rhor = vector2d(lt.x(), rb.x());
+		vector2d rver = vector2d(lt.y(), rb.y());
+		return rhor.contains(x) && rver.overlaps(ver);
+	}
+}

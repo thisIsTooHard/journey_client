@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,49 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include <ws2tcpip.h>
+#include <WinSock2.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include "packet.h"
+#include "crypto.h"
+#include "packethandler.h"
 
-using namespace program;
-using namespace net;
+#pragma comment (lib, "Ws2_32.lib")
+#pragma comment (lib, "Mswsock.lib")
+#pragma comment (lib, "AdvApi32.lib")
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace net
+{
+	//royals: 192.169.80.74
+	//some v83: 192.99.221.234
+	const string host = "localhost";
+	const string loginport = "8484";
 
-extern int result;
-extern byte mapleversion;
+	class session
+	{
+	private:
+		SOCKET sock;
+		packethandler handler;
+		crypto encrypter;
+		packet curp;
+		mutex sendlock;
+		mutex recvlock;
+		char buffer[10240];
+		int bufferpos;
+		short p_length;
+		bool active;
+	public:
+		session() {}
+		~session() {}
+		int init();
+		int init(const char*, const char*, bool);
+		int reconnect(vector<byte>, short);
+		int dispatch(packet*);
+		void receive();
+		void close();
+		void process(char*, int);
+	};
+}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

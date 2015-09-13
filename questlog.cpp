@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,14 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "questlog.h"
 
-using namespace program;
-using namespace net;
-
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
-
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;
+namespace character
+{
+	questlog::questlog(map<short, string> sta, map<short, pair<short, string>> pro, map<short, int64_t> com)
+	{
+		started = sta;
+		progress = pro;
+		completed = com;
+	}
+}

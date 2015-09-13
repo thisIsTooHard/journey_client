@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,30 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "maplestats.h"
+#include "maplelook.h"
 
-using namespace program;
-using namespace net;
+namespace gameplay
+{
+	class maplechar
+	{
+	public:
+		maplechar() {}
+		~maplechar() {}
+		maplechar(maplestats, maplelook);
+		maplelook* getlook();
+		maplestats* getstats();
+		maplestats copystats();
+		maplelook copylook();
+		void setrankinfo(int r, char rm, int jr, char jrm) { rank = make_pair(r, rm); jobrank = make_pair(jr, jrm); }
+		pair<int, char> getrank() { return rank; }
+		pair<int, char> getjobrank() { return jobrank; }
+	private:
+		maplestats stats;
+		maplelook look;
+		pair<int, char> rank;
+		pair<int, char> jobrank;
+	};
+}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
-
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

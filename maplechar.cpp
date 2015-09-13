@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,33 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "maplechar.h"
 
-using namespace program;
-using namespace net;
+namespace gameplay
+{
+	maplechar::maplechar(maplestats ms, maplelook ml)
+	{
+		stats = ms;
+		look = ml;
+	}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	maplelook* maplechar::getlook()
+	{
+		return &look;
+	}
 
-extern int result;
-extern byte mapleversion;
+	maplestats* maplechar::getstats()
+	{
+		return &stats;
+	}
 
-extern void quit();
+	maplestats maplechar::copystats()
+	{
+		return stats;
+	}
 
-const int SCREENW = 816;
-const int SCREENH = 624;
+	maplelook maplechar::copylook()
+	{
+		return look;
+	}
+}

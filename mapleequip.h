@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,48 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "mapleitem.h"
 
-using namespace program;
-using namespace net;
+using namespace std;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace gameplay
+{
+	enum equipstat : char
+	{
+		ES_STR,
+		ES_DEX,
+		ES_INT,
+		ES_LUK,
+		ES_HP,
+		ES_MP,
+		ES_WATK,
+		ES_MAGIC,
+		ES_WDEF,
+		ES_MDEF,
+		ES_ACC,
+		ES_AVOID,
+		ES_HANDS,
+		ES_SPEED,
+		ES_JUMP
+	};
 
-extern int result;
-extern byte mapleversion;
+	class mapleequip : public mapleitem
+	{
+	public:
+		mapleequip() {}
+		~mapleequip() {}
+		mapleequip(short, char, int, bool, int64_t, int64_t, char, char, map<equipstat, short>, string, short, char, short, int);
+		short getstat(equipstat es) { return stats[es]; }
+	private:
+		char slots;
+		char level;
+		map<equipstat, short> stats;
+		string owner;
+		short flag;
+		char itemlevel;
+		short itemexp;
+		int vicious;
+	};
+}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

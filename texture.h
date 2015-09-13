@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,39 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "node.h"
+#include "rectangle2d.h"
+#include "imagecache.h"
 
+using namespace util;
+using namespace nl;
+using namespace std;
 using namespace program;
-using namespace net;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace graphics
+{
+	class texture
+	{
+	public:
+		texture(node);
+		texture();
+		~texture() {}
+		void draw(vector2d);
+		void draw(vector2d, bool);
+		void draw(vector2d, float);
+		void draw(vector2d, vector2d);
+		void draw(vector2d, vector2d, float, bool);
+		void shift(vector2d);
+		void setorigin(vector2d v) { origin = v; }
+		bool isloaded() { return dimension != vector2d(); }
+		vector2d getdimension() { return dimension; }
+		vector2d getorigin() { return origin; }
+		rectangle2d getbounds() { return rectangle2d(origin, origin + dimension); }
+	private:
+		pair<imgcontext, size_t> source;
+		vector2d origin;
+		vector2d dimension;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

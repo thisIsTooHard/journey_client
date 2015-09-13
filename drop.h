@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,43 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "gravityobject.h"
+#include "texture.h"
 
-using namespace program;
-using namespace net;
+using namespace action;
+using namespace graphics;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace maplemap
+{
+	enum dropstate
+	{
+		DST_DROPPED,
+		DST_FLOATING,
+		DST_INACTIVE,
+		DST_EXPIRE,
+		DST_PICKEDUP
+	};
 
-extern int result;
-extern byte mapleversion;
+	class drop : public gravityobject
+	{
+	public:
+		drop() {}
+		virtual ~drop() {}
+		virtual void draw(ID2D1HwndRenderTarget*, vector2d) {}
+		virtual bool update();
+		void makeactive() { state = DST_FLOATING; }
+		void expire(char);
+	protected:
+		short oid;
+		int owner;
+		vector2d pos;
+		vector2d dest;
+		char pickuptype;
+		bool playerdrop;
+		dropstate state;
+		float alpha;
+		float basey;
+		float moved;
+	};
+}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

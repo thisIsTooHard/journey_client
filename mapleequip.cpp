@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,26 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "mapleequip.h"
 
-using namespace program;
-using namespace net;
-
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
-
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;
+namespace gameplay
+{
+	mapleequip::mapleequip(short ps, char typ, int id, bool cs, int64_t uq, int64_t expi, char slt, char lv, map<equipstat, short> sta, string own, short fl, char ilv, short iex, int vic)
+	{
+		pos = ps;
+		count = 1;
+		type = typ;
+		itemid = id;
+		cash = cs;
+		uniqueid = uq;
+		expire = expi;
+		slots = slt;
+		level = lv;
+		stats = sta;
+		owner = own;
+		flag = fl;
+		itemexp = iex;
+		itemlevel = ilv;
+		vicious = vic;
+	}
+}

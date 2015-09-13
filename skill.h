@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,44 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "playereffects.h"
 
-using namespace program;
-using namespace net;
+using namespace graphics;
+using namespace gameplay;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace action
+{
+	struct skillinfo
+	{
+		float damage;
+		float chance;
+		float crit;
+		short duration;
+		short hpcost;
+		short mpcost;
+		char attacks;
+		char mobs;
+		pair<vector2d, vector2d> range;
+	};
 
-extern int result;
-extern byte mapleversion;
+	class skill
+	{
+	public:
+		skill(int);
+		skill() {}
+		~skill() {}
+		string getaction(bool);
+		bool isattack() { return offensive; }
+		void addeffects(playereffects*, bool);
+		skillinfo getlevel(int l) { return levels[l]; }
+	private:
+		map<int, skillinfo> levels;
+		vector<animation> skill_e;
+		vector<animation> affected;
+		vector<string> actions;
+		string prepare;
+		short prepare_t;
+		bool offensive;
+	};
+}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

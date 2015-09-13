@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,35 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "nametag.h"
 
-using namespace program;
-using namespace net;
+namespace io
+{
+	nametag::nametag(dwfonts fnt, textcolor col, map<bool, vector<texture>> t, string n, vector2d p, bool a)
+	{
+		content = textlabel(fnt, col, n);
+		tag = t;
+		position = p;
+		active = a;
+	}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	nametag::nametag(dwfonts fnt, textcolor col, vector<texture> t, string n, vector2d p)
+	{
+		content = textlabel(fnt, col, n);
+		tag[false] = t;
+		position = p;
+		active = false;
+	}
 
-extern int result;
-extern byte mapleversion;
+	void nametag::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	{
+		int length = static_cast<int>(content.getlength());
 
-extern void quit();
+		vector2d bgpos = position + parentpos - vector2d(7 + length / 2, -2);
+		tag[active][0].draw(bgpos);
+		tag[active][1].draw(bgpos + vector2d(8, 0), vector2d(length, 0));
+		tag[active][2].draw(bgpos + vector2d(8, 0) + vector2d(length, 0));
 
-const int SCREENW = 816;
-const int SCREENH = 624;
+		content.draw(target, position + parentpos);
+	}
+}

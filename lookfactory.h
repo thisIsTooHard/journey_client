@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,33 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "maplelook.h"
 
-using namespace program;
-using namespace net;
+using namespace gameplay;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace program
+{
+	class lookfactory
+	{
+	public:
+		lookfactory() {}
+		~lookfactory() {}
+		void init();
+		void loadcharlook(maplelook*);
+		bodytype getbody(char);
+		hairstyle gethair(int);
+		facetype getface(int);
+		clothing getcloth(int);
+	private:
+		void initbodyinfo();
+		map<int, facetype> faces;
+		map<char, bodytype> bodytypes;
+		map<int, hairstyle> hairstyles;
+		map<int, clothing> clothes;
+		map<string, map<byte, short>> bodydelays;
+		map<string, map<byte, bodyaction>> bodyactions;
+		map<string, map<byte, vector2d>> facepos;
+		map<string, map<byte, map<charlayer, map<string, vector2d>>>> bodyheadmap;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

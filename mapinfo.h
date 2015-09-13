@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,40 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "vector2d.h"
+#include "node.h"
 
-using namespace program;
-using namespace net;
+using namespace std;
+using namespace util;
+using namespace nl;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace gameplay
+{
+	class mapinfo
+	{
+	public:
+		mapinfo(int, node, vector2d, vector2d);
+		mapinfo() {}
+		~mapinfo() {}
+		int getid() { return mapid; }
+		vector2d getwalls() { return mapwalls; }
+		vector2d getborders() { return mapborders; }
+		string getbgm() { return bgm; }
+	private:
+		int mapid;
+		int fieldlimit;
+		bool cloud;
+		string bgm;
+		string mapdesc;
+		string mapname;
+		string streetname;
+		string mapmark;
+		bool swim;
+		bool town;
+		bool hideminimap;
+		vector2d mapwalls;
+		vector2d mapborders;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,59 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "texture.h"
 
-using namespace program;
-using namespace net;
+using namespace graphics;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace character
+{
+	enum charlayer : char
+	{
+		CL_BASE,
+		CL_HAIRBBODY,
+		CL_CAPE,
+		CL_SHIELDBBODY,
+		CL_BODY,
+		CL_SHOES,
+		CL_PANTS,
+		CL_TOP,
+		CL_MAIL,
+		CL_LHAND,
+		CL_GLOVE,
+		CL_HAIR,
+		CL_BACKHAIRBCAP,
+		CL_BACKHAIR,
+		CL_SHIELDOHAIR,
+		CL_EARRINGS,
+		CL_HEAD,
+		CL_FACE,
+		CL_HAIRSHADE,
+		CL_FACEACC,
+		CL_EYEACC,
+		CL_SHIELD,
+		CL_BACKSHIELD,
+		CL_WEAPON,
+		CL_BACKWEAPON,
+		CL_ARM,
+		CL_MAILARM,
+		CL_RHAND,
+		CL_HAIROHEAD,
+		CL_HAT,
+		CL_ARMOHAIR,
+		CL_WEAPONOHAND,
+		CL_RGLOVE,
+		CL_WEAPONOGLOVE,
+		CL_HANDOWEP
+	};
 
-extern int result;
-extern byte mapleversion;
+	class charsprites
+	{
+	public:
+		charsprites() {}
+		virtual ~charsprites() {}
+		virtual void draw(charlayer, string, byte, vector2d);
+	protected:
+		map<charlayer, map<string, map<byte, texture>>> textures;
+	};
+}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

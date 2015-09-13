@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,62 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "playereffects.h"
 
-using namespace program;
-using namespace net;
+namespace gameplay
+{
+	playereffects::playereffects()
+	{
+		efflock = SRWLOCK_INIT;
+		top = 0;
+	}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	void playereffects::add(effect efc)
+	{
+		AcquireSRWLockExclusive(&efflock);
+		effects[top] = efc;
+		top++;
+		ReleaseSRWLockExclusive(&efflock);
+	}
 
-extern int result;
-extern byte mapleversion;
+	void playereffects::draw(ID2D1HwndRenderTarget* target, vector2d playerpos)
+	{
+		if (TryAcquireSRWLockShared(&efflock))
+		{
+			for (map<int, effect>::iterator efit = effects.begin(); efit != effects.end(); ++efit)
+			{
+				efit->second.draw(target, playerpos);
+			}
+			ReleaseSRWLockShared(&efflock);
+		}
+	}
 
-extern void quit();
+	void playereffects::update()
+	{
+		vector<int> toremove;
 
-const int SCREENW = 816;
-const int SCREENH = 624;
+		if (TryAcquireSRWLockShared(&efflock))
+		{
+			for (map<int, effect>::iterator efit = effects.begin(); efit != effects.end(); ++efit)
+			{
+				bool remove = efit->second.update();
+
+				if (remove)
+				{
+					toremove.push_back(efit->first);
+				}
+			}
+			ReleaseSRWLockShared(&efflock);
+		}
+
+		if (toremove.size() > 0)
+		{
+			AcquireSRWLockExclusive(&efflock);
+			for (vector<int>::iterator rmit = toremove.begin(); rmit != toremove.end(); ++rmit)
+			{
+				effects.erase(*rmit);
+			}
+			ReleaseSRWLockExclusive(&efflock);
+		}
+	}
+}

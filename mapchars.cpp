@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,48 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "mapchars.h"
 
-using namespace program;
-using namespace net;
+namespace maplemap
+{
+	void mapchars::addchar(int cid, maplelook toadd, byte level, short job, string name, vector2d pos)
+	{
+		if (chars.contains(cid))
+		{
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+		}
+		else
+		{
+			chars.add(cid, otherplayer(toadd, level, job, name, pos));
+		}
+	}
 
-extern int result;
-extern byte mapleversion;
+	void mapchars::movechar(int cid, vector<movefragment> movements)
+	{
+		if (chars.contains(cid))
+		{
+			chars.get(cid)->addmoves(movements);
+		}
+	}
 
-extern void quit();
+	void mapchars::removechar(int cid)
+	{
+		chars.removekey(cid);
+	}
 
-const int SCREENW = 816;
-const int SCREENH = 624;
+	void mapchars::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	{
+		for (int i = 0; i < chars.getend(); i++)
+		{
+			chars.getnext(i)->draw(target, viewpos);
+		}
+	}
+
+	void mapchars::update()
+	{
+		for (int i = 0; i < chars.getend(); i++)
+		{
+			chars.getnext(i)->update();
+		}
+	}
+}

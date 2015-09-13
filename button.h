@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,44 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "texture.h"
 
-using namespace program;
-using namespace net;
+using namespace util;
+using namespace std;
+using namespace graphics;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace io
+{
+	enum buttontypes : char
+	{
+		BTT_REGULAR,
+		BTT_ONESPRITE,
+		BTT_AREA
+	};
 
-extern int result;
-extern byte mapleversion;
+	class button
+	{
+	public:
+		button(node, int, int);
+		button(texture, texture, int, int);
+		button(int, int, int, int);
+		button() {}
+		~button() {}
+		pair<vector2d, vector2d> bounds();
+		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void setstate(string s) { state = s; }
+		void setposition(vector2d p) { position = p; }
+		void setactive(bool a) { active = a; }
+		bool isactive() { return active; }
+		string getstate() { return state; }
+	private:
+		map<string, texture> sprites;
+		vector2d position;
+		vector2d dimension;
+		string state;
+		char bttype;
+		bool active;
+	};
+}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "uielement.h"
+#include "keyboard.h"
+#include "inventory.h"
 
-using namespace program;
-using namespace net;
+using namespace gameplay;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace io
+{
+	class keyconfig : public uielement
+	{
+	public:
+		keyconfig(map<char, pair<keytype, int>>, inventory*);
+		~keyconfig() {}
+		void buttonpressed(short);
+		void sendicon(dragicon*, vector2d);
+	private:
+		map<char, pair<keytype, int>> keymap;
+		vector2d getkeypos(char);
+		vector2d getreservepos(keyaction);
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

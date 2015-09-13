@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,25 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "uibar.h"
 
-using namespace program;
-using namespace net;
+namespace io
+{
+	uibar::uibar(texture f, texture m, texture e, int max, vector2d pos)
+	{
+		front = f;
+		barmid = m;
+		barend = e;
+		barmax = max;
+		position = pos;
+	}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
-
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;
+	void uibar::draw(ID2D1HwndRenderTarget* target, vector2d pos, int value, int max)
+	{
+		vector2d absp = pos + position;
+		int percent = ((value / 100) * barmax) / (max / 100);
+		front.draw(absp);
+		barmid.draw(absp + vector2d(1, 0), vector2d(percent, 0));
+		barend.draw(absp + vector2d(percent + 1, 0));
+	}
+}

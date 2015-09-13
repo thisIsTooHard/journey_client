@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,45 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "vector2d.h"
 
-using namespace program;
-using namespace net;
+using namespace std;
+using namespace util;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace program
+{
+	class settings
+	{
+	private:
+		bool fullscreen;
+		byte bgmvolume;
+		byte sfxvolume;
+		bool saveacc;
+		string defaultacc;
+		byte defaultworld;
+		byte defaultchannel;
+		byte defaultchar;
+		vector2d equipsinvpos;
+		vector2d statsinfopos;
+		vector2d inventorypos;
+		vector2d questinfopos;
+	public:
+		settings();
+		~settings() {}
+		void save(char, string);
+		bool getfullscreen() { return fullscreen; }
+		byte getbgmvolume() { return bgmvolume; }
+		byte getsfxvolume() { return sfxvolume; }
+		bool accsaved() { return saveacc; }
+		string getdefaultacc() { return defaultacc; }
+		byte getdefworld() { return defaultworld; }
+		byte getdefch() { return defaultchannel; }
+		byte getdefchar() { return defaultchar; }
+		vector2d geteqspos() { return equipsinvpos; }
+		vector2d getstatspos() { return statsinfopos; }
+		vector2d getinvpos() { return inventorypos; }
+		vector2d getquestspos() { return questinfopos; }
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

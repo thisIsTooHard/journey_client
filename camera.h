@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,29 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "vector2d.h"
 
-using namespace program;
-using namespace net;
+using namespace util;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace gameplay
+{
+	class camera
+	{
+	private:
+		float movex;
+		float movey;
+		float posx;
+		float posy;
+		vector2d hbounds;
+		vector2d vbounds;
+	public:
+		camera();
+		~camera() {}
+		vector2d update(vector2d);
+		vector2d getposition();
+		void setposition(vector2d);
+		void setbounds(vector2d, vector2d);
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

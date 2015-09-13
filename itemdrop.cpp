@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,46 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "itemdrop.h"
 
-using namespace program;
-using namespace net;
+namespace maplemap
+{
+	itemdrop::itemdrop(short o, int id, int own, vector2d pos, vector2d dst, char type, bool pld, footholdtree* fht)
+	{
+		oid = o;
+		itemid = id;
+		ico = icon(itemid, true);
+		owner = own;
+		pickuptype = type;
+		playerdrop = pld;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+		footholds = fht;
+		fh = footholds->getbelow(pos);
+		fx = static_cast<float>(pos.x());
+		fy = static_cast<float>(pos.y());
+		alpha = 1.0f;
+		moved = 0.0f;
 
-extern int result;
-extern byte mapleversion;
+		if (pos == dst)
+		{
+			state = DST_FLOATING;
+			vspeed = 0;
+			hspeed = 0;
+			basey = fy;
+		}
+		else
+		{
+			state = DST_DROPPED;
+			vspeed = -6.0f;
+			hspeed = static_cast<float>(dst.x() - pos.x()) / 16;
+		}
+	}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;
+	void itemdrop::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	{
+		if (state != DST_INACTIVE)
+		{
+			ico.draw(viewpos + getposition(), alpha);
+		}
+	}
+}

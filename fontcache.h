@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,23 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "textlabel.h"
 
-using namespace program;
-using namespace net;
+using namespace std;
+using namespace graphics;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace program
+{
+	class fontcache
+	{
+	public:
+		fontcache() {}
+		~fontcache();
+		void init(IDWriteFactory*);
+		IDWriteTextFormat* getfont(dwfonts);
+	private:
+		unique_ptr<IDWriteFactory> fontfactory;
+		map<dwfonts, IDWriteTextFormat*> fonts;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,27 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "collision.h"
 
-using namespace program;
-using namespace net;
+namespace util
+{
+	bool colliding(vector2d a, vector2d b, vector2d dimb)
+	{
+		return (a.x() > b.x() && a.x() < b.x() + dimb.x()) && (a.y() > b.y() && a.y() < b.y() + dimb.y());
+	}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	bool colliding(vector2d a, pair<vector2d, vector2d> b)
+	{
+		return (a.x() > b.first.x() && a.x() < b.first.x() + b.second.x()) && (a.y() > b.first.y() && a.y() < b.first.y() + b.second.y());
+	}
 
-extern int result;
-extern byte mapleversion;
+	bool colliding(vector2d a, pair<vector2d, vector2d> b, vector2d c)
+	{
+		return (a.x() > b.first.x() + c.x() && a.x() < b.first.x() + c.x() + b.second.x()) && (a.y() > b.first.y() + c.y() && a.y() < b.first.y() + c.y() + b.second.y());
+	}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;
+	bool colliding(pair<vector2d, vector2d> a, pair<vector2d, vector2d> b)
+	{
+		return (a.first.x() + a.second.x() > b.first.x() && a.first.x() < b.first.x() + b.second.x()) && (a.first.y() + a.second.y() > b.first.y() && a.first.y() < b.first.y() + b.second.y());
+	}
+}

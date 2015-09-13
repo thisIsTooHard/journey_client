@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,51 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "uielement.h"
+#include "charset.h"
+#include "nametag.h"
 
-using namespace program;
-using namespace net;
+namespace io
+{
+	struct dmgeffect
+	{
+		int number;
+		char type; //2 - toplayer, 1 - crit, 0 - normal
+		float fx;
+		float fy;
+		float alpha;
+	};
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	struct statusinfo
+	{
+		bool white;
+		string text;
+		float alpha;
+	};
 
-extern int result;
-extern byte mapleversion;
+	class baseinterface : public uielement
+	{
+	public:
+		baseinterface() {}
+		~baseinterface() {}
+		void init();
+		void addstatusinfo(bool, string);
+		void showdamage(vector<pair<int, char>>, vector2d);
+		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void drawmobhp(char, vector2d);
+		void drawnpctag(string, string, vector2d);
+		void update();
+	private:
+		charset dmgset;
+		charset critset;
+		charset playerdmgset;
+		nametag npctag;
+		textlabel infotextw;
+		textlabel infotexty;
+		map<string, texture> mobhpbar;
+		vector<dmgeffect> dmgeffects;
+		vector<statusinfo> statusinfos;
+		SRWLOCK dmglock;
+	};
+}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

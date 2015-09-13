@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,62 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "gravityobject.h"
 
-using namespace program;
-using namespace net;
+namespace action
+{
+	gravityobject::gravityobject(vector2d pos, footholdtree* fht)
+	{
+		fx = static_cast<float>(pos.x());
+		fy = static_cast<float>(pos.y());
+		footholds = fht;
+		fh = fht->getbelow(pos);
+		hspeed = 0;
+		vspeed = 0;
+	}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	bool gravityobject::update()
+	{
+		bool groundhit = false;
 
-extern int result;
-extern byte mapleversion;
+		if (hspeed != 0 && vspeed == 0)
+		{
+			if (fx > fh.horizontal.y())
+			{
+				fh = footholds->getnext(false, fh);
+			}
+			else if (fx < fh.horizontal.x())
+			{
+				fh = footholds->getnext(true, fh);
+			}
+		}
+		else
+		{
+			fh = footholds->getbelow(getposition());
+		}
 
-extern void quit();
+		float ground = fh.resolvex(static_cast<int>(fx));
 
-const int SCREENW = 816;
-const int SCREENH = 624;
+		if (ground - fy <= fh.getslope() * abs(hspeed))
+		{
+			fy = ground;
+		}
+
+		if (ground > fy)
+		{
+			vspeed += grvacc;
+			vspeed = min(vspeed, maxvspeed);
+
+			if (fy + vspeed >= ground)
+			{
+				vspeed = 0;
+				fy = ground;
+				groundhit = true;
+			}
+		}
+
+		bool moveend = moveobject::update();
+
+		return groundhit;
+	}
+}

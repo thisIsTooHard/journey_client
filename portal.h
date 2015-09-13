@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,57 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "animation.h"
 
-using namespace program;
-using namespace net;
+using namespace std;
+using namespace util;
+using namespace graphics;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace gameplay
+{
+	enum portaltype : char
+	{
+		PT_SPAWN,
+		PT_INVISIBLE,
+		PT_REGULAR,
+		PT_TOUCH,
+		PT_4,
+		PT_5,
+		PT_WARP,
+		PT_SCRIPTED,
+		PT_SCRIPTED_INVISIBLE,
+		PT_SCRIPTED_TOUCH,
+		PT_HIDDEN,
+		PT_SCRIPTED_HIDDEN,
+		PT_SPRING1,
+		PT_SPRING2,
+		PT_14
+	};
 
-extern int result;
-extern byte mapleversion;
+	class portal
+	{
+	private:
+		animation anim;
+		portaltype type;
+		string pname;
+		vector2d position;
+		int targetid;
+		string targetpname;
+		bool touched;
+		bool intermap;
+	public:
+		portal();
+		~portal();
+		portal(portaltype, string, int, bool, string, animation, vector2d);
+		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void update();
+		void settouch(bool);
+		vector2d getposition();
+		vector2d getdimension();
+		portaltype gettype();
+		pair<int, string> getwarpinfo();
+		string getname();
+	};
+}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

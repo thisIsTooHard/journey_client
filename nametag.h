@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,28 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
+#include "texture.h"
+#include "textlabel.h"
 
-using namespace program;
-using namespace net;
+using namespace graphics;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace io
+{
+	class nametag
+	{
+	public:
+		nametag() {}
+		~nametag() {}
+		nametag(dwfonts, textcolor, vector<texture>, string, vector2d);
+		nametag(dwfonts, textcolor, map<bool, vector<texture>>, string, vector2d, bool);
+		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void setstate(bool a) { active = a; }
+	private:
+		textlabel content;
+		map<bool, vector<texture>> tag;
+		vector2d position;
+		bool active;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

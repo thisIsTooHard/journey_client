@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,36 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "stdfax.h"
 
-using namespace program;
-using namespace net;
+using namespace std;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace gameplay
+{
+	class mapleitem
+	{
+	public:
+		mapleitem() {}
+		~mapleitem() {}
+		mapleitem(int, short, short, char, bool, int64_t, int64_t, string, short);
+		mapleitem(int, short, char, bool, int64_t, int64_t, string, char, short, char);
+		bool canrecharge();
+		int getid() { return itemid; }
+		short getcount() { return count; }
+	protected:
+		int itemid;
+		short count;
+		short pos;
+		char type;
+		bool cash;
+		int64_t uniqueid;
+		int64_t expire;
+		string owner;
+		short flag;
+		string petname;
+		char petlevel;
+		short closeness;
+		char fullness;
+	};
+}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

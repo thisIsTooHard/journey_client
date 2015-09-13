@@ -28,6 +28,7 @@ session server;
 settings config;
 
 int result = 0;
+byte mapleversion = 0;
 
 void quit()
 {
@@ -36,11 +37,7 @@ void quit()
 }
 
 void CALLBACK Update(PVOID lpParam, BOOLEAN TimerOrWaitFired) {
-	if (WaitForSingleObject(gTimerStopEvent, 1) != WAIT_TIMEOUT)
-	{
-		SetEvent(gTimerDoneEvent);
-	}
-	else
+	if (result == 0)
 	{
 		app.getui()->update();
 		SetEvent(gTimerDoneEvent);
@@ -50,13 +47,14 @@ void CALLBACK Update(PVOID lpParam, BOOLEAN TimerOrWaitFired) {
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	result = server.init();
-	packet_c.init(&server);
 
-	if (result == 0)
+	if (result > 0)
 	{
+		mapleversion = result;
+		packet_c.init(&server, mapleversion);
+
 		HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 
-		gTimerStopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		gTimerDoneEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		hTimerQueue = CreateTimerQueue();
 
@@ -73,31 +71,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				MSG winmsg;
 				while (result == 0)
 				{
-					result = server.receive();
-
-					WaitForSingleObject(gTimerDoneEvent, DPF);
-
-					if (GetMessage(&winmsg, NULL, 0, 0))
+					if (WaitForSingleObject(gTimerDoneEvent, DPF) == WAIT_OBJECT_0)
 					{
-						TranslateMessage(&winmsg);
-						DispatchMessage(&winmsg);
+						server.receive();
+
+						if (GetMessage(&winmsg, NULL, 0, 0))
+						{
+							TranslateMessage(&winmsg);
+							DispatchMessage(&winmsg);
+						}
 					}
 				}
 
-				SetEvent(gTimerStopEvent);
 				WaitForSingleObject(gTimerDoneEvent, 1000);
-
-				if (result > 1)
-				{
-					string error = "Runtime error:\n";
-					switch (result)
-					{
-					case 2:
-						error.append("You have been disconnected.");
-						break;
-					}
-					MessageBox(NULL, error.c_str(), NULL, MB_OK);
-				}
 			}
 			else
 			{
@@ -114,11 +100,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		string error = "Connection failure:\n";
 		switch (result)
 		{
-		case 1:
-			error.append("Could not connect to server.");
+		case -1:
+			error.append("The server seems to be offline.");
 			break;
-		case 2:
-			error.append("Incorrect handshake packet.");
+		case -2:
+			error.append("Unsupported version.");
 			break;
 		}
 		MessageBox(NULL, error.c_str(), NULL, MB_OK);

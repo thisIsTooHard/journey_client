@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,33 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "mapinfo.h"
 
-using namespace program;
-using namespace net;
+namespace gameplay
+{
+	mapinfo::mapinfo(int id, node info, vector2d walls, vector2d borders)
+	{
+		mapid = id;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+		if (info["VRLeft"].istype(integernode))
+		{
+			mapwalls = vector2d(info["VRLeft"], info["VRRight"]);
+			mapborders = vector2d(info["VRTop"], info["VRBottom"]);
+		}
+		else
+		{
+			mapwalls = walls;
+			mapborders = borders;
+		}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;
+		string bgmpath = info["bgm"];
+		bgm = "Sound\\" + bgmpath.substr(0, bgmpath.find('/')) + ".img\\" + bgmpath.substr(0, bgmpath.find('/')) + ".img\\" + bgmpath.substr(bgmpath.find('/') + 1, bgmpath.size()) + ".mp3";
+		
+		cloud = info["cloud"].get_bool();
+		fieldlimit = static_cast<int>(info["fieldLimit"].get_integer());
+		hideminimap = info["hideMinimap"].get_bool();
+		mapmark = info["mapMark"].get_string();
+		swim = info["swim"].get_bool();
+		town = info["town"].get_bool();
+	}
+}

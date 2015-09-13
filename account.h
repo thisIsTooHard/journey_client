@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,38 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "maplechar.h"
 
-using namespace program;
-using namespace net;
+using namespace std;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
-
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;
+namespace gameplay
+{
+	class account
+	{
+	public:
+		account() {}
+		~account() {}
+		void init(int, string, char, bool, bool, short);
+		void selectchar(int);
+		void clear() { maplechars.clear(); }
+		char getslots() { return slots; }
+		bool isfemale() { return female; }
+		char getpic() { return pic; }
+		size_t charcount() { return maplechars.size(); }
+		void addchar(maplechar m) { maplechars.push_back(m); }
+		void setpicslots(char p, char s) { pic = p; slots = s; }
+		maplechar* getplayer() { return &maplechars[selected]; }
+		vector<maplechar>* getchars() { return &maplechars; }
+	private:
+		vector<maplechar> maplechars;
+		int accid;
+		string accname;
+		char gmlevel;
+		bool female;
+		bool muted;
+		short pin;
+		char pic; //0 - pic needed, 1 - has pic, 2 - no pic needed
+		char slots;
+		char selected;
+	};
+}

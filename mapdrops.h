@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,26 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "itemdrop.h"
+#include "mesodrop.h"
+#include "safeptrmap.h"
 
-using namespace program;
-using namespace net;
+namespace maplemap
+{
+	class mapdrops
+	{
+	public:
+		mapdrops() { footholds = 0; }
+		~mapdrops();
+		void adddrop(short, int, bool, int, vector2d, vector2d, char, bool);
+		void removedrop(short, char);
+		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void update();
+		void clear() { drops.clear(); }
+		void setfh(footholdtree* f) { footholds = f; }
+	private:
+		safeptrmap<short, drop*> drops;
+		footholdtree* footholds;
+	};
+}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
-
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,71 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "mapdrops.h"
 
-using namespace program;
-using namespace net;
+namespace maplemap
+{
+	void mapdrops::adddrop(short oid, int itemid, bool meso, int owner, vector2d pos, vector2d dest, char type, bool playerdrop)
+	{
+		if (drops.contains(oid))
+		{
+			drops.get(oid)->makeactive();
+		}
+		else
+		{
+			drop* toadd = 0;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+			if (meso)
+			{
+				toadd = new mesodrop(oid, itemid, owner, pos, dest, type, playerdrop, footholds);
+			}
+			else
+			{
+				toadd = new itemdrop(oid, itemid, owner, pos, dest, type, playerdrop, footholds);
+			}
 
-extern int result;
-extern byte mapleversion;
+			drops.add(oid, toadd);
+		}
+	}
 
-extern void quit();
+	void mapdrops::removedrop(short oid, char mode)
+	{
+		if (drops.contains(oid))
+		{
+			drops.get(oid)->expire(mode);
+		}
+	}
 
-const int SCREENW = 816;
-const int SCREENH = 624;
+	void mapdrops::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	{
+		for (int i = 0; i < drops.getend(); i++)
+		{
+			drops.getnext(i)->draw(target, viewpos);
+		}
+	}
+
+	void mapdrops::update()
+	{
+		vector<int> toremove;
+
+		for (int i = 0; i < drops.getend(); i++)
+		{
+			bool expired = drops.getnext(i)->update();
+
+			if (expired)
+			{
+				toremove.push_back(i);
+			}
+		}
+
+		for (vector<int>::iterator rmit = toremove.begin(); rmit != toremove.end(); rmit++)
+		{
+			drops.remove(*rmit);
+		}
+	}
+
+	mapdrops::~mapdrops()
+	{
+		drops.clear();
+	}
+}

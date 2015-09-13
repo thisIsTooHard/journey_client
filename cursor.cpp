@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,32 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "cursor.h"
+#include "Journey.h"
 
-using namespace program;
-using namespace net;
+namespace io
+{
+	cursor::cursor()
+	{
+		position = vector2d();
+		state = MST_IDLE;
+	}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	void cursor::init(imagecache* img)
+	{
+		img->setmode(ict_sys);
+		nl::nx::view_file("UI");
+		node cursornode = nl::nx::nodes["UI"]["Basic.img"]["Cursor"];
+		for (mousestate i = MST_IDLE; i <= MST_RCLICK; i = (mousestate) (i + 1))
+		{
+			sprites[i] = animation(cursornode[to_string(i)]);
+		}
+		nl::nx::unview_file("UI");
+		img->unlock();
+	}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;
+	void cursor::draw(ID2D1HwndRenderTarget* target)
+	{
+		sprites[state].draw(target, position);
+	}
+}

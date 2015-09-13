@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,22 +16,26 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "moveobject.h"
+#include "footholdtree.h"
 
-using namespace program;
-using namespace net;
+using namespace gameplay;
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+namespace action
+{
+	const float maxvspeed = 7.7f;
+	const float grvacc = 0.5f;
 
-extern int result;
-extern byte mapleversion;
+	class gravityobject : public moveobject
+	{
+	public:
+		gravityobject(vector2d, footholdtree*);
+		gravityobject() {}
+		virtual ~gravityobject() {}
+		bool update();
+	protected:
+		footholdtree* footholds;
+		foothold fh;
+	};
+}
 
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;

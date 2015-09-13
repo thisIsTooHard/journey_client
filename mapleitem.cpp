@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -15,23 +15,41 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "packetcreator.h"
-#include "winapp.h"
-#include "settings.h"
+#include "mapleitem.h"
 
-using namespace program;
-using namespace net;
+namespace gameplay
+{
+	mapleitem::mapleitem(int id, short c, short p, char typ, bool cs, int64_t uq, int64_t exp, string own, short fl)
+	{
+		itemid = id;
+		count = c;
+		pos = p;
+		type = typ;
+		cash = cs;
+		uniqueid = uq;
+		expire = exp;
+		owner = own;
+		flag = fl;
+	}
 
-extern packetcreator packet_c;
-extern winapp app;
-extern session server;
-extern settings config;
+	mapleitem::mapleitem(int id, short p, char typ, bool cs, int64_t uq, int64_t exp, string name, char lv, short close, char full)
+	{
+		itemid = id;
+		count = 1;
+		pos = p;
+		type = typ;
+		cash = cs;
+		uniqueid = uq;
+		expire = exp;
+		flag = -1;
+		petname = name;
+		petlevel = lv;
+		closeness = close;
+		fullness = full;
+	}
 
-extern int result;
-extern byte mapleversion;
-
-extern void quit();
-
-const int SCREENW = 816;
-const int SCREENH = 624;
+	bool mapleitem::canrecharge()
+	{
+		return itemid / 10000 == 233 || itemid / 10000 == 207;
+	}
+}
