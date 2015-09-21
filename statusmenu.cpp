@@ -44,6 +44,8 @@ namespace io
 		position = vector2d(721, 366);
 		dimensions = vector2d(79, 176);
 		active = true;
+		dragged = false;
+		buttoncd = 0;
 	}
 
 	void statusmenu::draw(ID2D1HwndRenderTarget* target)

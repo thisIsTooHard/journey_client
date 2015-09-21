@@ -38,6 +38,10 @@ namespace action
 
 		nl::node src = nl::nx::nodes["Skill"][fullname.substr(0, 3) + ".img"]["skill"][fullname];
 
+		icon[0] = texture(src["icon"]);
+		icon[1] = texture(src["iconDisabled"]);
+		icon[2] = texture(src["iconMouseOver"]);
+
 		if (src["effect"]["0"].istype(bitmapnode))
 		{
 			skill_e.push_back(animation(src["effect"]));

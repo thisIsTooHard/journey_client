@@ -40,6 +40,7 @@ namespace io
 		UI_CREATECHAR,
 		UI_BASEINTERFACE,
 		UI_STATUSBAR,
+		UI_CHATBAR,
 		UI_SYSTEM,
 		UI_KEYCONFIG,
 		UI_STATSINFO,
@@ -134,21 +135,24 @@ namespace io
 		BT_CHAR5,
 		BT_CHAR6,
 		BT_CHAR7,
-		BT_CASHSHOP,
-		BT_TRADE,
-		BT_MENU,
-		BT_SYSOP,
-		BT_CHANNEL,
-		BT_CHARINFO,
-		BT_STATS,
-		BT_QUEST,
-		BT_INVENTORY,
-		BT_SKILL,
-		BT_FARM,
-		BT_KEYMAP,
-		BT_CALLGM,
-		BT_CHAT,
-		BT_EQUIPS,
+		BT_BAR_CASHSHOP,
+		BT_BAR_TRADE,
+		BT_BAR_MENU,
+		BT_BAR_SYSOP,
+		BT_BAR_CHANNEL,
+		BT_BAR_WHISPER,
+		BT_BAR_CALLGM,
+		BT_BAR_CHARINFO,
+		BT_BAR_STATS,
+		BT_BAR_QUEST,
+		BT_BAR_INVENTORY,
+		BT_BAR_SKILL,
+		BT_BAR_FARM,
+		BT_BAR_KEYMAP,
+		BT_BAR_EQUIPS,
+		BT_BAR_OPENCHAT,
+		BT_BAR_CLOSECHAT,
+		BT_BAR_CHATTARGET,
 		BT_PETEQUIP,
 		BT_CHANGECH,
 		BT_KEYCONFIG,
@@ -156,18 +160,20 @@ namespace io
 		BT_JOYPAD,
 		BT_GOPTIONS,
 		BT_QUITGAME,
+		BT_STATS_AUTO,
+		BT_STATS_HP,
+		BT_STATS_MP,
+		BT_STATS_STR,
+		BT_STATS_DEX,
+		BT_STATS_LUK,
+		BT_STATS_INT,
+		BT_STATS_DETAILOPEN,
+		BT_STATS_DETAILCLOSE,
 		BT_KEYS_CANCEL,
 		BT_KEYS_CLEAR,
 		BT_KEYS_OK,
 		BT_KEYS_DEFAULT,
 		BT_KEYS_QUICK
-	};
-
-	enum textfieldid : short
-	{
-		TXT_ACC,
-		TXT_PASS,
-		TXT_NAMECHAR
 	};
 
 	class uielement
@@ -180,20 +186,26 @@ namespace io
 		virtual void update();
 		virtual void sendicon(dragicon*, vector2d);
 		virtual void sendbool(bool b) {}
+		virtual void oniteminfo(dragicon* d) {}
 		mousestate sendmouse(vector2d, mousestate);
-		virtual pair<vector2d, vector2d> bounds() { return pair<vector2d, vector2d>(position, dimensions); }
+		virtual rectangle2d bounds() { return rectangle2d(position, position + dimensions); }
+		virtual rectangle2d dragarea() { return rectangle2d(position, position); }
 		void setbutton(short i, string s) { if (buttons.count(i)) buttons[i].setstate(s); }
 		void togglehide() { active = !active; }
 		void deactivate() { active = false; }
 		bool isactive() { return active; }
+		bool isdragged() { return dragged; }
 	protected:
 		map<short, button> buttons;
-		map<short, textfield> textfields;
+		map<textid, textfield> textfields;
 		vector<dragicon> dragicons;
 		vector<sprite> sprites;
 		vector2d position;
 		vector2d dimensions;
+		vector2d cursorrel;
 		bool active;
+		bool dragged;
+		short buttoncd;
 	};
 }
 

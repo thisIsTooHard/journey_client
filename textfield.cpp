@@ -20,54 +20,63 @@
 
 namespace io
 {
-	textfield::textfield(dwfonts fnt, textcolor col, string default, vector2d pos, int length)
+	textfield::textfield(textid i, dwfonts fnt, textcolor col, string default, vector2d pos, int length)
 	{
+		id = i;
 		content = textlabel(fnt, col, default);
 		position = pos;
 		maxlength = length;
-		state = "inactive";
+		active = true;
+		focused = false;
 		showmark = false;
 		markpos = default.length();
 	}
 
-	pair<vector2d, vector2d> textfield::bounds()
+	rectangle2d textfield::bounds()
 	{
-		return pair<vector2d, vector2d>(position, vector2d(12 * maxlength, 24));
+		return rectangle2d(position, position + vector2d(12 * maxlength, 24));
 	}
 
 	void textfield::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
 	{
-		vector2d absp = position + parentpos;
+		if (active)
+		{
+			vector2d absp = position + parentpos;
 
-		if (content.gettext() == "" && state == "inactive")
-		{
-			if (bg.isloaded())
+			if (content.gettext() == "" && !focused)
 			{
-				bg.draw(absp + bgposition);
-			}
-		}
-		else
-		{
-			if (state == "active" && showmark && markpos == content.gettext().length())
-			{
-				content.setmarker(true);
+				if (bg.isloaded())
+				{
+					bg.draw(absp + bgposition);
+				}
 			}
 			else
 			{
-				content.setmarker(false);
-			}
+				if (focused && showmark && markpos == content.gettext().length())
+				{
+					content.setmarker(true);
+				}
+				else
+				{
+					content.setmarker(false);
+				}
 
-			content.draw(target, absp);
+				content.draw(target, absp);
+			}
 		}
 	}
 
 	void textfield::update()
 	{
-		elapsed += 16;
-		if (elapsed >= 300)
+		if (active)
 		{
-			showmark = !showmark;
-			elapsed -= 300;
+			elapsed += 16;
+
+			if (elapsed >= 300)
+			{
+				showmark = !showmark;
+				elapsed -= 300;
+			}
 		}
 	}
 
@@ -77,11 +86,11 @@ namespace io
 		bgposition = vector2d(x, y);
 	}
 
-	void textfield::setstate(string st)
+	void textfield::setfocus(bool f)
 	{
 		elapsed = 0;
 		showmark = true;
-		state = st;
+		focused = f;
 		markpos = content.gettext().length();
 	}
 

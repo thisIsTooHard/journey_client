@@ -45,6 +45,14 @@ namespace gameplay
 		vector<int> petids;
 	};
 
+	struct bodydrawinfo
+	{
+		map<string, map<byte, short>> delays;
+		map<string, map<byte, bodyaction>> actions;
+		map<string, map<byte, vector2d>> facepos;
+		map<string, map<byte, map<charlayer, map<string, vector2d>>>> posmap;
+	};
+
 	enum movetype
 	{
 		MVT_NONE,
@@ -68,41 +76,44 @@ namespace gameplay
 		short duration;
 	};
 
+	const string clothstrings[15] = { "Cap", "FaceAcc", "EyeAcc", "Earrings", "Coat", "Longcoat", "Pants", "Shoes", "Glove", "Shield", "Cape", "Weapon", "Pendant", "Belt", "Medal" };
+
 	class maplelook
 	{
 	public:
 		maplelook() {}
 		~maplelook() {}
 		maplelook(lookinfo);
-		void init(map<string, map<byte, short>>, map<string, map<byte, bodyaction>>);
+		void init(bodydrawinfo*);
+		void addcloth(clothing*);
+		void addcloth(clothing*, equiplayer);
 		void draw(ID2D1HwndRenderTarget*, vector2d);
 		bool update();
 		void setstate(string);
 		void setstate(string, float);
 		void setaction(string, float);
+		void setexpression(char);
 		void setposition(vector2d p) { position = p; }
 		void setfleft(bool f) { faceleft = f; }
-		void addcloth(clothing c) { clothes[c.gettype()] = c; }
-		void removecloth(string s) { clothes.erase(s); }
-		void setface(facetype f) { face = f; }
-		void sethair(hairstyle h) { hair = h; }
-		void setbody(bodytype b) { body = b; }
-		void setexpression(char c) { face.setexp(c); }
+		void removecloth(equiplayer l) { clothes.erase(l); }
+		void setface(facetype* f) { face = f; }
+		void sethair(hairstyle* h) { hair = h; }
+		void setbody(bodytype* b) { body = b; }
 		bool isloaded() { return loaded; }
+		weapontype getweptype() { return clothes[EQL_WEAPON]->getweptype(); }
 		string getstate() { return state; }
 		lookinfo* getinfo() { return &info; }
-		bodytype* getbody() { return &body; }
-		facetype* getface() { return &face; }
-		hairstyle* gethair() { return &hair; }
-		clothing* getcloth(string s) { return &clothes[s]; }
+		bodytype* getbody() { return body; }
+		facetype* getface() { return face; }
+		hairstyle* gethair() { return hair; }
+		clothing* getcloth(equiplayer l) { return clothes[l]; }
 	private:
-		map<string, map<byte, short>> delays;
-		map<string, map<byte, bodyaction>> bodyactions;
 		lookinfo info;
-		bodytype body;
-		facetype face;
-		hairstyle hair;
-		map<string, clothing> clothes;
+		bodydrawinfo* bodyinfo;
+		bodytype* body;
+		facetype* face;
+		hairstyle* hair;
+		map<equiplayer, clothing*> clothes;
 		string name;
 		bool loaded;
 		bool faceleft;
@@ -113,6 +124,9 @@ namespace gameplay
 		byte actionframe;
 		short elapsed;
 		float anispeed;
+		string state_f;
+		short elapsed_f;
+		byte frame_f;
 	};
 }
 

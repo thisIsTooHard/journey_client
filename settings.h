@@ -24,37 +24,63 @@ using namespace util;
 
 namespace program
 {
+	enum configtype
+	{
+		CFT_FULLSCREEN,
+		CFT_SFXVOLUME,
+		CFT_BGMVOLUME,
+		CFT_SAVEID,
+		CFT_DEFAULTID,
+		CFT_DEFAULTWORLD,
+		CFT_DEFAULTCHANNEL,
+		CFT_DEFAULTCHAR,
+		CFT_CHATOPEN,
+		CFT_UIPOS_EQUIPS,
+		CFT_UIPOS_STATS,
+		CFT_UIPOS_INVENT,
+		CFT_UIPOS_QUESTS
+	};
+
 	class settings
 	{
-	private:
-		bool fullscreen;
-		byte bgmvolume;
-		byte sfxvolume;
-		bool saveacc;
-		string defaultacc;
-		byte defaultworld;
-		byte defaultchannel;
-		byte defaultchar;
-		vector2d equipsinvpos;
-		vector2d statsinfopos;
-		vector2d inventorypos;
-		vector2d questinfopos;
 	public:
 		settings();
-		~settings() {}
+		~settings();
 		void save(char, string);
+		void setsaveid(bool s) { saveid = s; }
+		void setdefacc(string a) { defaultacc = a; }
+		void setdefworld(byte v) { defaultworld = v; }
+		void setdefchannel(byte v) { defaultchannel = v; }
+		void setdefchar(byte v) { defaultchar = v; }
+		void setchatopen(bool o) { chatopen = o; }
 		bool getfullscreen() { return fullscreen; }
 		byte getbgmvolume() { return bgmvolume; }
 		byte getsfxvolume() { return sfxvolume; }
-		bool accsaved() { return saveacc; }
+		bool getsaveid() { return saveid; }
 		string getdefaultacc() { return defaultacc; }
 		byte getdefworld() { return defaultworld; }
 		byte getdefch() { return defaultchannel; }
 		byte getdefchar() { return defaultchar; }
+		bool getchatopen() { return chatopen; }
 		vector2d geteqspos() { return equipsinvpos; }
 		vector2d getstatspos() { return statsinfopos; }
 		vector2d getinvpos() { return inventorypos; }
 		vector2d getquestspos() { return questinfopos; }
+	private:
+		map<configtype, string> configs;
+		bool fullscreen;
+		byte bgmvolume;
+		byte sfxvolume;
+		bool saveid;
+		string defaultacc;
+		byte defaultworld;
+		byte defaultchannel;
+		byte defaultchar;
+		bool chatopen;
+		vector2d equipsinvpos;
+		vector2d statsinfopos;
+		vector2d inventorypos;
+		vector2d questinfopos;
 	};
 }
 

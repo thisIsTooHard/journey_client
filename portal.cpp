@@ -17,15 +17,12 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "portal.h"
 
-namespace gameplay
+namespace maplemap
 {
-	portal::portal(){}
-	portal::~portal(){}
-
-	portal::portal(portaltype tp, string name, int tid, bool in, string tpn, animation ani, vector2d pos)
+	portal::portal(portaltype tp, string nm, int tid, bool in, string tpn, animation ani, vector2d pos)
 	{
 		type = tp;
-		pname = name;
+		name = nm;
 		targetid = tid;
 		intermap = in;
 		targetpname = tpn;
@@ -47,43 +44,5 @@ namespace gameplay
 				anim.draw(target, position + parentpos);
 			}
 		}
-	}
-
-	void portal::update()
-	{
-		anim.update(8);
-	}
-
-	void portal::settouch(bool t)
-	{
-		touched = t;
-	}
-
-	vector2d portal::getposition()
-	{
-		return position;
-	}
-
-	vector2d portal::getdimension()
-	{
-		return vector2d(30, 50);
-	}
-
-	portaltype portal::gettype()
-	{
-		return type;
-	}
-
-	pair<int, string> portal::getwarpinfo()
-	{
-		if (intermap)
-			return make_pair(targetid, targetpname);
-		else
-			return make_pair(targetid, pname);
-	}
-
-	string portal::getname()
-	{
-		return pname;
 	}
 }

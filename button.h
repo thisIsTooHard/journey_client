@@ -35,9 +35,10 @@ namespace io
 	class button
 	{
 	public:
+		button(node);
 		button(node, int, int);
 		button(texture, texture, int, int);
-		button(int, int, int, int);
+		button(vector2d, vector2d);
 		button() {}
 		~button() {}
 		pair<vector2d, vector2d> bounds();
@@ -48,7 +49,7 @@ namespace io
 		bool isactive() { return active; }
 		string getstate() { return state; }
 	private:
-		map<string, texture> sprites;
+		map<string, texture> textures;
 		vector2d position;
 		vector2d dimension;
 		string state;

@@ -52,11 +52,11 @@ namespace program
 						action.delay = (delay < 0) ? -delay : delay;
 						action.frame = static_cast<byte>(framenode["frame"]);
 
-						bodyactions[state][frame] = action;
+						bodyinfo.actions[state][frame] = action;
 					}
 					else
 					{
-						bodydelays[state][frame] = delay;
+						bodyinfo.delays[state][frame] = delay;
 
 						for (node partnode = framenode.begin(); partnode != framenode.end(); partnode++)
 						{
@@ -85,10 +85,10 @@ namespace program
 
 									if (mapnode.name() == "neck")
 									{
-										facepos[state][frame] = shift;
+										bodyinfo.facepos[state][frame] = shift;
 									}
 
-									bodyheadmap[state][frame][z][mapnode.name()] = shift;
+									bodyinfo.posmap[state][frame][z][mapnode.name()] = shift;
 								}
 							}
 						}
@@ -99,11 +99,11 @@ namespace program
 							vector2d shift = vector2d(mapnode.x(), mapnode.y());
 
 							if (mapnode.name() == "neck")
-								facepos[state][frame] = facepos[state][frame] - shift;
+								bodyinfo.facepos[state][frame] = bodyinfo.facepos[state][frame] - shift;
 							else if (mapnode.name() == "brow")
-								facepos[state][frame] = facepos[state][frame] + shift;
+								bodyinfo.facepos[state][frame] = bodyinfo.facepos[state][frame] + shift;
 
-							bodyheadmap[state][frame][CL_HEAD][mapnode.name()] = shift;
+							bodyinfo.posmap[state][frame][CL_HEAD][mapnode.name()] = shift;
 						}
 					}
 				}
@@ -127,46 +127,54 @@ namespace program
 				}
 			}
 
+			for (equiplayer l = EQL_CAP; l <= EQL_MEDAL; l = static_cast<equiplayer>(l + 1))
+			{
+				if (!plook->getcloth(l))
+				{
+					plook->addcloth(&emptycloth, l);
+				}
+			}
+
 			plook->setbody(getbody(info->skin));
 			plook->setface(getface(info->faceid));
 			plook->sethair(gethair(info->hairid));
-			plook->init(bodydelays, bodyactions);
+			plook->init(&bodyinfo);
 		}
 	}
 
-	bodytype lookfactory::getbody(char sk)
+	bodytype* lookfactory::getbody(char sk)
 	{
 		if (!bodytypes.count(sk))
 		{
-			bodytypes[sk] = bodytype(sk, &bodyheadmap);
+			bodytypes[sk] = bodytype(sk, &bodyinfo.posmap);
 		}
-		return bodytypes[sk];
+		return &bodytypes[sk];
 	}
 
-	facetype lookfactory::getface(int fid)
+	facetype* lookfactory::getface(int fid)
 	{
 		if (!faces.count(fid))
 		{
-			faces[fid] = facetype(fid, facepos);
+			faces[fid] = facetype(fid);
 		}
-		return faces[fid];
+		return &faces[fid];
 	}
 
-	hairstyle lookfactory::gethair(int hid)
+	hairstyle* lookfactory::gethair(int hid)
 	{
 		if (!hairstyles.count(hid))
 		{
-			hairstyles[hid] = hairstyle(hid, &bodyheadmap);
+			hairstyles[hid] = hairstyle(hid, &bodyinfo.posmap);
 		}
-		return hairstyles[hid];
+		return &hairstyles[hid];
 	}
 	
-	clothing lookfactory::getcloth(int iid)
+	clothing* lookfactory::getcloth(int iid)
 	{
 		if (!clothes.count(iid))
 		{
-			clothes[iid] = clothing(iid, &bodyheadmap);
+			clothes[iid] = clothing(iid, &bodyinfo.posmap);
 		}
-		return clothes[iid];
+		return &clothes[iid];
 	}
 }

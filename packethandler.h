@@ -25,7 +25,6 @@
 #include "mapleequip.h"
 
 using namespace io;
-using namespace std;
 using namespace util;
 using namespace gameplay;
 
@@ -76,7 +75,8 @@ namespace net
 		SPAWN_MOB = 236,
 		KILL_MOB = 237,
 		SPAWN_MOB_C = 238,
-		MOVE_MOB = 239,
+		MOB_MOVED = 239,
+		MOVE_MOB_RESPONSE = 240,
 		SHOW_MOB_HP = 250,
 		SPAWN_NPC = 257,
 		SPAWN_NPC_C = 259,

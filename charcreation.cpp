@@ -91,8 +91,8 @@ namespace io
 		buttons[BT_CHARC_GENDERL].setactive(false);
 		buttons[BT_CHARC_GEMDERR].setactive(false);
 
-		textfields[TXT_NAMECHAR] = textfield(DWF_14L, TXC_WHITE, "", vector2d(490, 217), 12);
-		textfields[TXT_NAMECHAR].setstate("active");
+		textfields[TXT_NAMECHAR] = textfield(TXT_NAMECHAR, DWF_14L, TXC_WHITE, "", vector2d(490, 217), 12);
+		textfields[TXT_NAMECHAR].setfocus(true);
 		app.getui()->settextfield(&textfields[TXT_NAMECHAR]);
 
 		setlabel = textlabel(DWF_12C, TXC_BLACK, "");
@@ -199,6 +199,8 @@ namespace io
 		position = vector2d(0, 0);
 		dimensions = vector2d(800, 600);
 		active = true;
+		dragged = false;
+		buttoncd = 0;
 		cloudfx = 200.0f;
 		name = "";
 	}
@@ -219,6 +221,8 @@ namespace io
 				if (name.size() >= 4)
 				{
 					app.getui()->disableactions();
+					app.getui()->settextfield(0);
+					textfields[TXT_NAMECHAR].setfocus(false);
 					packet_c.checkcharname(name);
 				}
 				else
@@ -252,11 +256,13 @@ namespace io
 				buttons[BT_CHARC_GENDERL].setactive(false);
 				buttons[BT_CHARC_GEMDERR].setactive(false);
 				buttons[BT_CHARC_CANCEL].setstate("normal");
+				textfields[TXT_NAMECHAR].setactive(true);
 				named = false;
 			}
 			else
 			{
 				active = false;
+				app.getui()->settextfield(0);
 				app.getui()->remove(UI_CHARSEL);
 				app.getui()->add(UI_CHARSEL);
 			}
@@ -401,6 +407,7 @@ namespace io
 				buttons[BT_CHARC_WEPR].setactive(true);
 				buttons[BT_CHARC_GENDERL].setactive(true);
 				buttons[BT_CHARC_GEMDERR].setactive(true);
+				textfields[TXT_NAMECHAR].setactive(false);
 			}
 			buttons[BT_CHARC_OK].setstate("normal");
 		}
@@ -441,20 +448,16 @@ namespace io
 		{
 			newchar.draw(target, position);
 
-			if (!named)
-			{
-				textfields[TXT_NAMECHAR].draw(target, vector2d());
-			}
-			else
+			if (named)
 			{
 				setlabel.draw(newchar.getface()->getname(), target, vector2d(591, 214));
 				setlabel.draw(newchar.gethair()->getname(), target, vector2d(591, 233));
 				setlabel.draw(newchar.gethair()->getcolor(), target, vector2d(591, 252));
 				setlabel.draw(newchar.getbody()->getname(), target, vector2d(591, 271));
-				setlabel.draw(newchar.getcloth("Coat")->getname(), target, vector2d(591, 290));
-				setlabel.draw(newchar.getcloth("Pants")->getname(), target, vector2d(591, 309));
-				setlabel.draw(newchar.getcloth("Shoes")->getname(), target, vector2d(591, 328));
-				setlabel.draw(newchar.getcloth("Weapon")->getname(), target, vector2d(591, 347));
+				setlabel.draw(newchar.getcloth(EQL_COAT)->getname(), target, vector2d(591, 290));
+				setlabel.draw(newchar.getcloth(EQL_PANTS)->getname(), target, vector2d(591, 309));
+				setlabel.draw(newchar.getcloth(EQL_SHOES)->getname(), target, vector2d(591, 328));
+				setlabel.draw(newchar.getcloth(EQL_WEAPON)->getname(), target, vector2d(591, 347));
 				setlabel.draw(female? "Female" : "Male", target, vector2d(591, 366));
 			}
 		}
@@ -462,13 +465,10 @@ namespace io
 
 	void charcreation::update()
 	{
+		uielement::update();
+
 		if (active)
 		{
-			if (!named)
-			{
-				textfields[TXT_NAMECHAR].update();
-			}
-
 			newchar.update();
 
 			if (cloudfx < cloud.getdimension().x())

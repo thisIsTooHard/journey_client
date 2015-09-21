@@ -16,12 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "stdfax.h"
 #include "uielement.h"
-#include "inventory.h"
-#include "icon.h"
+#include "player.h"
 
-using namespace std;
 using namespace gameplay;
 
 namespace io
@@ -29,17 +26,18 @@ namespace io
 	class equipinventory : public uielement
 	{
 	public:
-		equipinventory(inventory*);
-		~equipinventory();
+		equipinventory(player*);
+		~equipinventory() {}
 		void draw(ID2D1HwndRenderTarget*);
-		void update();
 		void buttonpressed(short);
+		void oniteminfo(dragicon*);
+		rectangle2d dragarea();
 	private:
-		vector2d* iconpositions;
-		map<short, icon> equips;
+		maplelook* look;
 		inventory* invent;
+		maplestats* stats;
+		vector<texture> petsprites;
 		bool showpet;
-		vector<sprite> petsprites;
 	};
 }
 

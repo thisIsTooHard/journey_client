@@ -29,20 +29,18 @@ namespace program
 		~lookfactory() {}
 		void init();
 		void loadcharlook(maplelook*);
-		bodytype getbody(char);
-		hairstyle gethair(int);
-		facetype getface(int);
-		clothing getcloth(int);
+		bodytype* getbody(char);
+		hairstyle* gethair(int);
+		facetype* getface(int);
+		clothing* getcloth(int);
 	private:
 		void initbodyinfo();
+		clothing emptycloth;
+		bodydrawinfo bodyinfo;
 		map<int, facetype> faces;
 		map<char, bodytype> bodytypes;
 		map<int, hairstyle> hairstyles;
 		map<int, clothing> clothes;
-		map<string, map<byte, short>> bodydelays;
-		map<string, map<byte, bodyaction>> bodyactions;
-		map<string, map<byte, vector2d>> facepos;
-		map<string, map<byte, map<charlayer, map<string, vector2d>>>> bodyheadmap;
 	};
 }
 

@@ -26,47 +26,44 @@ namespace io
 		app.getimgcache()->setmode(ict_login);
 		nl::nx::view_file("UI");
 
-		node title = nl::nx::nodes["UI"].resolve("Login.img/Title/");
-		node common = nl::nx::nodes["UI"].resolve("Login.img/Common/");
+		node title = nl::nx::nodes["UI"]["Login.img"]["Title"];
+		node common = nl::nx::nodes["UI"]["Login.img"]["Common"];
 
-		sprites.push_back(sprite(animation(title.resolve("11")), vector2d(410, 300)));
-		sprites.push_back(sprite(animation(title.resolve("35")), vector2d(410, 260)));
-		sprites.push_back(sprite(animation(title.resolve("Logo")), vector2d(410, 130)));
-		sprites.push_back(sprite(animation(title.resolve("signboard")), vector2d(410, 300)));
-		sprites.push_back(sprite(animation(common.resolve("frame")), vector2d(400, 290)));
+		sprites.push_back(sprite(animation(title["11"]), vector2d(410, 300)));
+		sprites.push_back(sprite(animation(title["35"]), vector2d(410, 260)));
+		sprites.push_back(sprite(animation(title["Logo"]), vector2d(410, 130)));
+		sprites.push_back(sprite(animation(title["signboard"]), vector2d(410, 300)));
+		sprites.push_back(sprite(animation(common["frame"]), vector2d(400, 290)));
 
-		buttons[BT_LOGIN] = button(title.resolve("BtLogin"), 475, 248);
-		buttons[BT_NEW] = button(title.resolve("BtNew"), 309, 320);
-		buttons[BT_HOMEPAGE] = button(title.resolve("BtHomePage"), 382, 320);
-		buttons[BT_PWDLOST] = button(title.resolve("BtPasswdLost"), 470, 300);
-		buttons[BT_QUIT] = button(title.resolve("BtQuit"), 455, 320);
-		buttons[BT_LOGINLOST] = button(title.resolve("BtLoginIDLost"), 395, 300);
-		buttons[BT_SAVEID] = button(title.resolve("BtLoginIDSave"), 325, 300);
+		buttons[BT_LOGIN] = button(title["BtLogin"], 475, 248);
+		buttons[BT_NEW] = button(title["BtNew"], 309, 320);
+		buttons[BT_HOMEPAGE] = button(title["BtHomePage"], 382, 320);
+		buttons[BT_PWDLOST] = button(title["BtPasswdLost"], 470, 300);
+		buttons[BT_QUIT] = button(title["BtQuit"], 455, 320);
+		buttons[BT_LOGINLOST] = button(title["BtLoginIDLost"], 395, 300);
+		buttons[BT_SAVEID] = button(title["BtLoginIDSave"], 325, 300);
 
-		bool saveid = config.accsaved();
-		saveidcheck = sprite(animation(title.resolve("check")), vector2d(313, 304));
+		string defaultacc = config.getdefaultacc();
+		saveid = config.getsaveid();
 
-		string defaultacc;
+		saveidcheck[false] = texture(title["check"]["0"]);
+		saveidcheck[true] = texture(title["check"]["1"]);
+
+		textfields[TXT_ACC] = textfield(TXT_ACC, DWF_14L, TXC_WHITE, defaultacc, vector2d(315, 249), 12);
+		textfields[TXT_ACC].setbg(texture(title["ID"]), -5, 0);
+
+		textfields[TXT_PASS] = textfield(TXT_PASS, DWF_14L, TXC_WHITE, "", vector2d(315, 275), 12);
+		textfields[TXT_PASS].setbg(texture(title["PW"]), -5, 0);
+
 		if (saveid)
-			defaultacc = config.getdefaultacc();
-		else
-			defaultacc = "";
-
-		textfields[TXT_ACC] = textfield(DWF_14L, TXC_WHITE, defaultacc, vector2d(315, 249), 12);
-		textfields[TXT_ACC].setbg(texture(title.resolve("ID")), -5, 0);
-
-		textfields[TXT_PASS] = textfield(DWF_14L, TXC_WHITE, "", vector2d(315, 275), 12);
-		textfields[TXT_PASS].setbg(texture(title.resolve("PW")), -5, 0);
-
-		if (!saveid)
 		{
-			textfields[TXT_ACC].setstate("active");
-			app.getui()->settextfield(&textfields[0]);
+			textfields[TXT_PASS].setfocus(true);
+			app.getui()->settextfield(&textfields[TXT_PASS]);
 		}
 		else
 		{
-			textfields[TXT_PASS].setstate("active");
-			app.getui()->settextfield(&textfields[1]);
+			textfields[TXT_ACC].setfocus(true);
+			app.getui()->settextfield(&textfields[TXT_ACC]);
 		}
 
 		nl::nx::unview_file("UI");
@@ -74,6 +71,8 @@ namespace io
 		position = vector2d(0, 0);
 		dimensions = vector2d(800, 600);
 		active = true;
+		dragged = false;
+		buttoncd = 0;
 	}
 
 	void login::draw(ID2D1HwndRenderTarget* target)
@@ -82,26 +81,7 @@ namespace io
 
 		if (active)
 		{
-			saveidcheck.setframe((saveid) ? 0 : 1);
-			saveidcheck.draw(target, position);
-
-			for (std::map<short, textfield>::iterator ittxt = textfields.begin(); ittxt != textfields.end(); ittxt++)
-			{
-				ittxt->second.draw(target, position);
-			}
-		}
-	}
-
-	void login::update()
-	{
-		uielement::update();
-
-		if (active)
-		{
-			for (std::map<short, textfield>::iterator ittxt = textfields.begin(); ittxt != textfields.end(); ittxt++)
-			{
-				ittxt->second.update();
-			}
+			saveidcheck[saveid].draw(position + vector2d(313, 304));
 		}
 	}
 
@@ -111,8 +91,9 @@ namespace io
 		{
 		case BT_LOGIN:
 			app.getui()->disableactions();
-			if (saveid)
-				config.save(3, textfields[TXT_ACC].text());
+			app.getui()->settextfield(0);
+			textfields[TXT_ACC].setfocus(false);
+			textfields[TXT_PASS].setfocus(false);
 			app.getui()->add(UI_LOGINWAIT);
 			packet_c.c_login(textfields[TXT_ACC].text(), textfields[TXT_PASS].text());
 			return;
@@ -121,6 +102,7 @@ namespace io
 			return;
 		case BT_SAVEID:
 			saveid = !saveid;
+			config.setsaveid(saveid);
 			buttons[BT_SAVEID].setstate("mouseOver");
 			return;
 		}

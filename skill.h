@@ -43,10 +43,12 @@ namespace action
 		skill() {}
 		~skill() {}
 		string getaction(bool);
-		bool isattack() { return offensive; }
 		void addeffects(playereffects*, bool);
+		bool isattack() { return offensive; }
 		skillinfo getlevel(int l) { return levels[l]; }
+		texture geticon(char c) { return icon[c]; }
 	private:
+		map<char, texture> icon;
 		map<int, skillinfo> levels;
 		vector<animation> skill_e;
 		vector<animation> affected;

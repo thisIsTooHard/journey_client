@@ -23,6 +23,8 @@
 #include "keyboard.h"
 #include "baseinterface.h"
 #include "dragicon.h"
+#include "itemtooltip.h"
+#include "equiptooltip.h"
 
 using namespace std;
 using namespace util;
@@ -43,6 +45,8 @@ namespace io
 		void remove(uielements);
 		void sendkey(WPARAM, bool);
 		void sendmouse(mousestate, vector2d);
+		void showiteminfo(int);
+		void showequipinfo(int, short);
 		void setactive(bool a) { active = a; }
 		void sendmouse(vector2d p) { sendmouse(mouse.getstate(), p); }
 		void enableactions() { actionsenabled = true; }
@@ -59,8 +63,12 @@ namespace io
 		baseinterface base;
 		cursor mouse;
 		keyboard keys;
+		equiptooltip* equipinfo;
+		itemtooltip* miteminfo;
+		tooltip* uiinfo;
 		textfield* activetext;
 		dragicon* activeicon;
+		tooltip* activeinfo;
 		bool shift;
 		bool active;
 		bool actionsenabled;

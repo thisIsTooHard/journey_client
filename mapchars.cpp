@@ -46,17 +46,17 @@ namespace maplemap
 
 	void mapchars::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
 	{
-		for (int i = 0; i < chars.getend(); i++)
+		for (smit<int, otherplayer> plit = chars.getit(); plit.belowtop(); plit++)
 		{
-			chars.getnext(i)->draw(target, viewpos);
+			plit->draw(target, viewpos);
 		}
 	}
 
 	void mapchars::update()
 	{
-		for (int i = 0; i < chars.getend(); i++)
+		for (smit<int, otherplayer> plit = chars.getit(); plit.belowtop(); plit++)
 		{
-			chars.getnext(i)->update();
+			plit->update();
 		}
 	}
 }

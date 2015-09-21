@@ -21,68 +21,57 @@
 
 namespace io
 {
-	equipinventory::equipinventory(inventory* inv)
+	const vector2d iconpositions[18] = { 
+		vector2d(), vector2d(43, 24), vector2d(43, 91), vector2d(109, 91), vector2d(109, 91), vector2d(43, 124), vector2d(43, 157), vector2d(76, 190), vector2d(10, 157), 
+		vector2d(142, 124), vector2d(10, 124), vector2d(109, 124), vector2d(76, 124), vector2d(76, 157), vector2d(10, 58), vector2d(), vector2d(), vector2d(76, 124)
+	};
+
+	equipinventory::equipinventory(player* plc)
 	{
-		iconpositions = new vector2d[13];
-		iconpositions[0] = vector2d(24, 24);
-		iconpositions[1] = vector2d(43, 58);
-		iconpositions[2] = vector2d(76, 24);
-		iconpositions[3] = vector2d(109, 157);
-		iconpositions[4] = vector2d(109, 122);
-		iconpositions[5] = vector2d(43, 157);
-		iconpositions[6] = vector2d(43, 190);
-		iconpositions[7] = vector2d(75, 223);
-		iconpositions[8] = vector2d(10, 190);
-		iconpositions[9] = vector2d(24, 96);
-		iconpositions[10] = vector2d(48, 96);
-		iconpositions[11] = vector2d(109, 157);
-		iconpositions[12] = vector2d();
-		iconpositions[13] = vector2d();
-
-		invent = inv;
-
 		app.getimgcache()->setmode(ict_sys);
+		nl::nx::view_file("UI");
 
-		for (short i = 0; i < 14; i++)
+		node source = nl::nx::nodes["UI"]["UIWindow2.img"]["Equip"]["character"];
+		node petsource = nl::nx::nodes["UI"]["UIWindow2.img"]["Equip"]["pet"];
+
+		sprites.push_back(sprite(animation(source["backgrnd"]), vector2d()));
+		sprites.push_back(sprite(animation(source["backgrnd2"]), vector2d()));
+		sprites.push_back(sprite(animation(source["backgrnd3_Kanna"]), vector2d()));
+		sprites.push_back(sprite(animation(source["cashPendant"]), vector2d()));
+		sprites.push_back(sprite(animation(source["charmPocket"]), vector2d()));
+		sprites.push_back(sprite(animation(source["emblem"]), vector2d()));
+
+		buttons[BT_PETEQUIP] = button(source["BtPet"]);
+
+		petsprites.push_back(texture(petsource["backgrnd"]));
+		petsprites.push_back(texture(petsource["backgrnd2"]));
+		petsprites.push_back(texture(petsource["backgrnd3"]));
+
+		look = plc->getlook();
+		invent = plc->getinventory();
+		stats = plc->getstats();
+
+		for (spmit<short, mapleitem*> eqit = invent->getinventory(IVT_EQUIPPED); eqit.belowtop(); ++eqit)
 		{
-			mapleequip* todraw = invent->getequip(i);
-			if (todraw)
+			short slot = eqit.getkey();
+			if (slot >= 0)
 			{
-				int id = todraw->getid();
-				equips[i] = icon(id, false);
+				mapleequip* equip = reinterpret_cast<mapleequip*>(eqit.get());
+				int id = equip->getid();
+				clothing* cloth = app.getlookfactory()->getcloth(id);
+				dragicons.push_back(dragicon(DIT_ITEM, itemicon(cloth->geticons(), false, 1), texture(), iconpositions[slot], slot, id));
 			}
 		}
 
-		nl::nx::view_file("UI");
-
-		node source = nl::nx::nodes["UI"].resolve("UIWindow2.img/Equip/character");
-		node petsource = nl::nx::nodes["UI"].resolve("UIWindow2.img/Equip/pet");
-
-		sprites.push_back(sprite(animation(source.resolve("backgrnd")), vector2d()));
-		sprites.push_back(sprite(animation(source.resolve("backgrnd2")), vector2d()));
-		sprites.push_back(sprite(animation(source.resolve("backgrnd3_Kanna")), vector2d()));
-		sprites.push_back(sprite(animation(source.resolve("cashPendant")), vector2d()));
-		sprites.push_back(sprite(animation(source.resolve("charmPocket")), vector2d()));
-		sprites.push_back(sprite(animation(source.resolve("emblem")), vector2d()));
-
-		buttons.insert(make_pair(BT_PETEQUIP, button(source.resolve("BtPet"), 0, 0)));
-
-		petsprites.push_back(sprite(animation(petsource.resolve("backgrnd")), vector2d(184, 0)));
-		petsprites.push_back(sprite(animation(petsource.resolve("backgrnd2")), vector2d(184, 0)));
-		petsprites.push_back(sprite(animation(petsource.resolve("backgrnd3")), vector2d(184, 0)));
-
 		nl::nx::unview_file("UI");
 		app.getimgcache()->unlock();
-		position = vector2d(0, 0);
+
+		position = config.geteqspos();
 		dimensions = vector2d(184, 290);
 		active = true;
+		dragged = false;
+		buttoncd = 0;
 		showpet = false;
-	}
-
-	equipinventory::~equipinventory()
-	{
-		delete invent;
-		delete iconpositions;
 	}
 
 	void equipinventory::draw(ID2D1HwndRenderTarget* target)
@@ -91,24 +80,15 @@ namespace io
 
 		if (active)
 		{
-			for (map<short, icon>::iterator eqit = equips.begin(); eqit != equips.end(); ++eqit)
-			{
-				eqit->second.draw(position + iconpositions[eqit->first], 1.0f);
-			}
-
 			if (showpet)
 			{
-				for (vector<sprite>::iterator petit = petsprites.begin(); petit != petsprites.end(); ++petit)
+				vector2d petpos = position + vector2d(184, 0);
+				for (vector<texture>::iterator petit = petsprites.begin(); petit != petsprites.end(); ++petit)
 				{
-					petit->draw(target, position);
+					petit->draw(petpos);
 				}
 			}
 		}
-	}
-
-	void equipinventory::update()
-	{
-
 	}
 
 	void equipinventory::buttonpressed(short id)
@@ -120,5 +100,22 @@ namespace io
 			buttons[BT_PETEQUIP].setstate("mouseOver");
 			break;
 		}
+	}
+
+	void equipinventory::oniteminfo(dragicon* dgi)
+	{
+		if (dgi)
+		{
+			app.getui()->showequipinfo(dgi->getaction(), dgi->getkey());
+		}
+		else
+		{
+			app.getui()->showequipinfo(0, 0);
+		}
+	}
+
+	rectangle2d equipinventory::dragarea()
+	{
+		return rectangle2d(position, position + vector2d(184, 20));
 	}
 }

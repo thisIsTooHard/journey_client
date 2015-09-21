@@ -36,5 +36,7 @@ namespace io
 		position = vector2d(292, 200);
 		dimensions = vector2d(282, 144);
 		active = true;
+		dragged = false;
+		buttoncd = 0;
 	}
 }

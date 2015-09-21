@@ -18,6 +18,7 @@
 #pragma once
 #include "uielement.h"
 #include "maplestats.h"
+#include "inventory.h"
 
 using namespace gameplay;
 
@@ -26,12 +27,18 @@ namespace io
 	class statsinfo : public uielement
 	{
 	public:
-		statsinfo(maplestats*);
+		statsinfo(maplestats*, inventory*);
 		~statsinfo() {}
+		void draw(ID2D1HwndRenderTarget*);
+		void sendbool(bool);
+		void buttonpressed(short);
+		rectangle2d dragarea();
 	private:
 		maplestats* stats;
+		inventory* invent;
 		vector<texture> detailbgs;
 		map<string, texture> abilities;
+		textlabel statlabel;
 		bool showdetail;
 	};
 }

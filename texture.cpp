@@ -25,19 +25,12 @@ namespace graphics
 	{
 		origin = vector2d();
 		dimension = vector2d();
+		loaded = false;
 	}
 
 	texture::texture(node src)
 	{
-		node originnode = src["origin"];
-		if (originnode.data_type() == nl::node::type::vector)
-		{
-			origin = vector2d(originnode.x(), originnode.y());
-		}
-		else
-		{
-			origin = vector2d();
-		}
+		origin = src["origin"].tov2d();
 
 		if (src["source"].istype(stringnode))
 		{
@@ -48,8 +41,16 @@ namespace graphics
 		}
 
 		bitmap bmp = src.get_bitmap();
+
 		source = app.getimgcache()->createimage(bmp);
 		dimension = vector2d(bmp.width(), bmp.height());
+
+		loaded = bmp.width() > 0 && bmp.height() > 0;
+	}
+
+	void texture::draw()
+	{
+		draw(vector2d(), vector2d(), 1.0f, false);
 	}
 
 	void texture::draw(vector2d position)
@@ -74,7 +75,7 @@ namespace graphics
 
 	void texture::draw(vector2d position, vector2d stretch, float alpha, bool flip)
 	{
-		if (isloaded())
+		if (loaded)
 		{
 			int w = stretch.x();
 			if (w == 0)

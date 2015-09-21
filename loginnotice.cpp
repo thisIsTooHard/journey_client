@@ -55,6 +55,8 @@ namespace io
 		dimensions = vector2d(362, 219);
 		type = param;
 		active = true;
+		dragged = false;
+		buttoncd = 0;
 	}
 
 	void loginnotice::buttonpressed(short id)

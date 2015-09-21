@@ -19,11 +19,11 @@
 
 namespace maplemap
 {
-	itemdrop::itemdrop(short o, int id, int own, vector2d pos, vector2d dst, char type, bool pld, footholdtree* fht)
+	itemdrop::itemdrop(short o, int id, texture ic, int own, vector2d pos, vector2d dst, char type, bool pld, footholdtree* fht)
 	{
 		oid = o;
 		itemid = id;
-		ico = icon(itemid, true);
+		ico = ic;
 		owner = own;
 		pickuptype = type;
 		playerdrop = pld;

@@ -16,30 +16,26 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "stdfax.h"
-#include "collision.h"
 #include "portal.h"
-#include "node.h"
+#include "safemap.h"
 
-using namespace util;
-
-namespace gameplay
+namespace maplemap
 {
 	class mapportals
 	{
 	public:
-		mapportals();
+		mapportals(node, int);
+		mapportals() {}
 		~mapportals() {}
-		void init();
-		void clear();
 		void addportal(char, portaltype, string, int, bool, string, vector2d);
 		void draw(ID2D1HwndRenderTarget*, vector2d);
-		void update(vector2d);
+		void update(rectangle2d);
 		vector2d getspawnpoint(char);
 		vector2d getspawnpoint(string);
-		pair<int, string> getportal(vector2d);
+		pair<int, string> getportal(rectangle2d);
+		void clear() { portals.clear(); }
 	private:
-		map<char, portal> portals;
+		safemap<char, portal> portals;
 		map<portaltype, animation> animations;
 	};
 }

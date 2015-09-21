@@ -34,6 +34,7 @@ namespace graphics
 		texture(node);
 		texture();
 		~texture() {}
+		void draw();
 		void draw(vector2d);
 		void draw(vector2d, bool);
 		void draw(vector2d, float);
@@ -41,7 +42,7 @@ namespace graphics
 		void draw(vector2d, vector2d, float, bool);
 		void shift(vector2d);
 		void setorigin(vector2d v) { origin = v; }
-		bool isloaded() { return dimension != vector2d(); }
+		bool isloaded() { return loaded; }
 		vector2d getdimension() { return dimension; }
 		vector2d getorigin() { return origin; }
 		rectangle2d getbounds() { return rectangle2d(origin, origin + dimension); }
@@ -49,6 +50,7 @@ namespace graphics
 		pair<imgcontext, size_t> source;
 		vector2d origin;
 		vector2d dimension;
+		bool loaded;
 	};
 }
 

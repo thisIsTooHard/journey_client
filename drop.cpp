@@ -53,7 +53,7 @@ namespace maplemap
 		if (state == DST_FLOATING)
 		{
 			float shift = cos(moved) - 1.0f;
-			fy = basey + 2.5f + shift * 5.0f;
+			fy = basey + 5.0f + shift * 2.5f;
 			moved = (moved < 360.0f) ? moved + 0.025f : 0.0f;
 		}
 

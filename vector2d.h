@@ -16,7 +16,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include <cmath>
+#include "stdfax.h"
+
+using namespace std;
 
 namespace util
 {
@@ -38,6 +40,7 @@ namespace util
 		bool straight();
 		bool overlaps(vector2d);
 		bool iswithin(vector2d, vector2d);
+		string tostring() { return to_string(a) + "," + to_string(b); }
 		vector2d operator + (vector2d);
 		vector2d operator - (vector2d);
 		vector2d operator * (vector2d);

@@ -23,12 +23,63 @@ using namespace std;
 namespace util
 {
 	template <typename K, typename V>
+	class smit
+	{
+	public:
+		smit(map<K, V>* std, vector<K>* ky, SRWLOCK* lock, int t)
+		{
+			stdmap = std;
+			keys = ky;
+			maplock = lock;
+			top = t;
+			index = 0;
+		}
+
+		~smit()
+		{
+			ReleaseSRWLockShared(maplock);
+		}
+
+		V* operator -> ()
+		{
+			return &stdmap->at(keys->at(index));
+		}
+
+		V* get()
+		{
+			return &stdmap->at(keys->at(index));
+		}
+
+		void operator ++ ()
+		{
+			index++;
+		}
+
+		bool belowtop()
+		{
+			return index < top;
+		}
+
+		int getindex()
+		{
+			return index;
+		}
+	private:
+		map<K, V>* stdmap;
+		vector<K>* keys;
+		SRWLOCK* maplock;
+		int index;
+		int top;
+	};
+
+	template <typename K, typename V>
 	class safemap
 	{
 	public:
 		safemap() 
 		{ 
 			top = 0; 
+			maplock = SRWLOCK_INIT;
 		}
 		
 		~safemap() {}
@@ -38,17 +89,10 @@ namespace util
 			return &stdmap[key]; 
 		}
 
-		V* getnext(int i)
+		smit<K, V> getit()
 		{
-			if (i >= top)
-			{
-				return 0;
-			}
-			else
-			{
-				K key = keys[i];
-				return &stdmap[key];
-			}
+			AcquireSRWLockShared(&maplock);
+			return smit<K, V>(&stdmap, &keys, &maplock, top);
 		}
 
 		int getend() 
@@ -65,9 +109,11 @@ namespace util
 		{
 			if (!stdmap.count(key))
 			{
+				AcquireSRWLockExclusive(&maplock);
 				stdmap[key] = value;
 				keys.push_back(key);
 				top += 1;
+				ReleaseSRWLockExclusive(&maplock);
 			}
 		}
 
@@ -77,9 +123,11 @@ namespace util
 			{
 				if (stdmap.count(keys[i]))
 				{
+					AcquireSRWLockExclusive(&maplock);
 					top -= 1;
 					stdmap.erase(keys[i]);
 					keys.erase(keys.begin() + i);
+					ReleaseSRWLockExclusive(&maplock);
 				}
 			}
 		}
@@ -88,6 +136,7 @@ namespace util
 		{
 			if (stdmap.count(key))
 			{
+				AcquireSRWLockShared(&maplock);
 				int index = -1;
 				for (int i = 0; i < top; i++)
 				{
@@ -97,6 +146,7 @@ namespace util
 						break;
 					}
 				}
+				ReleaseSRWLockShared(&maplock);
 
 				if (index >= 0)
 				{
@@ -107,14 +157,17 @@ namespace util
 
 		void clear()
 		{
+			AcquireSRWLockExclusive(&maplock);
 			top = 0;
 			stdmap.clear();
 			keys.clear();
+			ReleaseSRWLockExclusive(&maplock);
 		}
 	private:
 		vector<K> keys;
 		map<K, V> stdmap;
 		int top;
+		SRWLOCK maplock;
 	};
 }
 

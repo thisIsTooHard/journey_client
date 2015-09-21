@@ -18,7 +18,7 @@
 // This file uses cryptography algorithms from the OdinMS Maplestory server //
 // AES implemenation by Chris Lomont										//
 //////////////////////////////////////////////////////////////////////////////
-#include "crypto.h"
+#include "cryptography.h"
 
 namespace net
 {
@@ -48,7 +48,7 @@ namespace net
 
 	const byte jrkey[13] = { 33, 101, 54, 27, 11, 7, 78, 62, 119, 120, 47, 85, 93 };
 
-	void crypto::init(vector<byte> recv, vector<byte> send, byte ver, byte loc)
+	void cryptography::init(vector<byte> recv, vector<byte> send, byte ver, byte loc)
 	{
 		recviv = recv;
 		sendiv = send;
@@ -58,7 +58,7 @@ namespace net
 		cipher.SetParameters(256);
 	}
 
-	void crypto::sendencrypt(packet* tosend)
+	void cryptography::sendencrypt(packet* tosend)
 	{
 		int length = tosend->length();
 
@@ -82,14 +82,14 @@ namespace net
 		tosend->writeheader(header);
 	}
 
-	int crypto::getlength(char* bytes)
+	int cryptography::getlength(char* bytes)
 	{
 		int first = static_cast<byte>(bytes[0]) | static_cast<byte>(bytes[1]) << 8 | static_cast<byte>(bytes[2]) << 16 | static_cast<byte>(bytes[3]) << 24;
 		unsigned short length = (first >> 16) ^ (first & 0xFFFF);
 		return static_cast<int>(length);
 	}
 
-	void crypto::recvdecrypt(char* bytes, int length, bool end)
+	void cryptography::recvdecrypt(char* bytes, int length, bool end)
 	{
 		if (MAPLECRYPTO)
 		{
@@ -103,7 +103,7 @@ namespace net
 		}
 	}
 
-	void crypto::mapleencrypt(char* bytes, int length)
+	void cryptography::mapleencrypt(char* bytes, int length)
 	{
 		for (int j = 0; j < 6; j++) {
 			char remember = 0;
@@ -138,7 +138,7 @@ namespace net
 		}
 	}
 
-	void crypto::mapledecrypt(char* bytes, int length)
+	void cryptography::mapledecrypt(char* bytes, int length)
 	{
 		for (int j = 1; j <= 6; j++) {
 			byte remember = 0;
@@ -176,7 +176,7 @@ namespace net
 		}
 	}
 
-	void crypto::aescrypt(char* bytes, int length, bool recv)
+	void cryptography::aescrypt(char* bytes, int length, bool recv)
 	{
 		int total = length;
 		int llength = 0x5B0;
@@ -212,19 +212,19 @@ namespace net
 		}
 	}
 
-	char crypto::rollleft(char in, int count) {
+	char cryptography::rollleft(char in, int count) {
 		int tmp = (int)in & 0xFF;
 		tmp = tmp << (count % 8);
 		return static_cast<char>(((tmp & 0xFF) | (tmp >> 8)));
 	}
 
-	char crypto::rollright(char in, int count) {
+	char cryptography::rollright(char in, int count) {
 		int tmp = (int)in & 0xFF;
 		tmp = (tmp << 8) >> (count % 8);
 		return static_cast<char>(((tmp & 0xFF) | (tmp >> 8)));
 	}
 
-	void crypto::updateiv(bool recv)
+	void cryptography::updateiv(bool recv)
 	{
 		if (MAPLECRYPTO)
 		{

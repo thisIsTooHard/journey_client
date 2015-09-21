@@ -132,18 +132,58 @@ namespace net
 		send(&p);
 	}
 
+	void packetcreator::writemoves(packet* p, vector<movefragment> moves)
+	{
+		p->writech(moves.size());
+
+		for (vector<movefragment>::iterator mvit = moves.begin(); mvit != moves.end(); ++mvit)
+		{
+			p->writech(mvit->command);
+
+			switch (mvit->type)
+			{
+			case MVT_ABSOLUTE:
+				p->writesh(mvit->xpos);
+				p->writesh(mvit->ypos);
+				p->writesh(mvit->xpps);
+				p->writesh(mvit->ypps);
+				p->writesh(mvit->unk);
+				p->writech(mvit->newstate);
+				p->writesh(mvit->duration);
+				break;
+			case MVT_RELATIVE:
+				p->writesh(mvit->xpos);
+				p->writesh(mvit->ypos);
+				p->writech(mvit->newstate);
+				p->writesh(mvit->duration);
+				break;
+			case MVT_CHAIR:
+				p->writesh(mvit->xpos);
+				p->writesh(mvit->ypos);
+				p->writesh(mvit->unk);
+				p->writech(mvit->newstate);
+				p->writesh(mvit->duration);
+				break;
+			case MVT_JUMPDOWN:
+				p->writesh(mvit->xpos);
+				p->writesh(mvit->ypos);
+				p->writesh(mvit->xpps);
+				p->writesh(mvit->ypps);
+				p->writesh(mvit->unk);
+				p->writesh(mvit->fh);
+				p->writech(mvit->newstate);
+				p->writesh(mvit->duration);
+				break;
+			}
+		}
+	}
+
 	void packetcreator::moveplayer(movefragment move)
 	{
 		packet p = packet(MOVE_PLAYER);
-		p.writech(1);
-		p.writech(move.command);
-		p.writesh(move.xpos);
-		p.writesh(move.ypos);
-		p.writesh(move.xpps);
-		p.writesh(move.ypps);
-		p.writesh(move.unk);
-		p.writech(move.newstate);
-		p.writesh(move.duration);
+		vector<movefragment> moves;
+		moves.push_back(move);
+		writemoves(&p, moves);
 		send(&p);
 	}
 
@@ -202,12 +242,48 @@ namespace net
 		send(&p);
 	}
 
+	void packetcreator::general_chat(string text, bool show)
+	{
+		packet p = packet(GENERAL_CHAT);
+		p.writestr(text);
+		p.writech(show ? 1 : 0);
+		send(&p);
+	}
+
 	void packetcreator::useitem(short slot, int itemid)
 	{
 		packet p = packet(USE_ITEM);
 		p.writeint(0);
 		p.writesh(slot);
 		p.writeint(itemid);
+		send(&p);
+	}
+
+	void packetcreator::spendap(maplestat stat)
+	{
+		packet p = packet(SPEND_AP);
+		p.writeint(0);
+		p.writeint(static_cast<int>(stat));
+		send(&p);
+	}
+
+	void packetcreator::movemonster(int oid, short type, byte skillb, byte skill0, byte skill1, byte skill2, byte skill3, byte skill4, vector2d startpos, vector<movefragment> movements)
+	{
+		packet p = packet(MOVE_MONSTER);
+		p.writeint(oid);
+		p.writesh(type);
+		p.writech(skillb);
+		p.writech(skill0);
+		p.writech(skill1);
+		p.writech(skill2);
+		p.writech(skill3);
+		p.writech(skill4);
+		p.writelg(0);
+		p.writech(0);
+		p.writeint(0);
+		p.writesh(startpos.x());
+		p.writesh(startpos.y());
+		writemoves(&p, movements);
 		send(&p);
 	}
 }

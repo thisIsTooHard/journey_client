@@ -63,7 +63,7 @@ namespace graphics
 		}
 
 		float space = font->GetFontSize() + 2.0f;
-		float length = (font->GetFontSize() / 2.3f) * temp.length() + font->GetFontSize() + 2.0f;
+		float length = (font->GetFontSize() / 2.3f) * temp.length() + font->GetFontSize() + 5.0f;
 
 		if (absp.x() + length >= 0 && absp.x() - length <= SCREENW && absp.y() + space >= 0 && absp.y() - space <= SCREENH && temp != "")
 		{
@@ -113,8 +113,26 @@ namespace graphics
 				case TXC_YELLOW:
 					target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Yellow), &brush);
 					break;;
+				case TXC_RED:
+					target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), &brush);
+					break;
+				case TXC_BLUE:
+					target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Blue), &brush);
+					break;
 				case TXC_BROWN:
 					target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Brown), &brush);
+					break;
+				case TXC_GREY:
+					target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), &brush);
+					break;
+				case TXC_ORANGE:
+					target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Orange), &brush);
+					break;
+				case TXC_MBLUE:
+					target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::SkyBlue), &brush);
+					break;
+				case TXC_VIOLET:
+					target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Violet), &brush);
 					break;
 				}
 			}

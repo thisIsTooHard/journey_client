@@ -62,6 +62,7 @@ namespace program
 		ID2D1Layer* d2d_layer;
 		float dpiX;
 		float dpiY;
+		SRWLOCK drawlock;
 	};
 }
 

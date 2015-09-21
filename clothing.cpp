@@ -31,76 +31,160 @@ namespace character
 		{
 		case 100:
 			category = CL_HAT;
+			layer = EQL_CAP;
+			type = "HAT";
 			catname = "Cap";
 			break;
 		case 101:
 			category = CL_FACEACC;
+			layer = EQL_FACEACC;
+			type = "FACE ACCESSORY";
 			catname = "Accessory";
 			break;
 		case 102:
 			category = CL_EYEACC;
+			layer = EQL_EYEACC;
+			type = "EYE ACCESSORY";
 			catname = "Accessory";
 			break;
 		case 103:
 			category = CL_EARRINGS;
+			layer = EQL_EARRINGS;
+			type = "EARRINGS";
 			catname = "Accessory";
 			break;
 		case 104:
 			category = CL_TOP;
+			layer = EQL_COAT;
+			type = "TOP";
 			catname = "Coat";
 			break;
 		case 105:
 			category = CL_MAIL;
+			layer = EQL_LONGCOAT;
+			type = "OVERALL";
 			catname = "Longcoat";
 			break;
 		case 106:
 			category = CL_PANTS;
+			layer = EQL_PANTS;
+			type = "BOTTOM";
 			catname = "Pants";
 			break;
 		case 107:
 			category = CL_SHOES;
+			layer = EQL_SHOES;
+			type = "SHOES";
 			catname = "Shoes";
 			break;
 		case 108:
 			category = CL_GLOVE;
+			layer = EQL_GLOVES;
+			type = "GLOVES";
 			catname = "Glove";
 			break;
 		case 109:
 			category = CL_SHIELD;
+			layer = EQL_SHIELD;
+			type = "SHIELD";
 			catname = "Shield";
 			break;
 		case 110:
 			category = CL_CAPE;
+			layer = EQL_CAPE;
+			type = "CAPE";
 			catname = "Cape";
+			break;
+		case 111:
+			category = CL_RING;
+			layer = EQL_RING;
+			type = "RING";
+			catname = "Ring";
+			break;
+		case 112:
+			category = CL_PENDANT;
+			layer = EQL_PENDANT;
+			type = "PENDANT";
+			catname = "Accessory";
+			break;
+		case 113:
+			category = CL_BELT;
+			layer = EQL_BELT;
+			type = "BELT";
+			catname = "Accessory";
+			break;
+		case 114:
+			category = CL_MEDAL;
+			layer = EQL_MEDAL;
+			type = "MEDAL";
+			catname = "Accessory";
 			break;
 		default:
 			if (prefix >= 130 && prefix <= 170)
 			{
 				category = CL_WEAPON;
+				layer = EQL_WEAPON;
 				catname = "Weapon";
-
+				
+				weptype = static_cast<weapontype>(prefix);
 				twohanded = (prefix == 138) || (prefix >= 140 && prefix <= 144);
+
+				switch (prefix)
+				{
+				case 130:
+					type = "ONE-HANDED SWORD";
+					break;
+				case 131:
+					type = "ONE-HANDED AXE";
+					break;
+				case 132:
+					type = "ONE-HANDED MACE";
+					break;
+				case 133:
+					type = "DAGGER";
+					break;
+				case 137:
+					type = "WAND";
+					break;
+				case 138:
+					type = "STAFF";
+					break;
+				case 140:
+					type = "TWO-HANDED SWORD";
+					break;
+				case 141:
+					type = "TWO-HANDED AXE";
+					break;
+				case 142:
+					type = "TWO-HANDED MACE";
+					break;
+				case 143:
+					type = "SPEAR";
+					break;
+				case 144:
+					type = "POLEARM";
+					break;
+				case 145:
+					type = "BOW";
+					break;
+				case 146:
+					type = "CROSSBOW";
+					break;
+				case 147:
+					type = "CLAW";
+					break;
+				case 148:
+					type = "KNUCKLE";
+					break;
+				case 149:
+					type = "GUN";
+					break;
+				}
 			}
 			else
 			{
 				return;
 			}
-		}
-
-		string layername;
-		switch (category)
-		{
-		case CL_EARRINGS:
-			layername = "Earrings";
-			break;
-		case CL_FACEACC:
-			layername = "FaceAcc";
-			break;
-		case CL_EYEACC:
-			layername = "EyeAcc";
-			break;
-		default:
-			layername = catname;
 		}
 
 		node equipnode = nx::nodes["Character"].resolve(catname + "/0" + to_string(equipid) + ".img");
@@ -111,20 +195,20 @@ namespace character
 
 			if (state == "info")
 			{
-				icon.first = texture(statenode["icon"]);
-				icon.second = texture(statenode["iconRaw"]);
+				icon[false] = texture(statenode["icon"]);
+				icon[true] = texture(statenode["iconRaw"]);
 
 				cash = statenode["cash"].get_bool();
 				tradeable = statenode["tradeBlock"].istype(integernode) ? !statenode["tradeBlock"].get_bool() : true;
 				price = statenode["price"].istype(integernode) ? statenode["price"] : 0;
 				slots = statenode["tuc"].istype(integernode) ? static_cast<byte>(statenode["tuc"]) : 0;
 
-				reqlevel = statenode["reqLevel"];
-				reqjob = statenode["reqJob"];
-				reqstr = statenode["reqSTR"];
-				reqdex = statenode["reqDEX"];
-				reqint = statenode["reqINT"];
-				reqluk = statenode["reqLUK"];
+				reqstats[MS_LEVEL] = statenode["reqLevel"];
+				reqstats[MS_JOB] = statenode["reqJob"];
+				reqstats[MS_STR] = statenode["reqSTR"];
+				reqstats[MS_DEX] = statenode["reqDEX"];
+				reqstats[MS_INT] = statenode["reqINT"];
+				reqstats[MS_LUK] = statenode["reqLUK"];
 
 				defstats[ES_STR] = statenode["incSTR"].istype(integernode) ? static_cast<short>(statenode["incSTR"]) : 0;
 				defstats[ES_DEX] = statenode["incDEX"].istype(integernode) ? static_cast<short>(statenode["incDEX"]) : 0;
@@ -192,13 +276,12 @@ namespace character
 									z = CL_BACKSHIELD;
 							}
 
-
 							vector<string> parentpos;
 							vector<vector2d> shiftmap;
 							node map = partnode.resolve("map");
 							for (node mapnode = map.begin(); mapnode != map.end(); mapnode++)
 							{
-								if (mapnode.data_type() == node::type::vector)
+								if (mapnode.istype(vectornode))
 								{
 									parentpos.push_back(mapnode.name());
 									shiftmap.push_back(vector2d(mapnode.x(), mapnode.y()));
@@ -257,8 +340,124 @@ namespace character
 			}
 		}
 
-		type = layername;
 		name = nx::nodes["String"]["Eqp.img"]["Eqp"][catname][to_string(equipid)]["name"];
 		desc = nx::nodes["String"]["Eqp.img"]["Eqp"][catname][to_string(equipid)]["desc"];
+		itemid = equipid;
+
+		transparent = (itemid == 1002186);
+	}
+
+	clothing::clothing()
+	{
+		itemid = 0;
+		layer = EQL_NONE;
+		name = "";
+		desc = "";
+		type = "";
+		transparent = true;
+	}
+
+	float clothing::getwmultiplier()
+	{
+		if (layer == EQL_WEAPON)
+		{
+			switch (weptype)
+			{
+			case WEP_1H_SWORD:
+				return 4.0f;
+			case WEP_1H_AXE:
+			case WEP_1H_MACE:
+			case WEP_WAND:
+			case WEP_STAFF:
+				return 4.4f;
+			case WEP_DAGGER:
+			case WEP_CROSSBOW:
+			case WEP_CLAW:
+			case WEP_GUN:
+				return 3.6f;
+			case WEP_2H_SWORD:
+				return 4.6f;
+			case WEP_2H_AXE:
+			case WEP_2H_MACE:
+			case WEP_KNUCKLE:
+				return 4.8f;
+			case WEP_SPEAR:
+			case WEP_POLEARM:
+				return 5.0f;
+			case WEP_BOW:
+				return 3.4f;
+			}
+		}
+		else
+		{
+			return 0.0f;
+		}
+	}
+
+	string clothing::getdisplayspeed()
+	{
+		if (isweapon())
+		{
+			switch (attackspeed)
+			{
+			case 1:
+				return "FAST (1)";
+			case 2:
+				return "FAST (2)";
+			case 3:
+				return "FAST (3)";
+			case 4:
+				return "FAST (4)";
+			case 5:
+				return "NORMAL (5)";
+			case 6:
+				return "NORMAL (6)";
+			case 7:
+				return "SLOW (7)";
+			case 8:
+				return "SLOW (8)";
+			case 9:
+				return "SLOW (9)";
+			default:
+				return "";
+			}
+		}
+		else
+		{
+			return "";
+		}
+	}
+
+	string clothing::getdisplaystat(equipstat es)
+	{
+		switch (es)
+		{
+		case ES_STR:
+			return "STR";
+		case ES_DEX:
+			return "DEX";
+		case ES_INT:
+			return "INT";
+		case ES_LUK:
+			return "LUK";
+		case ES_WATK:
+			return "WEAPON ATT";
+		case ES_WDEF:
+			return "WEAPON DEFENSE";
+		case ES_MAGIC:
+			return "MAGIC ATT";
+		case ES_MDEF:
+			return "MAGIC DEFENSE";
+		case ES_ACC:
+			return "ACCURACY";
+		case ES_AVOID:
+			return "AVOID";
+		case ES_HP:
+			return "MAX HP";
+		case ES_MP:
+			return "MAX MP";
+		case ES_HANDS:
+			return "HANDS";
+		}
 	}
 }

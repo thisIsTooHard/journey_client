@@ -49,6 +49,8 @@ namespace io
 		position = vector2d();
 		dimensions = vector2d();
 		active = true;
+		dragged = false;
+		buttoncd = 0;
 		dmglock = SRWLOCK_INIT;
 	}
 
@@ -179,5 +181,10 @@ namespace io
 		info.text = text;
 		info.alpha = 1.0f;
 		statusinfos.push_back(info);
+	}
+
+	void baseinterface::addnpcbutton(int npcid, vector2d pos, vector2d dim)
+	{
+		npcbuttons[npcid] = button(pos, dim);
 	}
 }

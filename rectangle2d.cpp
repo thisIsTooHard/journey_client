@@ -39,7 +39,7 @@ namespace util
 
 	bool rectangle2d::contains(vector2d v)
 	{
-		return v.x() >= lt.x() && v.x() <= rb.x() && v.y() >= lt.y() && v.y() <= rb.y();
+		return !straight() && v.x() >= lt.x() && v.x() <= rb.x() && v.y() >= lt.y() && v.y() <= rb.y();
 	}
 
 	bool rectangle2d::contains(int x, vector2d ver)
@@ -47,5 +47,14 @@ namespace util
 		vector2d rhor = vector2d(lt.x(), rb.x());
 		vector2d rver = vector2d(lt.y(), rb.y());
 		return rhor.contains(x) && rver.overlaps(ver);
+	}
+
+	bool rectangle2d::overlaps(rectangle2d ar)
+	{
+		vector2d rhor = vector2d(lt.x(), rb.x());
+		vector2d rver = vector2d(lt.y(), rb.y()); 
+		vector2d ahor = vector2d(ar.getlt().x(), ar.getrb().x());
+		vector2d aver = vector2d(ar.getlt().y(), ar.getrb().y());
+		return rhor.overlaps(ahor) && rver.overlaps(aver);
 	}
 }

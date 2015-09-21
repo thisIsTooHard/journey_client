@@ -16,37 +16,35 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "packet.h"
-#include "AES.h"
+#include "texture.h"
+#include "textlabel.h"
 
-using namespace std;
+using namespace graphics;
 
-namespace net
+namespace io
 {
-	const bool MAPLECRYPTO = true;
+	enum tooltiptype
+	{
+		TTT_DESC,
+		TTT_ITEM,
+		TTT_EQUIP
+	};
 
-	class crypto
+	class tooltip
 	{
 	public:
-		crypto() {}
-		~crypto() {}
-		void init(vector<byte>, vector<byte>, byte, byte);
-		void sendencrypt(packet*);
-		void recvdecrypt(char*, int, bool);
-		int getlength(char*);
-		void mapleencrypt(char*, int);
-		void mapledecrypt(char*, int);
-		void aescrypt(char*, int, bool);
-		char rollleft(char, int);
-		char rollright(char, int);
-		void updateiv(bool);
-	private:
-		vector<byte> recviv;
-		vector<byte> sendiv;
-		byte version;
-		byte localisation;
-		AES cipher;
-		mutex decryptlock;
+		tooltip(string, tooltiptype, vector2d);
+		tooltip() {}
+		virtual ~tooltip() {}
+		virtual void draw(ID2D1HwndRenderTarget*, vector2d);
+		virtual void update() {}
+		void setactive(bool a) { active = a; }
+		void setpos(vector2d p) { position = p; }
+	protected:
+		vector<texture> textures;
+		textlabel info;
+		vector2d position;
+		bool active;
 	};
 }
 

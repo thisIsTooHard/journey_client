@@ -17,7 +17,6 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "Journey.h"
 
-HANDLE gTimerStopEvent;
 HANDLE gTimerDoneEvent;
 HANDLE hTimer = NULL;
 HANDLE hTimerQueue = NULL;

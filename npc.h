@@ -24,7 +24,7 @@ using namespace std;
 using namespace graphics;
 using namespace io;
 
-namespace gameplay
+namespace maplemap
 {
 	class npc
 	{
@@ -34,6 +34,7 @@ namespace gameplay
 		npc(int, int, bool, short, vector2d);
 		void draw(ID2D1HwndRenderTarget*, vector2d);
 		void update();
+		vector2d getdim() { return textures[state].getdimension(0); }
 	private:
 		map<string, animation> textures;
 		map<string, vector<string>> lines;

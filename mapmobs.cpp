@@ -36,13 +36,11 @@ namespace gameplay
 	void mapmobs::sendattack(attackinfo* attack, rectangle2d range)
 	{
 		attack->numattacked = 0;
-		for (int i = 0; i < mobs.getend(); i++)
+		for (smit<int, mob> mbit = mobs.getit(); mbit.belowtop(); mbit++)
 		{
-			mob* mobit = mobs.getnext(i);
-
-			if (mobit->isinrange(range) && mobit->isactive())
+			if (mbit->bounds().overlaps(range) && mbit->isactive())
 			{
-				mobit->damage(attack);
+				mbit->damage(attack);
 				attack->numattacked++;
 
 				if (attack->numattacked >= attack->maxattacked)
@@ -73,9 +71,9 @@ namespace gameplay
 
 	void mapmobs::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
 	{
-		for (int i = 0; i < mobs.getend(); i++)
+		for (smit<int, mob> mbit = mobs.getit(); mbit.belowtop(); mbit++)
 		{
-			mobs.getnext(i)->draw(target, viewpos);
+			mbit->draw(target, viewpos);
 		}
 	}
 
@@ -83,13 +81,13 @@ namespace gameplay
 	{
 		vector<int> toremove;
 
-		for (int i = 0; i < mobs.getend(); i++)
+		for (smit<int, mob> mbit = mobs.getit(); mbit.belowtop(); mbit++)
 		{
-			bool died = mobs.getnext(i)->update();
+			bool died = mbit->update();
 
 			if (died)
 			{
-				toremove.push_back(i);
+				toremove.push_back(mbit.getindex());
 			}
 		}
 

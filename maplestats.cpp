@@ -19,26 +19,27 @@
 
 namespace gameplay
 {
-	maplestats::maplestats(int i, string nm, bool fem, short sk, int fc, int hr, int ep, short fm, map<maplestat, short> st, pair<int, char> wi, vector<int64_t> pets)
+	maplestats::maplestats(int i, string nm, int ep, map<maplestat, short> st, pair<int, char> wi, vector<int64_t> pets)
 	{
 		id = i;
 		name = nm;
-		female = fem;
-		skin = sk;
-		face = fc;
-		hair = hr;
 		exp = ep;
-		fame = fm;
 		stats = st;
 		spawninfo = wi;
 		petids = pets;
 
 		maxdamage = 0;
 		mindamage = 0;
-		totalmaxhp = 0;
-		totalmaxmp = 0;
+		attack = 0;
+		honor = 0;
 		mastery = 0.5f;
 		critical = 0.05f;
+		mincrit = 0.5f;
+		maxcrit = 0.75f;
+		bossdmg = 0.0f;
+		ignoredef = 0.0f;
+		stance = 0.0f;
+		resiststatus = 0.0f;
 	}
 
 	void maplestats::calcdamage(short prim, short sec, short watk)
@@ -47,55 +48,50 @@ namespace gameplay
 		mindamage = static_cast<int>((prim * 0.9 * mastery) + sec) * (static_cast<float>(watk) / 100);
 	}
 
-	short maplestats::getstat(maplestat s) 
-	{ 
-		return (stats.count(s)) ? stats[s] : 0;
-	}
-
-	short maplestats::getprim(short weapon)
+	short maplestats::getprim(weapontype wtype)
 	{
-		if (weapon > 0)
+		if (wtype != WEP_NONE)
 		{
-			switch (getstat(JOB) / 100)
+			switch (getstat(MS_JOB) / 100)
 			{
 			case 0:
 			case 1:
 			case 20:
 			case 21:
-				return getstat(STR);
+				return gettotal(MS_STR);
 			case 2:
-				return getstat(INT_);
+				return gettotal(MS_INT);
 			case 3:
-				return getstat(DEX);
+				return gettotal(MS_DEX);
 			case 4:
-				return getstat(LUK);
+				return gettotal(MS_LUK);
 			case 5:
-				return (weapon == 149) ? getstat(DEX) : getstat(STR);
+				return (wtype == WEP_GUN) ? gettotal(MS_DEX) : gettotal(MS_STR);
 			}
 		}
 
 		return 0;
 	}
 
-	short maplestats::getsec(short weapon)
+	short maplestats::getsec(weapontype wtype)
 	{
-		if (weapon > 0)
+		if (wtype != WEP_NONE)
 		{
-			switch (getstat(JOB) / 100)
+			switch (getstat(MS_JOB) / 100)
 			{
 			case 0:
 			case 1:
 			case 20:
 			case 21:
-				return getstat(DEX);
+				return gettotal(MS_DEX);
 			case 2:
-				return getstat(LUK);
+				return gettotal(MS_LUK);
 			case 3:
-				return getstat(STR);
+				return gettotal(MS_STR);
 			case 4:
-				return getstat(DEX);
+				return gettotal(MS_DEX);
 			case 5:
-				return (weapon == 149) ? getstat(STR) : getstat(DEX);
+				return (wtype == WEP_GUN) ? gettotal(MS_STR) : gettotal(MS_DEX);
 			}
 		}
 
@@ -104,14 +100,14 @@ namespace gameplay
 
 	short maplestats::getaccuracy()
 	{
-		float dexacc = static_cast<float>(stats[DEX]) * 0.8f;
-		float lukacc = static_cast<float>(stats[LUK]) * 0.5f;
+		float dexacc = static_cast<float>(stats[MS_DEX]) * 0.8f;
+		float lukacc = static_cast<float>(stats[MS_LUK]) * 0.5f;
 		return static_cast<short>(dexacc + lukacc);
 	}
 
 	const string maplestats::getjobname()
 	{
-		switch (stats[JOB])
+		switch (stats[MS_JOB])
 		{
 		case 0:
 			return "Beginner";

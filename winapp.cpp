@@ -42,6 +42,8 @@ namespace program
 
 		if (result == 0)
 		{
+			LPCSTR title = (LPCSTR)"Journey";
+
 			WNDCLASSEX wcex = { sizeof(WNDCLASSEX) };
 			wcex.style = CS_HREDRAW | CS_VREDRAW;
 			wcex.lpfnWndProc = winapp::WndProc;
@@ -51,15 +53,15 @@ namespace program
 			wcex.hbrBackground = NULL;
 			wcex.lpszMenuName = NULL;
 			wcex.hCursor = LoadCursor(NULL, IDI_APPLICATION);
-			wcex.lpszClassName = (LPCSTR)L"Journey";
+			wcex.lpszClassName = title;
 
 			RegisterClassEx(&wcex);
 
 			d2d_factory->GetDesktopDpi(&dpiX, &dpiY);
 
 			window = CreateWindow(
-				(LPCSTR)L"Journey",
-				"Journey",
+				title,
+				title,
 				WS_OVERLAPPED,
 				CW_USEDEFAULT,
 				CW_USEDEFAULT,

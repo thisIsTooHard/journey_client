@@ -25,23 +25,16 @@ namespace character
 	class facetype
 	{
 	public:
-		facetype(int, map<string, map<byte, vector2d>>);
+		facetype(int);
 		facetype() {}
 		~facetype() {}
-		void draw(vector2d);
-		void update();
-		void setexp(char);
-		byte getframe() { return frame; }
+		void draw(string, byte, vector2d);
 		string getname() { return name; }
-		string getexp() { return expression; }
-		vector2d getshift(string s, byte f) { return facepos[s][f]; }
+		byte getlastf(string s) { return static_cast<byte>(delays[s].size() - 1); }
+		short getdelay(string s, byte f) { return delays[s][f]; }
 	private:
 		map<string, map<byte, texture>> textures;
 		map<string, map<byte, short>> delays;
-		map<string, map<byte, vector2d>> facepos;
-		string expression;
-		short elapsed;
-		byte frame;
 		string name;
 	};
 }

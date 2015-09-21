@@ -26,7 +26,10 @@ namespace io
 		worldselect(char, vector<char>);
 		~worldselect() {}
 		void buttonpressed(short);
+		void draw(ID2D1HwndRenderTarget*);
 	private:
+		vector<char> chloads;
+		texture chltxt;
 		char worldid;
 		char channelid;
 	};

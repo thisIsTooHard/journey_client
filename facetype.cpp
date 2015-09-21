@@ -21,7 +21,7 @@
 
 namespace character
 {
-	facetype::facetype(int faceid, map<string, map<byte, vector2d>> fpos)
+	facetype::facetype(int faceid)
 	{
 		node facenode = nx::nodes["Character"]["Face"]["000" + to_string(faceid) + ".img"];
 
@@ -77,74 +77,10 @@ namespace character
 		}
 
 		name = nx::nodes["String"]["Eqp.img"]["Eqp"]["Face"][to_string(faceid)]["name"];
-
-		facepos = fpos;
-		expression = "default";
-		frame = 0;
-		elapsed = 0;
 	}
 
-	void facetype::draw(vector2d pos)
+	void facetype::draw(string exp, byte frame, vector2d pos)
 	{
-		textures[expression][frame].draw(pos);
-	}
-
-	void facetype::update()
-	{
-		elapsed += 16;
-
-		short delay = delays[expression][frame];
-		if (elapsed > delay)
-		{
-			elapsed -= delay;
-			frame = (delays[expression].count(frame + 1)) ? frame + 1 : 0;
-			if (frame == 0)
-			{
-				if (expression == "default")
-				{
-					expression = "blink";
-				}
-				else
-				{
-					expression = "default";
-				}
-			}
-		}
-	}
-
-	void facetype::setexp(char id)
-	{
-		string exp;
-		switch (id)
-		{
-		case 0:
-			exp = "hit";
-			break;
-		case 1:
-			exp = "smile";
-			break;
-		case 2:
-			exp = "troubled";
-			break;
-		case 3:
-			exp = "cry";
-			break;
-		case 4:
-			exp = "angry";
-			break;
-		case 5:
-			exp = "bewildered";
-			break;
-		case 6:
-			exp = "stunned";
-			break;
-		}
-
-		if (exp != expression)
-		{
-			frame = 0;
-			elapsed = 0;
-			expression = exp;
-		}
+		textures[exp][frame].draw(pos);
 	}
 }

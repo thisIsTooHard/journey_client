@@ -32,6 +32,7 @@ namespace gameplay
 		bool canrecharge();
 		int getid() { return itemid; }
 		short getcount() { return count; }
+		short getpos() { return pos; }
 	protected:
 		int itemid;
 		short count;

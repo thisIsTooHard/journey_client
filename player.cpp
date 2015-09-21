@@ -19,21 +19,25 @@
 
 namespace gameplay
 {
-	player::player(maplechar* ch, inventory inv, int meso, skillbook skl, questlog qst, pair<vector<int>, vector<int>> trock, int cov, map<short, char> mb, map<short, string> area)
+	player::player(maplechar* ch)
 	{
 		look = ch->copylook();
 		stats = ch->copystats();
-		invent = inv;
+
+		name = textlabel(DWF_14C, TXC_WHITE, stats.getname(), TXB_NAMETAG);
+	}
+
+	void player::init(int meso, skillbook skl, questlog qst, pair<vector<int>, vector<int>> trock, int cov, map<short, char> mb, map<short, string> area)
+	{
 		stats.setmeso(meso);
-
-		recalcstats(true);
-
 		skills = skl;
 		quests = qst;
 		trockmaps = trock;
 		bookcover = cov;
 		bookcards = mb;
 		areainfo = area;
+
+		recalcstats(true);
 
 		hspeed = 0;
 		vspeed = 0;
@@ -42,8 +46,6 @@ namespace gameplay
 		fleft = true;
 		look.setfleft(true);
 		candjump = true;
-
-		name = textlabel(DWF_14C, TXC_WHITE, stats.getname(), TXB_NAMETAG);
 
 		for (moveinput i = MIN_LEFT; i <= MIN_JUMP; i = static_cast<moveinput>(i + 1))
 		{
@@ -73,6 +75,10 @@ namespace gameplay
 
 	void player::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
 	{
+		fx += hspeed;
+		fy += vspeed;
+		position = getposition();
+
 		if (vspeed > 0)
 		{
 			if (fy + vspeed >= ground && ground >= fy)
@@ -82,10 +88,7 @@ namespace gameplay
 			}
 		}
 
-		fx += hspeed;
-		fy += vspeed;
-
-		vector2d absp = parentpos + getposition();
+		vector2d absp = parentpos + position;
 
 		look.draw(target, absp);
 		name.draw(target, absp);
@@ -522,7 +525,7 @@ namespace gameplay
 	{
 		bool stateok = state != PST_SKILL && state != PST_CLIMB;
 		bool nocd = skills.getcd(skillid) == 0;
-		bool hpmpok = stats.getstat(HP) >= hpcost && stats.getstat(MP) >= mpcost;
+		bool hpmpok = stats.getstat(MS_HP) >= hpcost && stats.getstat(MS_MP) >= mpcost;
 
 		bool allow = stateok && nocd && hpmpok;
 
@@ -531,8 +534,8 @@ namespace gameplay
 			info->mastery = stats.getmastery();
 			info->maxdamage = stats.getmaxdamage();
 			info->mindamage = stats.getmindamage();
-			info->pllevel = stats.getstat(LEVEL);
-			info->speed = look.getcloth("Weapon")->getwspeed();
+			info->pllevel = stats.getstat(MS_LEVEL);
+			info->speed = look.getcloth(EQL_WEAPON)->getwspeed();
 			info->direction = fleft ? 1 : 0;
 			info->skill = skillid;
 			info->critical = stats.getcritical();
@@ -564,23 +567,32 @@ namespace gameplay
 
 	float player::getattspeed()
 	{ 
-		return 1.7f - (static_cast<float>(look.getcloth("Weapon")->getwspeed()) / 10); 
+		return 1.7f - (static_cast<float>(look.getcloth(EQL_WEAPON)->getwspeed()) / 10); 
 	}
 
-	void player::recalcstats(bool param)
+	void player::recalcstats(bool equipchange)
 	{
-		invent.recalcstats();
+		if (equipchange)
+		{
+			invent.recalcstats();
+		}
 
 		speed = 100 + invent.gettotal(ES_SPEED);
 		jump = 100 + invent.gettotal(ES_JUMP);
 
-		stats.setmaxhp(stats.getstat(MAXHP) + invent.gettotal(ES_HP));
-		stats.setmaxmp(stats.getstat(MAXMP) + invent.gettotal(ES_MP));
+		stats.settotal(MS_STR, stats.getstat(MS_STR) + invent.gettotal(ES_STR));
+		stats.settotal(MS_DEX, stats.getstat(MS_DEX) + invent.gettotal(ES_DEX));
+		stats.settotal(MS_INT, stats.getstat(MS_INT) + invent.gettotal(ES_INT));
+		stats.settotal(MS_LUK, stats.getstat(MS_LUK) + invent.gettotal(ES_LUK));
+		stats.settotal(MS_MAXHP, stats.getstat(MS_MAXHP) + invent.gettotal(ES_HP));
+		stats.settotal(MS_MAXMP, stats.getstat(MS_MAXMP) + invent.gettotal(ES_MP));
 
-		short primary = invent.getprimstat(stats.getstat(JOB)) + stats.getprim(invent.getequip(11)->getid() / 10000);
-		short secondary = invent.getsecstat(stats.getstat(JOB)) + stats.getsec(invent.getequip(11)->getid() / 10000);
-		short watk = invent.gettotal(ES_WATK);
-		float wmult = invent.getwmult();
+		stats.setattack(invent.gettotal(ES_WATK));
+
+		short primary = stats.getprim(look.getweptype());
+		short secondary = stats.getsec(look.getweptype());
+		short watk = stats.getattack();
+		float wmult = look.getcloth(EQL_WEAPON)->getwmultiplier();
 		stats.calcdamage(static_cast<short>(primary * wmult), secondary, watk);
 	}
 

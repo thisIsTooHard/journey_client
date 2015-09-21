@@ -32,6 +32,10 @@ namespace gameplay
 		float skillmult;
 		float mastery;
 		float critical;
+		float mincrit;
+		float maxcrit;
+		float bossdmg;
+		float ignoredef;
 		char maxattacked;
 		char numattacked;
 		char numdamage;

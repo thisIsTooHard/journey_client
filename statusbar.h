@@ -19,6 +19,7 @@
 #include "uielement.h"
 #include "maplestats.h"
 #include "charset.h"
+#include "chatbar.h"
 #include "uibar.h"
 
 using namespace gameplay;
@@ -27,6 +28,13 @@ namespace io
 {
 	class statusbar : public uielement
 	{
+	public:
+		statusbar(maplestats*);
+		~statusbar() {}
+		void draw(ID2D1HwndRenderTarget*);
+		void update();
+		void buttonpressed(short);
+		rectangle2d bounds();
 	private:
 		maplestats* stats;
 		uibar exp;
@@ -36,13 +44,8 @@ namespace io
 		charset lvset;
 		textlabel name;
 		textlabel job;
-	public:
-		statusbar(maplestats*);
-		~statusbar() {}
-		void draw(ID2D1HwndRenderTarget*);
-		void update();
-		void buttonpressed(short);
-		pair<vector2d, vector2d> bounds();
+		animation anihp;
+		animation animp;
 	};
 }
 

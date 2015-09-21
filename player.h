@@ -60,7 +60,7 @@ namespace gameplay
 	public:
 		player() {}
 		~player() {}
-		player(maplechar*, inventory, int, skillbook, questlog, pair<vector<int>, vector<int>>, int, map<short, char>, map<short, string>);
+		player(maplechar*);
 		void setposition(vector2d);
 		void setlr(ladderrope);
 		void sit(bool);
@@ -73,11 +73,15 @@ namespace gameplay
 		void draw(ID2D1HwndRenderTarget*, vector2d);
 		movefragment update();
 		void setaction(string);
+		void recalcstats(bool);
+		void init(int, skillbook, questlog, pair<vector<int>, vector<int>>, int, map<short, char>, map<short, string>);
+		void setinventory(inventory ivt) { invent = ivt; }
 		void setfh(footholdtree* f) { footholds = f; }
 		void setexpression(char c) { look.setexpression(c); }
 		bool getleft() { return fleft; }
 		bool onladderrope() { return state == PST_CLIMB; }
-		vector2d getposition() { return vector2d(static_cast<int>(fx), static_cast<int>(fy)); }
+		vector2d getposition() { return vector2d(static_cast<int>(floor(fx)), static_cast<int>(floor(fy))); }
+		rectangle2d bounds() { return rectangle2d(position, position + vector2d(50, 80)); }
 		maplestats* getstats() { return &stats; }
 		maplelook* getlook() { return &look; }
 		playereffects* geteffects() { return &effects; }
@@ -104,12 +108,12 @@ namespace gameplay
 		short jump;
 		float hspeed;
 		float vspeed;
+		vector2d position;
 		float fx;
 		float fy;
 		float ground;
 		bool fleft;
 		bool nofriction;
-		void recalcstats(bool);
 		bool candjump;
 		playerstate state;
 		map<moveinput, bool> keydown;

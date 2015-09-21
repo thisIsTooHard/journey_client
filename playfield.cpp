@@ -26,18 +26,13 @@ namespace gameplay
 		active = false;
 	}
 
-	void playfield::init()
-	{
-		portals.init();
-	}
-
 	bool playfield::moveup(bool keydown)
 	{
 		bool enable = true;
 
 		if (keydown)
 		{
-			pair<int, string> warpinfo = portals.getportal(playerchar.getposition());
+			pair<int, string> warpinfo = portals.getportal(playerchar.bounds());
 
 			if (warpinfo.first == maplemap.getid())
 			{
@@ -86,7 +81,7 @@ namespace gameplay
 					bool left = playerchar.getleft();
 
 					touse->addeffects(playerchar.geteffects(), !left);
-					playerchar.setaction(touse->getaction(playerchar.getlook()->getcloth("Weapon")->istwo_h()));
+					playerchar.setaction(touse->getaction(playerchar.getlook()->getcloth(EQL_WEAPON)->istwo_h()));
 
 					if (touse->isattack())
 					{
@@ -125,7 +120,7 @@ namespace gameplay
 
 			if (allowed)
 			{
-				regularattack regtype = static_cast<regularattack>(playerchar.getlook()->getcloth("Weapon")->getattack());
+				regularattack regtype = static_cast<regularattack>(playerchar.getlook()->getcloth(EQL_WEAPON)->getattack());
 
 				rectangle2d range = attfactory.getnormalrange(regtype);
 				vector2d plpos = playerchar.getposition();
@@ -206,8 +201,8 @@ namespace gameplay
 			layers[5].draw(target, viewpos);
 			layers[6].draw(target, viewpos);
 			layers[7].draw(target, viewpos);
+			npcs.draw(target, viewpos);
 			mobs.draw(target, viewpos);
-			objects.draw(target, viewpos);
 			chars.draw(target, viewpos);
 			playerchar.draw(target, viewpos);
 			drops.draw(target, viewpos);
@@ -221,7 +216,7 @@ namespace gameplay
 		if (active)
 		{
 			backgrounds.update();
-			objects.update();
+			npcs.update();
 			mobs.update();
 			drops.update();
 			chars.update();
@@ -232,7 +227,7 @@ namespace gameplay
 				packet_c.moveplayer(movement);
 			}
 
-			portals.update(playerchar.getposition());
+			portals.update(playerchar.bounds());
 
 			for (int i = 0; i < 8; i++)
 			{
@@ -241,16 +236,16 @@ namespace gameplay
 		}
 	}
 
-	void playfield::setplayer(player plchar)
+	void playfield::buildplayer()
 	{
-		playerchar = plchar;
+		playerchar = player(login.getacc()->getplayer());
 	}
 
 	void playfield::setfield(int mapid, char pid)
 	{
 		active = false;
 
-		objects.clear();
+		npcs.clear();
 		mobs.clear();
 		drops.clear();
 		portals.clear();
@@ -259,39 +254,20 @@ namespace gameplay
 		app.getimgcache()->setmode(ict_map);
 		nl::nx::view_file("Map");
 
-		string fullname;
 		string strid = to_string(mapid);
-		size_t extend = 9 - strid.length();
-		for (char i = 0; i < extend; i++)
-		{
-			fullname.append("0");
-		}
+		strid.insert(0, 9 - strid.length(), '0');
 
-		node mapdata = nl::nx::nodes["Map"].resolve("Map/Map" + to_string(mapid / 100000000) + "/" + fullname.append(strid) + ".img");
+		node mapdata = nl::nx::nodes["Map"]["Map"]["Map" + to_string(mapid / 100000000)][strid + ".img"];
 
 		footholds = footholdtree(mapdata["foothold"]);
 		maplemap = mapinfo(mapid, mapdata["info"], vector2d(footholds.getwalls()), vector2d(footholds.getborders()));
 		landr = laddersropes(mapdata["ladderRope"]);
-
-		nl::node portalnodes = mapdata["portal"];
-		for (nl::node portalnd = portalnodes.begin(); portalnd != portalnodes.end(); portalnd++)
-		{
-			char pid = static_cast<char>(stoi(portalnd.name()));
-
-			portaltype ptype = static_cast<portaltype>(portalnd.resolve("pt").get_integer());
-			string pname = portalnd.resolve("pn").get_string();
-			int targetid = static_cast<int>(portalnd.resolve("tm").get_integer());
-			string targetpname = portalnd.resolve("tn").get_string();
-			vector2d ppos = vector2d(static_cast<int>(portalnd.resolve("x").get_integer()), static_cast<int>(portalnd.resolve("y").get_integer()));
-
-			portals.addportal(pid, ptype, pname, targetid, mapid == targetid, targetpname, ppos);
-		}
-
-		backgrounds = mapbackgrounds(mapdata.resolve("back"), maplemap.getwalls(), maplemap.getborders());
+		portals = mapportals(mapdata["portal"], mapid);
+		backgrounds = mapbackgrounds(mapdata["back"], maplemap.getwalls(), maplemap.getborders());
 
 		for (int i = 0; i < 8; i++)
 		{
-			layers[i] = maplayer(mapdata.resolve(to_string(i)));
+			layers[i] = maplayer(mapdata[to_string(i)]);
 		}
 
 		nl::nx::unview_file("Map");

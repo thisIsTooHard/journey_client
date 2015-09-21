@@ -54,6 +54,7 @@ namespace action
 		if (ground - fy <= fh.getslope() * abs(hspeed))
 		{
 			fy = ground;
+			groundhit = true;
 		}
 
 		if (ground > fy)

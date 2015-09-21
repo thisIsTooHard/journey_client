@@ -27,10 +27,13 @@ namespace graphics
 	enum dwfonts
 	{
 		DWF_12L,
+		DWF_12LL,
 		DWF_12C,
+		DWF_12BC,
 		DWF_12R,
 		DWF_14L,
 		DWF_14C,
+		DWF_14BC,
 		DWF_14R,
 		DWF_20C
 	};
@@ -42,7 +45,11 @@ namespace graphics
 		TXC_YELLOW,
 		TXC_BLUE,
 		TXC_RED,
-		TXC_BROWN
+		TXC_BROWN,
+		TXC_GREY,
+		TXC_ORANGE,
+		TXC_MBLUE,
+		TXC_VIOLET
 	};
 
 	enum textbg

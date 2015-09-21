@@ -16,7 +16,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "stdfax.h"
 #include "texture.h"
 #include "textlabel.h"
 
@@ -24,30 +23,43 @@ using namespace graphics;
 
 namespace io
 {
+	enum textid
+	{
+		TXT_ACC,
+		TXT_PASS,
+		TXT_NAMECHAR,
+		TXT_CHAT
+	};
+
 	class textfield
 	{
 	public:
-		textfield(dwfonts, textcolor, string, vector2d, int);
+		textfield(textid, dwfonts, textcolor, string, vector2d, int);
 		textfield() {}
 		~textfield() {}
-		pair<vector2d, vector2d> bounds();
+		rectangle2d bounds();
 		void draw(ID2D1HwndRenderTarget*, vector2d);
 		void update();
-		void setstate(string);
+		void setfocus(bool);
 		void sendchar(char);
 		void setbg(texture, int, int);
+		void setactive(bool a) { active = a; }
 		void settext(string s) { content.settext(s); }
-		string getstate() { return state; }
+		bool isactive() { return active; }
+		bool isfocused() { return focused; }
+		textid getid() { return id; }
 		string text() { return content.gettext(); }
 	private:
+		textid id;
 		texture bg;
 		textlabel content;
 		vector2d position;
-		string state;
 		vector2d bgposition;
 		int maxlength;
-		int markpos;
+		bool active;
+		bool focused;
 		bool showmark;
+		int markpos;
 		short elapsed;
 	};
 }

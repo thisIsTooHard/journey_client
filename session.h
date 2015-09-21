@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "packet.h"
-#include "crypto.h"
+#include "cryptography.h"
 #include "packethandler.h"
 
 #pragma comment (lib, "Ws2_32.lib")
@@ -41,7 +41,7 @@ namespace net
 	private:
 		SOCKET sock;
 		packethandler handler;
-		crypto encrypter;
+		cryptography encrypter;
 		packet curp;
 		mutex sendlock;
 		mutex recvlock;

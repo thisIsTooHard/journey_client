@@ -17,86 +17,94 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "mapportals.h"
-#include "Journey.h"
+#include "nxfile.h"
 
-namespace gameplay
+namespace maplemap
 {
-	mapportals::mapportals()
+	mapportals::mapportals(node src, int mapid)
 	{
-
-	}
-
-	void mapportals::init()
-	{
-		app.getimgcache()->setmode(ict_sys);
-		nl::node pnode = nl::nx::nodes["Map"].resolve("MapHelper.img/portal/game");
+		node pnode = nx::nodes["Map"]["MapHelper.img"]["portal"]["game"];
 		animations[PT_REGULAR] = animation(pnode["pv"]);
 		animations[PT_HIDDEN] = animation(pnode["ph"]["default"]["portalContinue"]);
-		app.getimgcache()->unlock();
-	}
 
-	void mapportals::clear()
-	{
-		portals.clear();
-	}
-
-	void mapportals::addportal(char id, portaltype type, string pname, int targetid, bool intern, string targetn, vector2d ppos)
-	{
-		animation anim = animation();
-
-		switch (type)
+		for (node ptnode = src.begin(); ptnode != src.end(); ++ptnode)
 		{
-		case PT_REGULAR:
-		case PT_HIDDEN:
-			anim = animations[type];
-			break;
-		case PT_SCRIPTED_HIDDEN:
-			anim = animations[PT_HIDDEN];
-			break;
-		}
+			char pid = static_cast<char>(stoi(ptnode.name()));
+			portaltype type = static_cast<portaltype>(ptnode["pt"].toi8());
+			string name = ptnode["pn"];
+			int targetid = ptnode["tm"];
+			string targetname = ptnode["tn"];
+			vector2d pos = vector2d(ptnode["x"], ptnode["y"]);
 
-		portals[id] = portal(type, pname, targetid, intern, targetn, anim, ppos);
+			animation anim;
+			switch (type)
+			{
+			case PT_REGULAR:
+			case PT_HIDDEN:
+				anim = animations[type];
+				break;
+			case PT_SCRIPTED_HIDDEN:
+				anim = animations[PT_HIDDEN];
+				break;
+			default:
+				anim = animation();
+			}
+
+			portals.add(pid, portal(type, name, targetid, mapid == targetid, targetname, anim, pos));
+		}
 	}
 
 	vector2d mapportals::getspawnpoint(char id)
 	{
-		return portals[id].getposition();
+		return portals.contains(id) ? portals.get(id)->getposition() : vector2d();
 	}
 
 	vector2d mapportals::getspawnpoint(string pname)
 	{
-		for (map<char, portal>::iterator pit = portals.begin(); pit != portals.end(); pit++)
+		vector2d ret = vector2d();
+
+		for (smit<char, portal> ptit = portals.getit(); ptit.belowtop(); ptit++)
 		{
-			if (pit->second.getname() == pname)
-				return pit->second.getposition();
+			if (ptit->getname() == pname)
+			{
+				ret = ptit->getposition();
+				break;
+			}
 		}
-		return portals[0].getposition();
+
+		return ret;
 	}
 
-	pair<int, string> mapportals::getportal(vector2d playerpos)
+	pair<int, string> mapportals::getportal(rectangle2d playerrect)
 	{
-		for (map<char, portal>::iterator pit = portals.begin(); pit != portals.end(); pit++)
+		pair<int, string> warpinfo = make_pair(999999999, "");
+
+		for (smit<char, portal> ptit = portals.getit(); ptit.belowtop(); ptit++)
 		{
-			if (colliding(make_pair(playerpos, vector2d(50, 80)), make_pair(pit->second.getposition(), pit->second.getdimension())) && pit->second.gettype() != PT_WARP)
-				return pit->second.getwarpinfo();
+			if (ptit->bounds().overlaps(playerrect) && ptit->gettype() != PT_WARP)
+			{
+				warpinfo = ptit->getwarpinfo();
+				break;
+			}
 		}
-		return make_pair(999999999, "");
+
+		return warpinfo;
 	}
 
 	void mapportals::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
 	{
-		for (map<char, portal>::iterator pit = portals.begin(); pit != portals.end(); pit++)
+		for (smit<char, portal> ptit = portals.getit(); ptit.belowtop(); ptit++)
 		{
-			pit->second.draw(target, viewpos);
+			ptit->draw(target, viewpos);
 		}
 	}
 
-	void mapportals::update(vector2d playerpos)
+	void mapportals::update(rectangle2d playerrect)
 	{
-		for (map<char, portal>::iterator pit = portals.begin(); pit != portals.end(); pit++)
+		for (smit<char, portal> ptit = portals.getit(); ptit.belowtop(); ptit++)
 		{
-			pit->second.settouch(colliding(make_pair(playerpos, vector2d(50, 80)), make_pair(pit->second.getposition(), pit->second.getdimension())));
-			pit->second.update();
+			ptit->settouch(ptit->bounds().overlaps(playerrect));
+			ptit->update();
 		}
 	}
 }

@@ -43,19 +43,31 @@ namespace io
 		nl::node keys_n = src["key"];
 		nl::node icons_n = src["icon"];
 
+		for (char i = 0; i < 90; i++)
+		{
+			keytxt[i] = texture(keys_n[to_string(i)]);
+		}
+
 		map<keyaction, keyaction> reserve;
 		for (keyaction k = KA_EQUIPS; k <= KA_EQUIPENHANCE2; k = static_cast<keyaction>(k + 1))
 		{
 			reserve[k] = k;
+			actiontxt[k] = texture(icons_n[to_string(k)]);
 		}
 		for (keyaction k = KA_PICKUP; k <= KA_JUMP; k = static_cast<keyaction>(k + 1))
 		{
 			reserve[k] = k;
+			actiontxt[k] = texture(icons_n[to_string(k)]);
 		}
 		for (keyaction k = KA_FACE1; k <= KA_FACE7; k = static_cast<keyaction>(k + 1))
 		{
 			reserve[k] = k;
+			actiontxt[k] = texture(icons_n[to_string(k)]);
 		}
+
+		nl::nx::unview_file("UI");
+		app.getimgcache()->unlock();
+
 
 		for (map<char, pair<keytype, int>>::iterator keyit = keymap.begin(); keyit != keymap.end(); ++keyit)
 		{
@@ -63,40 +75,46 @@ namespace io
 			keytype type = keyit->second.first;
 			int action = keyit->second.second;
 			vector2d pos = getkeypos(key);
-			texture txt;
+			texture txtkey = keytxt[key];
 
-			switch (type)
+			if (type == KT_ACTION || type == KT_MENU || type == KT_FACE)
 			{
-			case KT_ACTION:
-			case KT_MENU:
-			case KT_FACE:
-				reserve.erase(static_cast<keyaction>(action));
-				txt = texture(icons_n[to_string(action)]);
-				if (txt.isloaded())
+				keyaction ka = static_cast<keyaction>(action);
+				reserve.erase(ka);
+				texture txticon = actiontxt[ka];
+				if (txticon.isloaded())
 				{
-					dragicons.push_back(dragicon(txt, key, static_cast<keyaction>(action), texture(keys_n[to_string(keyit->first)]), pos));
+					dragicons.push_back(dragicon(DIT_KEY, txticon, txtkey, pos, key, action));
 				}
-				break;
-			case KT_CASH:
-			case KT_ITEM:
-				dragicons.push_back(dragicon(itemicon(action, true, invent->countitem(action)), texture(keys_n[to_string(keyit->first)]), pos));
-				break;
-			case KT_SKILL:
-				dragicons.push_back(dragicon(skillicon(action), texture(keys_n[to_string(keyit->first)]), pos));
-				break;
+			}
+			else if (type == KT_CASH || type == KT_ITEM)
+			{
+				iteminfo* item = app.getui()->getfield()->getitems()->getitem(action);
+				if (item)
+				{
+					dragicons.push_back(dragicon(DIT_ITEMKEY, itemicon(item->geticons(), true, invent->countitem(action)), txtkey, pos, key, action));
+				}
+			}
+			else if (type == KT_SKILL)
+			{
+				skill* skl = app.getui()->getfield()->getattacks()->getskill(action);
+				if (skl)
+				{
+					dragicons.push_back(dragicon(DIT_SKILLKEY, skl->geticon(0), txtkey, pos, key, action));
+				}
 			}
 		}
 
 		for (map<keyaction, keyaction>::iterator rsit = reserve.begin(); rsit != reserve.end(); ++rsit)
 		{
-			dragicons.push_back(dragicon(texture(icons_n[to_string(rsit->first)]), 0, rsit->first, texture(), getreservepos(rsit->first)));
+			dragicons.push_back(dragicon(DIT_KEY, texture(icons_n[to_string(rsit->first)]), texture(), getreservepos(rsit->first), 0, rsit->first));
 		}
 
-		nl::nx::unview_file("UI");
-		app.getimgcache()->unlock();
 		position = vector2d(89, 73);
 		dimensions = vector2d(622, 374);
 		active = true;
+		dragged = false;
+		buttoncd = 0;
 	}
 
 	void keyconfig::buttonpressed(short id)
@@ -118,8 +136,8 @@ namespace io
 				{
 					switch (drit->gettype())
 					{
-					case dit_keyconfig:
-						drit->setposition(getreservepos(drit->getaction()));
+					case DIT_KEY:
+						drit->setposition(getreservepos(static_cast<keyaction>(drit->getaction())));
 						drit->setkeyicon(texture());
 						newicons.push_back(*drit);
 						break;
@@ -136,14 +154,14 @@ namespace io
 	{
 		switch (icon->gettype())
 		{
-		case dit_keyconfig:
+		case DIT_KEY:
 			if (pos.y() > position.y() + 265)
 			{
 				char keybind = icon->getkey();
 				if (keybind > -1)
 				{
 					keymap[keybind] = make_pair(KT_NONE, 0);
-					icon->setposition(getreservepos(icon->getaction()));
+					icon->setposition(getreservepos(static_cast<keyaction>(icon->getaction())));
 					icon->setkeyicon(texture());
 				}
 				icon->resetdrag();
@@ -155,6 +173,20 @@ namespace io
 				icon->resetdrag();
 			}
 			break;
+		default:
+			uielement::sendicon(icon, pos);
+		}
+	}
+
+	void keyconfig::oniteminfo(dragicon* dgi)
+	{
+		if (dgi)
+		{
+			app.getui()->showiteminfo(dgi->getaction());
+		}
+		else
+		{
+			app.getui()->showiteminfo(0);
 		}
 	}
 
@@ -246,5 +278,10 @@ namespace io
 		}
 
 		return ret;
+	}
+
+	rectangle2d keyconfig::dragarea()
+	{
+		return rectangle2d(position, position + vector2d(622, 20));
 	}
 }

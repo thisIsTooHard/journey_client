@@ -40,16 +40,17 @@ namespace gameplay
 		void showhp(char);
 		void setmove(char, bool);
 		void kill(char);
-		bool isinrange(rectangle2d);
+		rectangle2d bounds();
 		void setstate(string st) { state = st; }
 		void makeactive() { active = true; }
 		bool isalive() { return state != "die1"; }
 		bool isactive() { return active && isalive(); }
-		vector2d getdimension() { return textures[state].getdimension(0); }
 	private:
 		pair<int, bool> calcdamage(uniform_int_distribution<int>, float, float);
+		void sendmoves(byte);
 		map<string, animation> textures;
 		map<string, texture> uitextures;
+		map<string, rectangle2d> hitrect;
 		float alpha;
 		bool active;
 		int oid;
@@ -72,7 +73,7 @@ namespace gameplay
 		vector2d walls;
 		string state;
 		bool control;
-		float moved;
+		byte moved;
 		char stance;
 		char effect;
 		bool fadein;

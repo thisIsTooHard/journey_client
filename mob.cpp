@@ -57,6 +57,7 @@ namespace gameplay
 			else
 			{
 				textures[state] = animation(subnode);
+				hitrect[state] = rectangle2d(subnode["0"]["lt"].tov2d(), subnode["0"]["rb"].tov2d());
 			}
 		}
 
@@ -178,11 +179,21 @@ namespace gameplay
 		}
 	}
 
-	bool mob::isinrange(rectangle2d range)
+	rectangle2d mob::bounds()
 	{
-		vector2d pos = getposition();
-		vector2d posver = vector2d(pos.y() - textures[state].getdimension(0).y(), pos.y());
-		return range.contains(pos.x(), posver);
+		rectangle2d bounds = hitrect[state];
+		if (bounds.straight())
+		{
+			vector2d dim = textures[state].getdimension(0);
+			vector2d lt = getposition() - vector2d(dim.y(), dim.x() / 2);
+			bounds = rectangle2d(lt, lt + dim);
+		}
+		else
+		{
+			bounds.setlt(bounds.getlt() + getposition());
+			bounds.setrb(bounds.getrb() + getposition());
+		}
+		return bounds;
 	}
 
 	void mob::kill(char animation)
@@ -316,6 +327,11 @@ namespace gameplay
 							hspeed = fspeed;
 						}
 					}
+
+					if (moved % 10 == 0)
+					{
+						//sendmoves(10);
+					}
 				}
 			}
 
@@ -327,8 +343,7 @@ namespace gameplay
 					aniend = true;
 				}
 			}
-
-			if (fadein)
+			else if (fadein)
 			{
 				alpha += 0.025f;
 				if (alpha > 0.975f)
@@ -342,6 +357,23 @@ namespace gameplay
 		}
 
 		return false;
+	}
+
+	void mob::sendmoves(byte elapsed)
+	{
+		vector<movefragment> moves;
+		movefragment lastmove;
+		lastmove.type = MVT_ABSOLUTE;
+		lastmove.command = 1;
+		lastmove.newstate = 1;
+		lastmove.xpos = static_cast<short>(fx);
+		lastmove.ypos = static_cast<short>(fy);
+		lastmove.xpps = hspeed * elapsed;
+		lastmove.ypps = vspeed * elapsed;
+		lastmove.duration = elapsed;
+		moves.push_back(lastmove);
+
+		packet_c.movemonster(oid, 1, 0, 0, 0, 0, 0, 0, getposition(), moves);
 	}
 
 	void mob::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)

@@ -29,6 +29,8 @@ namespace util
 		~rectangle2d() {}
 		bool contains(vector2d);
 		bool contains(int, vector2d);
+		bool overlaps(rectangle2d);
+		bool straight() { return lt == rb; }
 		void setlt(vector2d l) { lt = l; }
 		void setrb(vector2d r) { rb = r; }
 		void shift(vector2d v) { lt = lt + v; rb = rb + v; }

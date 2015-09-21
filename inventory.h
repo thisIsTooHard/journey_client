@@ -18,31 +18,29 @@
 #pragma once
 #include "mapleitem.h"
 #include "mapleequip.h"
+#include "safeptrmap.h"
 
-using namespace std;
+using namespace util;
 
 namespace gameplay
 {
 	enum inventorytype : char
 	{
 		IVT_EQUIPPED = -1,
-		IVT_EQUIP = 0,
-		IVT_USE = 1,
-		IVT_SETUP = 2,
-		IVT_ETC = 3,
-		IVT_CASH = 4,
-		IVT_CLOTHES = 5,
-		IVT_CASHCLOTHES = 6,
-		IVT_NONE = 7
+		IVT_NONE = 0,
+		IVT_EQUIP = 1,
+		IVT_USE = 2,
+		IVT_SETUP = 3,
+		IVT_ETC = 4,
+		IVT_CASH = 5
 	};
 
 	class inventory
 	{
 	public:
-		inventory(vector<char>, map<short, mapleequip>, map<short, mapleequip>, map<short, mapleequip>, map<char, mapleitem>, map<char, mapleitem>, map<char, mapleitem>, map<char, mapleitem>);
+		inventory(vector<char>);
 		inventory() {}
-		~inventory() {}
-		void removeitem(inventorytype, short);
+		~inventory() { items.clear(); }
 		void recalcstats();
 		short countitem(int);
 		short getprimstat(short);
@@ -50,13 +48,15 @@ namespace gameplay
 		short getaccuracy();
 		short finditem(int);
 		short finditem(inventorytype, int);
-		const float getwmult();
-		const inventorytype gettypebyid(int);
+		mapleequip* getequip(inventorytype, short);
+		mapleitem* getitem(inventorytype t, short s) { return items[t].get(s); }
+		void additem(mapleitem* i, inventorytype t) { items[t].add(i->getpos(), i); }
+		void removeitem(inventorytype t, short s) { items[t].removekey(s); }
 		short gettotal(equipstat es) { return totalstats[es]; }
-		map<short, mapleequip>* getequipped() { return &equipped; }
-		map<short, mapleequip>* getequippedcash() { return &equippedcash; }
-		mapleequip* getequip(short s) { return (equipped.count(s)) ? &equipped[s] : 0; }
+		inventorytype gettypebyid(int id) { return static_cast<inventorytype>(id / 1000000); }
+		spmit<short, mapleitem*> getinventory(inventorytype t) { return items[t].getit(); }
 	private:
+		map<inventorytype, safeptrmap<short, mapleitem*>> items;
 		vector<char> slots;
 		map<equipstat, short> totalstats;
 		map<short, mapleequip> equipped;

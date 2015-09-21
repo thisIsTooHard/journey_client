@@ -38,6 +38,10 @@ namespace io
 			{
 				itbt->second.draw(target, position);
 			}
+			for (map<textid, textfield>::iterator ittxt = textfields.begin(); ittxt != textfields.end(); ++ittxt)
+			{
+				ittxt->second.draw(target, position);
+			}
 			for (vector<dragicon>::iterator itdg = dragicons.begin(); itdg != dragicons.end(); ++itdg)
 			{
 				itdg->draw(target, position);
@@ -53,6 +57,15 @@ namespace io
 			{
 				itspr->update();
 			}
+			for (map<textid, textfield>::iterator ittxt = textfields.begin(); ittxt != textfields.end(); ++ittxt)
+			{
+				ittxt->second.update();
+			}
+
+			if (buttoncd > 0)
+			{
+				buttoncd -= DPF;
+			}
 		}
 	}
 
@@ -61,14 +74,12 @@ namespace io
 		if (active)
 		{
 			mousestate ret = state;
-			bool drag = false;
+			bool iteminfo = false;
 
 			for (vector<dragicon>::iterator dgit = dragicons.begin(); dgit != dragicons.end(); ++dgit)
 			{
-				if (colliding(pos, dgit->bounds(), position))
+				if (dgit->bounds(position).contains(pos))
 				{
-					drag = true;
-
 					if (!dgit->dragged())
 					{
 						switch (state)
@@ -76,7 +87,13 @@ namespace io
 						case MST_IDLE:
 						case MST_CANCLICK:
 						case MST_CANCLICK2:
+						case MST_CANGRAB:
 							ret = MST_CANGRAB;
+							if (dgit->gettype() == DIT_ITEM || dgit->gettype() == DIT_ITEMKEY)
+							{
+								oniteminfo(dgit._Ptr);
+								iteminfo = true;
+							}
 							break;
 						case MST_CLICKING:
 							dgit->setdrag(pos, position);
@@ -85,12 +102,14 @@ namespace io
 							break;
 						}
 					}
-				}
 
-				if (drag)
-				{
 					return ret;
 				}
+			}
+
+			if (!iteminfo && state != MST_IDLE)
+			{
+				oniteminfo(0);
 			}
 
 			bool anycoll = false;
@@ -113,8 +132,12 @@ namespace io
 					case MST_CLICKING:
 						if (btst == "normal" || btst == "mouseOver")
 						{
-							itbt->second.setstate("pressed");
-							buttonpressed(itbt->first);
+							if (buttoncd <= 0)
+							{
+								itbt->second.setstate("pressed");
+								buttonpressed(itbt->first);
+								buttoncd = 60;
+							}
 							ret = MST_CANCLICK;
 						}
 					}
@@ -135,42 +158,66 @@ namespace io
 			}
 
 			bool anytext = false;
-			for (map<short, textfield>::iterator txtit = textfields.begin(); txtit != textfields.end(); txtit++)
+			for (map<textid, textfield>::iterator txtit = textfields.begin(); txtit != textfields.end(); txtit++)
 			{
-				if (util::colliding(pos, txtit->second.bounds(), position))
+				if (txtit->second.isactive())
 				{
-					switch (state)
+					if (txtit->second.bounds().contains(pos))
 					{
-					case MST_CLICKING:
-						txtit->second.setstate("active");
-						app.getui()->settextfield(&txtit->second);
-						anytext = true;
-						break;
-					}
-				}
-				else
-				{
-					switch (state)
-					{
-					case MST_CLICKING:
-						txtit->second.setstate("inactive");
-						if (!anytext)
+						switch (state)
 						{
-							app.getui()->settextfield(0);
+						case MST_CLICKING:
+							txtit->second.setfocus(true);
+							app.getui()->settextfield(&txtit->second);
+							anytext = true;
+							break;
 						}
-						break;
+					}
+					else
+					{
+						switch (state)
+						{
+						case MST_CLICKING:
+							txtit->second.setfocus(false);
+							if (!anytext)
+							{
+								app.getui()->settextfield(0);
+							}
+							break;
+						}
 					}
 				}
 			}
 
 			if (!anycoll)
 			{
-				switch (state)
+				if (dragged)
 				{
-				case MST_CANCLICK:
-				case MST_CANGRAB:
-					ret = MST_IDLE;
-					break;
+					if (state == MST_CLICKING)
+					{
+						position = pos + cursorrel;
+					}
+					else
+					{
+						dragged = false;
+					}
+				}
+				else
+				{
+					switch (state)
+					{
+					case MST_CANCLICK:
+					case MST_CANGRAB:
+						ret = MST_IDLE;
+						break;
+					case MST_CLICKING:
+						if (dragarea().contains(pos))
+						{
+							cursorrel = position - pos;
+							dragged = true;
+						}
+						break;
+					}
 				}
 			}
 

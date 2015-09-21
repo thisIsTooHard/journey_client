@@ -27,9 +27,17 @@ namespace program
 		fonts[DWF_12L]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 		fonts[DWF_12L]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 
+		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12LL]);
+		fonts[DWF_12LL]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+		fonts[DWF_12LL]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+
 		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12C]);
 		fonts[DWF_12C]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 		fonts[DWF_12C]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+
+		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12BC]);
+		fonts[DWF_12BC]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+		fonts[DWF_12BC]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 
 		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12R]);
 		fonts[DWF_12R]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
@@ -42,6 +50,10 @@ namespace program
 		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-us", &fonts[DWF_14C]);
 		fonts[DWF_14C]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 		fonts[DWF_14C]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+
+		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-us", &fonts[DWF_14BC]);
+		fonts[DWF_14BC]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+		fonts[DWF_14BC]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 
 		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-us", &fonts[DWF_14R]);
 		fonts[DWF_14R]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);

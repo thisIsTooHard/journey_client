@@ -19,12 +19,24 @@
 
 namespace io
 {
+	button::button(node src)
+	{
+		textures["pressed"] = texture(src["pressed"]["0"]);
+		textures["mouseOver"] = texture(src["mouseOver"]["0"]);
+		textures["normal"] = texture(src["normal"]["0"]);
+		textures["disabled"] = texture(src["disabled"]["0"]);
+		position = vector2d();
+		state = "normal";
+		bttype = BTT_REGULAR;
+		active = true;
+	}
+
 	button::button(node src, int x, int y)
 	{
-		sprites["pressed"] = texture(src.resolve("pressed/0"));
-		sprites["mouseOver"] = texture(src.resolve("mouseOver/0"));
-		sprites["normal"] = texture(src.resolve("normal/0"));
-		sprites["disabled"] = texture(src.resolve("disabled/0"));
+		textures["pressed"] = texture(src.resolve("pressed/0"));
+		textures["mouseOver"] = texture(src.resolve("mouseOver/0"));
+		textures["normal"] = texture(src.resolve("normal/0"));
+		textures["disabled"] = texture(src.resolve("disabled/0"));
 		position = vector2d(x, y);
 		state = "normal";
 		bttype = BTT_REGULAR;
@@ -33,18 +45,18 @@ namespace io
 	
 	button::button(texture s1, texture s2, int x, int y)
 	{
-		sprites["normal"] = s1;
-		sprites["select"] = s2;
+		textures["normal"] = s1;
+		textures["select"] = s2;
 		position = vector2d(x, y);
 		state = "normal";
 		bttype = BTT_ONESPRITE;
 		active = true;
 	}
 
-	button::button(int x, int y, int w, int h)
+	button::button(vector2d pos, vector2d dim)
 	{
-		position = vector2d(x, y);
-		dimension = vector2d(w, h);
+		position = pos;
+		dimension = dim;
 		state = "normal";
 		bttype = BTT_AREA;
 		active = true;
@@ -58,7 +70,7 @@ namespace io
 		}
 		else
 		{
-			return pair<vector2d, vector2d>(position - sprites["normal"].getorigin(), (sprites["normal"].getdimension()));
+			return pair<vector2d, vector2d>(position - textures["normal"].getorigin(), (textures["normal"].getdimension()));
 		}
 	}
 
@@ -72,17 +84,17 @@ namespace io
 			{
 				if (state == "normal")
 				{
-					sprites["normal"].draw(absp);
+					textures["normal"].draw(absp);
 				}
 				else if (state == "pressed" || state == "mouseOver")
 				{
-					sprites["normal"].draw(absp);
-					sprites["select"].draw(absp);
+					textures["normal"].draw(absp);
+					textures["select"].draw(absp);
 				}
 			}
 			else if (bttype == BTT_REGULAR)
 			{
-				sprites[state].draw(absp);
+				textures[state].draw(absp);
 			}
 		}
 	}

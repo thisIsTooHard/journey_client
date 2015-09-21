@@ -31,8 +31,12 @@ namespace io
 		~keyconfig() {}
 		void buttonpressed(short);
 		void sendicon(dragicon*, vector2d);
+		void oniteminfo(dragicon*);
+		rectangle2d dragarea();
 	private:
 		map<char, pair<keytype, int>> keymap;
+		map<char, texture> keytxt;
+		map<keyaction, texture> actiontxt;
 		vector2d getkeypos(char);
 		vector2d getreservepos(keyaction);
 	};

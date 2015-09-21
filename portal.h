@@ -16,14 +16,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "stdfax.h"
 #include "animation.h"
 
-using namespace std;
-using namespace util;
 using namespace graphics;
 
-namespace gameplay
+namespace maplemap
 {
 	enum portaltype : char
 	{
@@ -46,27 +43,27 @@ namespace gameplay
 
 	class portal
 	{
+	public:
+		portal() {}
+		~portal() {}
+		portal(portaltype, string, int, bool, string, animation, vector2d);
+		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void update() { anim.update(8); }
+		void settouch(bool t) { touched = t; }
+		vector2d getposition() { return position; }
+		rectangle2d bounds() { return rectangle2d(position, position + vector2d(30, 50)); }
+		portaltype gettype() { return type; }
+		pair<int, string> getwarpinfo() { return make_pair(targetid, intermap ? targetpname : name); }
+		string getname() { return name; }
 	private:
 		animation anim;
 		portaltype type;
-		string pname;
+		string name;
 		vector2d position;
 		int targetid;
 		string targetpname;
 		bool touched;
 		bool intermap;
-	public:
-		portal();
-		~portal();
-		portal(portaltype, string, int, bool, string, animation, vector2d);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
-		void update();
-		void settouch(bool);
-		vector2d getposition();
-		vector2d getdimension();
-		portaltype gettype();
-		pair<int, string> getwarpinfo();
-		string getname();
 	};
 }
 

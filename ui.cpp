@@ -28,27 +28,35 @@
 #include "keyconfig.h"
 #include "statsinfo.h"
 #include "equipinventory.h"
+#include "Journey.h"
 
 namespace io
 {
 	void ui::init(imagecache* img)
 	{
-		mouse.init(img);
 		base.init();
-		field.init();
+		mouse.init(img);
+
+		equipinfo = new equiptooltip(img);
+		equipinfo->clear();
+
+		miteminfo = new itemtooltip(img);
+		miteminfo->clear();
 
 		//field.playbgm("Sound\\BgmUI.img\\BgmUI.img\\Title.mp3");
 
 		activetext = 0;
 		activeicon = 0;
+
+		active = true;
 		shift = false;
 		actionsenabled = true;
-		active = true;
 	}
 
 	ui::~ui()
 	{
 		elements.clear();
+		delete equipinfo;
 	}
 
 	void ui::add(uielements type, char param)
@@ -80,13 +88,16 @@ namespace io
 			toadd = new loginwait();
 			break;
 		case UI_WORLDSELECT:
-			toadd = new worldselect(field.getworlds()->at(0).getchannels(), field.getworlds()->at(0).getchloads());
+			toadd = new worldselect(field.getlogin()->getworld(0)->getchannels(), field.getlogin()->getworld(0)->getchloads());
 			break;
 		case UI_CHARSEL:
-			toadd = new charselect(field.getaccount());
+			toadd = new charselect(field.getlogin()->getacc());
 			break;
 		case UI_CREATECHAR:
-			toadd = new charcreation(field.getaccount()->isfemale());
+			toadd = new charcreation(field.getlogin()->getacc()->isfemale());
+			break;
+		case UI_CHATBAR:
+			toadd = new chatbar();
 			break;
 		case UI_STATUSBAR:
 			toadd = new statusbar(field.getplayer()->getstats());
@@ -98,10 +109,10 @@ namespace io
 			toadd = new keyconfig(keys.getkeys(), field.getplayer()->getinventory());
 			break;
 		case UI_STATSINFO:
-			toadd = new statsinfo(field.getplayer()->getstats());
+			toadd = new statsinfo(field.getplayer()->getstats(), field.getplayer()->getinventory());
 			break;
 		case UI_EQUIPS:
-			toadd = new equipinventory(field.getplayer()->getinventory());
+			toadd = new equipinventory(field.getplayer());
 			break;
 		}
 		elements.add(type, toadd);
@@ -118,14 +129,17 @@ namespace io
 		base.draw(target, field.getviewpos());
 		if (active)
 		{
-			for (int i = 0; i < elements.getend(); i++)
+			for (spmit<uielements, uielement*> elit = elements.getit(); elit.belowtop(); ++elit)
 			{
-				elements.getnext(i)->draw(target);
+				elit->draw(target);
 			}
-
 			if (activeicon)
 			{
 				activeicon->dragdraw(target, mouse.getposition());
+			}
+			if (activeinfo)
+			{
+				activeinfo->draw(target, mouse.getposition());
 			}
 		}
 		mouse.draw(target);
@@ -137,9 +151,9 @@ namespace io
 		base.update();
 		if (active)
 		{
-			for (int i = 0; i < elements.getend(); i++)
+			for (spmit<uielements, uielement*> elit = elements.getit(); elit.belowtop(); ++elit)
 			{
-				elements.getnext(i)->update();
+				elit->update();
 			}
 		}
 		mouse.update();
@@ -160,6 +174,18 @@ namespace io
 						break;
 					case VK_BACK:
 						activetext->sendchar(0);
+						break;
+					case VK_RETURN:
+						switch (activetext->getid())
+						{
+						case TXT_ACC:
+						case TXT_PASS:
+							elements.get(UI_LOGIN)->buttonpressed(BT_LOGIN);
+							break;
+						case TXT_CHAT:
+							packet_c.general_chat(activetext->text(), true);
+							break;
+						}
 						break;
 					}
 				}
@@ -286,12 +312,11 @@ namespace io
 			if (param == MST_IDLE)
 			{
 				uielement* front = 0;
-				for (int i = 0; i < elements.getend(); i++)
+				for (spmit<uielements, uielement*> elit = elements.getit(); elit.belowtop(); ++elit)
 				{
-					uielement* elit = elements.getnext(i);
-					if (util::colliding(pos, elit->bounds()) && elit->isactive())
+					if (elit->bounds().contains(pos) && elit->isactive())
 					{
-						front = elit;
+						front = elit.get();
 					}
 				}
 
@@ -310,17 +335,22 @@ namespace io
 		uielement* front = 0;
 		if (actionsenabled)
 		{
-			for (int i = 0; i < elements.getend(); i++)
+			for (spmit<uielements, uielement*> elit = elements.getit(); elit.belowtop(); ++elit)
 			{
-				uielement* elit = elements.getnext(i);
-				if (util::colliding(pos, elit->bounds()) && elit->isactive())
+				if (elit->isdragged())
+				{
+					front = elit.get();
+					break;
+				}
+
+				if (elit->bounds().contains(pos) && elit->isactive())
 				{
 					if (front)
 					{
 						front->sendmouse(pos, MST_IDLE);
 					}
 
-					front = elit;
+					front = elit.get();
 				}
 			}
 		}
@@ -337,6 +367,55 @@ namespace io
 			{
 				mouse.setstate(MST_IDLE);
 			}
+
+			if (activeinfo)
+			{
+				activeinfo = 0;
+				equipinfo->clear();
+			}
+		}
+	}
+
+	void ui::showiteminfo(int itemid)
+	{
+		if (itemid > 0)
+		{
+			if (itemid != equipinfo->getid())
+			{
+				iteminfo* info = field.getitems()->getitem(itemid);
+				if (info)
+				{
+					miteminfo->setitem(info);
+					activeinfo = miteminfo;
+				}
+			}
+		}
+		else
+		{
+			activeinfo = 0;
+			miteminfo->clear();
+		}
+	}
+
+	void ui::showequipinfo(int itemid, short slot)
+	{
+		if (itemid > 0)
+		{
+			if (itemid != equipinfo->getid() && slot != equipinfo->getslot())
+			{
+				clothing* cloth = app.getlookfactory()->getcloth(itemid);
+				mapleequip* equip = field.getplayer()->getinventory()->getequip(IVT_EQUIPPED, slot);
+				if (cloth && equip)
+				{
+					equipinfo->setequip(cloth, equip, field.getplayer()->getstats());
+					activeinfo = equipinfo;
+				}
+			}
+		}
+		else
+		{
+			activeinfo = 0;
+			equipinfo->clear();
 		}
 	}
 }

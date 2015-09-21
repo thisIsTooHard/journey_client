@@ -25,7 +25,7 @@ namespace io
 	class itemicon
 	{
 	public:
-		itemicon(int, bool, short);
+		itemicon(map<bool, texture>, bool, short);
 		itemicon() {}
 		~itemicon() {}
 		void toggle() { raw = !raw; }

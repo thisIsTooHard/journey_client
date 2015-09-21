@@ -15,7 +15,9 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
+#pragma once
 #include "mapdrops.h"
+#include "Journey.h"
 
 namespace maplemap
 {
@@ -31,11 +33,31 @@ namespace maplemap
 
 			if (meso)
 			{
+				app.getimgcache()->setmode(ict_sys);
 				toadd = new mesodrop(oid, itemid, owner, pos, dest, type, playerdrop, footholds);
+				app.getimgcache()->unlock();
 			}
 			else
 			{
-				toadd = new itemdrop(oid, itemid, owner, pos, dest, type, playerdrop, footholds);
+				texture icon;
+				int prefix = itemid / 1000000;
+				if (prefix == 1)
+				{
+					clothing* cloth = app.getlookfactory()->getcloth(itemid);
+					if (cloth)
+					{
+						icon = cloth->geticon(true);
+					}
+				}
+				else
+				{
+					iteminfo* item = app.getui()->getfield()->getitems()->getitem(itemid);
+					if (item)
+					{
+						icon = item->geticon(true);
+					}
+				}
+				toadd = new itemdrop(oid, itemid, icon, owner, pos, dest, type, playerdrop, footholds);
 			}
 
 			drops.add(oid, toadd);
@@ -52,9 +74,9 @@ namespace maplemap
 
 	void mapdrops::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
 	{
-		for (int i = 0; i < drops.getend(); i++)
+		for (spmit<short, drop*> drit = drops.getit(); drit.belowtop(); drit++)
 		{
-			drops.getnext(i)->draw(target, viewpos);
+			drit->draw(target, viewpos);
 		}
 	}
 
@@ -62,13 +84,13 @@ namespace maplemap
 	{
 		vector<int> toremove;
 
-		for (int i = 0; i < drops.getend(); i++)
+		for (spmit<short, drop*> drit = drops.getit(); drit.belowtop(); drit++)
 		{
-			bool expired = drops.getnext(i)->update();
+			bool expired = drit->update();
 
 			if (expired)
 			{
-				toremove.push_back(i);
+				toremove.push_back(drit.getindex());
 			}
 		}
 

@@ -17,14 +17,12 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "npc.h"
-#include "Journey.h"
 #include "nxfile.h"
 
-namespace gameplay
+namespace maplemap
 {
 	npc::npc(int id, int o, bool fr, short f, vector2d pos)
 	{
-		app.getimgcache()->setmode(ict_map);
 		nx::view_file("Npc");
 
 		string fullname;
@@ -93,11 +91,10 @@ namespace gameplay
 		nx::unview_file("String");
 		nx::view_file("UI");
 
-		ntag = textlabel(DWF_14C, TXC_YELLOW, name, TXB_NAMETAG);
-		ftag = textlabel(DWF_14C, TXC_YELLOW, func, TXB_NAMETAG);
+		ntag = textlabel(DWF_14BC, TXC_YELLOW, name, TXB_NAMETAG);
+		ftag = textlabel(DWF_14BC, TXC_YELLOW, func, TXB_NAMETAG);
 
 		nx::unview_file("UI");
-		app.getimgcache()->unlock();
 
 		oid = o;
 		front = fr;

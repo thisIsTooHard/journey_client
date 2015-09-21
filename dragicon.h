@@ -26,19 +26,18 @@ namespace io
 {
 	enum dragicontype : char
 	{
-		dit_keyconfig,
-		dit_keyitem,
-		dit_skill,
-		dit_equip,
-		dit_item
+		DIT_KEY,
+		DIT_SKILLKEY,
+		DIT_ITEMKEY,
+		DIT_SKILL,
+		DIT_ITEM
 	};
 
 	class dragicon
 	{
 	public:
-		dragicon(texture, char, keyaction, texture, vector2d);
-		dragicon(itemicon, texture, vector2d);
-		dragicon(skillicon, texture, vector2d);
+		dragicon(dragicontype, texture, texture, vector2d, char, int);
+		dragicon(dragicontype, itemicon, texture, vector2d, char, int);
 		dragicon() {}
 		~dragicon() {}
 		void draw(ID2D1HwndRenderTarget*, vector2d);
@@ -49,15 +48,15 @@ namespace io
 		void setkeyicon(texture t) { keyicon.second = t; }
 		bool dragged() { return drag; }
 		char getkey() { return keybind; }
-		keyaction getaction() { return action; }
+		int getaction() { return action; }
 		dragicontype gettype() { return type; }
-		pair<vector2d, vector2d> bounds() { return make_pair(pos, keyicon.first.getdimension()); }
+		rectangle2d bounds(vector2d);
 	private:
 		itemicon item_ico;
 		skillicon skill_ico;
 		pair<texture, texture> keyicon;
 		dragicontype type;
-		keyaction action;
+		int action;
 		char keybind;
 		bool drag;
 		vector2d pos;

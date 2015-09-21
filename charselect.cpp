@@ -38,7 +38,7 @@ namespace io
 		sprites.push_back(sprite(animation(login.resolve("Common/selectWorld")), vector2d(580, 42)));
 		sprites.push_back(sprite(animation(charsel.resolve("selectedWorld/icon/15")), vector2d(580, 42)));
 		sprites.push_back(sprite(animation(charsel.resolve("selectedWorld/name/15")), vector2d(580, 42)));
-		sprites.push_back(sprite(animation(charsel.resolve("selectedWorld/ch/" + to_string(app.getui()->getfield()->getchannel()))), vector2d(580, 42)));
+		sprites.push_back(sprite(animation(charsel.resolve("selectedWorld/ch/" + to_string(app.getui()->getfield()->getlogin()->channelid))), vector2d(580, 42)));
 		sprites.push_back(sprite(animation(charsel.resolve("charInfo")), vector2d(662, 355)));
 
 		buttons.insert(make_pair(BT_ARBEIT, button(charsel.resolve("arbeit"), 580, 115)));
@@ -73,12 +73,15 @@ namespace io
 
 		size_t charbtcount = min(charcount, 8);
 
+		selected = config.getdefchar();
+		page = selected % 8;
+
 		for (size_t i = 0; i < charbtcount; i++)
 		{
-			nametag charname = nametag(DWF_14C, TXC_WHITE, nttextures, chars->at(i).getstats()->getname(), vector2d(133 + (120 * (i % 4)), 250 + (200 * (i > 3))), (i == 0));
+			nametag charname = nametag(DWF_14C, TXC_WHITE, nttextures, chars->at(i).getstats()->getname(), vector2d(133 + (120 * (i % 4)), 250 + (200 * (i > 3))), (i == selected));
 			nametags.push_back(charname);
-			buttons.insert(make_pair(BT_CHAR0 + i, button(105 + (120 * (i % 4)), 170 + (200 * (i > 3)), 50, 80)));
-			buttons[BT_CHAR0].setstate("pressed");
+			buttons.insert(make_pair(BT_CHAR0 + i, button(vector2d(105 + (120 * (i % 4)), 170 + (200 * (i > 3))), vector2d(50, 80))));
+			buttons[BT_CHAR0 + selected].setstate("pressed");
 		}
 
 		app.getimgcache()->unlock();
@@ -93,9 +96,6 @@ namespace io
 
 		nl::nx::unview_file("UI");
 		nl::nx::view_file("Character");
-
-		selected = config.getdefchar();
-		page = selected % 8;
 
 		size_t displaycount = min(charcount, 8);
 
@@ -130,6 +130,8 @@ namespace io
 		position = vector2d(0, 0);
 		dimensions = vector2d(800, 600);
 		active = true;
+		dragged = false;
+		buttoncd = 0;
 	}
 
 	void charselect::draw(ID2D1HwndRenderTarget* target)
@@ -156,12 +158,12 @@ namespace io
 				statset.draw(to_string(rankinfo[selected].second.first), cha_right, vector2d(732, 355));
 
 				lvset.draw('l', vector2d(648, 262));
-				lvset.draw(to_string(stats[selected].getstat(LEVEL)), 12, cha_left, vector2d(655, 262));
+				lvset.draw(to_string(stats[selected].getstat(MS_LEVEL)), 12, cha_left, vector2d(655, 262));
 
-				statset.draw(to_string(stats[selected].getstat(STR)), cha_right, vector2d(655, 385));
-				statset.draw(to_string(stats[selected].getstat(DEX)), cha_right, vector2d(655, 407));
-				statset.draw(to_string(stats[selected].getstat(INT_)), cha_right, vector2d(732, 385));
-				statset.draw(to_string(stats[selected].getstat(LUK)), cha_right, vector2d(732, 407));
+				statset.draw(to_string(stats[selected].getstat(MS_STR)), cha_right, vector2d(655, 385));
+				statset.draw(to_string(stats[selected].getstat(MS_DEX)), cha_right, vector2d(655, 407));
+				statset.draw(to_string(stats[selected].getstat(MS_INT)), cha_right, vector2d(732, 385));
+				statset.draw(to_string(stats[selected].getstat(MS_LUK)), cha_right, vector2d(732, 407));
 			}
 		}
 	}
@@ -216,7 +218,8 @@ namespace io
 			if (cid != -1)
 			{
 				app.getui()->disableactions();
-				app.getui()->getfield()->getaccount()->selectchar(cid);
+				app.getui()->getfield()->getlogin()->getacc()->selectchar(cid);
+				config.setdefchar(selected);
 				switch (pic)
 				{
 				case 0:

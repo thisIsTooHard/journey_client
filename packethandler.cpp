@@ -65,7 +65,11 @@ namespace net
 			{
 				pin = recv.readshort();
 			}
-			app.getui()->getfield()->getaccount()->init(accid, accname, gmlevel, female, muted, pin);
+			app.getui()->getfield()->getlogin()->getacc()->init(accid, accname, gmlevel, female, muted, pin);
+			if (config.getsaveid())
+			{
+				config.setdefacc(accname);
+			}
 			packet_c.serverlrequest();
 		}
 	};
@@ -102,7 +106,7 @@ namespace net
 					chloads.push_back(recv.readbyte());
 					recv.readshort();
 				}
-				app.getui()->getfield()->getworlds()->insert(make_pair(id, world(id, name, flag, svrmsg, channels, chloads)));
+				app.getui()->getfield()->getlogin()->addworld(id, world(id, name, flag, svrmsg, channels, chloads));
 				app.getui()->remove(UI_LOGIN);
 				app.getui()->add(UI_WORLDSELECT);
 				app.getui()->enableactions();
@@ -125,26 +129,26 @@ namespace net
 		}
 
 		map<maplestat, short> stats;
-		stats[LEVEL] = static_cast<short>(static_cast<byte>(recv->readbyte()));
-		stats[JOB] = recv->readshort();
-		stats[STR] = recv->readshort();
-		stats[DEX] = recv->readshort();
-		stats[INT_] = recv->readshort();
-		stats[LUK] = recv->readshort();
-		stats[HP] = recv->readshort();
-		stats[MAXHP] = recv->readshort();
-		stats[MP] = recv->readshort();
-		stats[MAXMP] = recv->readshort();
-		stats[AP] = recv->readshort();
-		stats[SP] = recv->readshort();
+		stats[MS_LEVEL] = static_cast<byte>(recv->readbyte());
+		stats[MS_JOB] = recv->readshort();
+		stats[MS_STR] = recv->readshort();
+		stats[MS_DEX] = recv->readshort();
+		stats[MS_INT] = recv->readshort();
+		stats[MS_LUK] = recv->readshort();
+		stats[MS_HP] = recv->readshort();
+		stats[MS_MAXHP] = recv->readshort();
+		stats[MS_MP] = recv->readshort();
+		stats[MS_MAXMP] = recv->readshort();
+		stats[MS_AP] = recv->readshort();
+		stats[MS_SP] = recv->readshort();
 
 		int exp = recv->readint();
-		short fame = recv->readshort();
+		stats[MS_FAME] = recv->readshort();
 		int gachaexp = recv->readint();
 		int mapid = recv->readint();
 		char spawnp = recv->readbyte();
 		recv->readint();
-		return maplestats(id, name, female, skin, face, hair, exp, fame, stats, make_pair(mapid, spawnp), pets);
+		return maplestats(id, name, exp, stats, make_pair(mapid, spawnp), pets);
 	}
 
 	maplelook getmlook(packet* recv)
@@ -198,7 +202,7 @@ namespace net
 			char jobrankmc = (jobrankmv > 0) ? '+' : (jobrankmv < 0) ? '-' : '=';
 			mchar.setrankinfo(rank, rankmc, jobrank, jobrankmc);
 		}
-		app.getui()->getfield()->getaccount()->addchar(mchar);
+		app.getui()->getfield()->getlogin()->getacc()->addchar(mchar);
 	}
 
 	class charlist_h : public vhandler
@@ -213,7 +217,7 @@ namespace net
 			}
 			char pic = (mapleversion == 62) ? 2 : recv.readbyte();
 			char slots = static_cast<char>(recv.readint());
-			app.getui()->getfield()->getaccount()->setpicslots(pic, slots);
+			app.getui()->getfield()->getlogin()->getacc()->setpicslots(pic, slots);
 			app.getui()->remove(UI_WORLDSELECT);
 			app.getui()->add(UI_CHARSEL);
 			app.getui()->enableactions();
@@ -324,7 +328,7 @@ namespace net
 				int mapid = recv.readint();
 				char portalid = recv.readbyte();
 				int64_t timestamp = recv.readlong();
-				if (channel == app.getui()->getfield()->getchannel())
+				if (channel == app.getui()->getfield()->getlogin()->channelid)
 				{
 					app.getimgcache()->clearcache(ict_map);
 					app.getui()->getfield()->setfield(mapid, portalid);
@@ -354,7 +358,11 @@ namespace net
 			}
 			int meso = recv.readint();
 
-			inventory inv = getinventory(&recv);
+			app.getui()->getfield()->buildplayer();
+
+			player* plc = app.getui()->getfield()->getplayer();
+
+			getinventory(&recv, plc);
 
 			map<int, int> levels;
 			map<int, int> m_levels;
@@ -496,16 +504,20 @@ namespace net
 
 			recv.readshort();
 			int64_t timestamp = recv.readlong();
+
+			plc->init(meso, skills, quests, trockmaps, bookcover, bookcards, areainfo);
+
 			app.getui()->remove(UI_CHARSEL);
 			app.getimgcache()->clearcache(ict_login);
-			app.getui()->getfield()->setplayer(player(app.getui()->getfield()->getaccount()->getplayer(), inv, meso, skills, quests, trockmaps, bookcover, bookcards, areainfo));
 			app.getui()->add(UI_STATUSBAR);
+			app.getui()->add(UI_CHATBAR);
+
 			pair<int, char> spawninfo = app.getui()->getfield()->getplayer()->getstats()->getspawninfo();
 			app.getui()->getfield()->setfield(spawninfo.first, spawninfo.second);
 			app.getui()->enableactions();
 		}
 
-		inventory set_field_h::getinventory(packet* recv)
+		void set_field_h::getinventory(packet* recv, player* plc)
 		{
 			vector<char> slots;
 			for (char i = 0; i < 5; i++)
@@ -513,6 +525,11 @@ namespace net
 				slots.push_back(recv->readbyte());
 			}
 			recv->readlong();
+
+			plc->setinventory(inventory(slots));
+
+			inventory* ivt = plc->getinventory();
+
 			map<short, mapleequip> equipped;
 			map<short, mapleequip> equippedcash;
 			map<short, mapleequip> equips;
@@ -561,17 +578,25 @@ namespace net
 					recv->readlong();
 					recv->readint();
 
-					mapleequip equip = mapleequip(pos, type, id, cash, uniqueid, expire, slots, level, stats, owner, flag, itemlevel, itemexp, vicious);
+					if (i == 1)
+					{
+						pos = -pos;
+					}
+
+					mapleequip* equip = new mapleequip(pos, type, id, cash, uniqueid, expire, slots, level, stats, owner, flag, itemlevel, itemexp, vicious);
 					switch (i)
 					{
 					case 0:
-						equipped.insert(make_pair(pos, equip));
+						//equipped.insert(make_pair(pos, equip));
+						ivt->additem(equip, IVT_EQUIPPED);
 						break;
 					case 1:
-						equippedcash.insert(make_pair(pos, equip));
+						//equippedcash.insert(make_pair(pos, equip));
+						ivt->additem(equip, IVT_EQUIPPED);
 						break;
 					case 2:
-						equips.insert(make_pair(pos, equip));
+						//equips.insert(make_pair(pos, equip));
+						ivt->additem(equip, IVT_EQUIP);
 						break;
 					}
 
@@ -645,7 +670,6 @@ namespace net
 					pos = recv->readbyte();
 				}
 			}
-			return inventory(slots, equipped, equippedcash, equips, useitems, setupitems, etcitems, cashitems);
 		}
 	};
 
@@ -705,7 +729,7 @@ namespace net
 			short fh = recv.readshort();
 			short rx = recv.readshort();
 			short ry = recv.readshort();
-			app.getui()->getfield()->getmapobjects()->addnpc(oid, npc(id, oid, f, fh, vector2d(posx, cy)));
+			app.getui()->getfield()->getnpcs()->addnpc(oid, id, f, fh, vector2d(posx, cy));
 		}
 	};
 
@@ -729,7 +753,7 @@ namespace net
 				short rx = recv.readshort();
 				short ry = recv.readshort();
 				bool minimap = recv.readbool();
-				app.getui()->getfield()->getmapobjects()->addnpc(oid, npc(id, oid, f, fh, vector2d(posx, cy)));
+				app.getui()->getfield()->getnpcs()->addnpc(oid, id, f, fh, vector2d(posx, cy));
 			}
 		}
 	};
@@ -897,29 +921,34 @@ namespace net
 					{
 						switch (stat)
 						{
-						case SKIN:
-							app.getui()->getfield()->getplayer()->getstats()->setskin(recv.readshort());
+						case MS_SKIN:
+							app.getui()->getfield()->getplayer()->getlook()->setbody(app.getlookfactory()->getbody(recv.readshort()));
 							break;
-						case FACE:
-							app.getui()->getfield()->getplayer()->getstats()->setface(recv.readint());
+						case MS_FACE:
+							app.getui()->getfield()->getplayer()->getlook()->setface(app.getlookfactory()->getface(recv.readint()));
 							break;
-						case HAIR:
-							app.getui()->getfield()->getplayer()->getstats()->sethair(recv.readint());
+						case MS_HAIR:
+							app.getui()->getfield()->getplayer()->getlook()->sethair(app.getlookfactory()->gethair(recv.readint()));
 							break;
-						case LEVEL:
-							app.getui()->getfield()->getplayer()->getstats()->setstat(LEVEL, static_cast<byte>(recv.readbyte()));
+						case MS_LEVEL:
+							app.getui()->getfield()->getplayer()->getstats()->setstat(MS_LEVEL, static_cast<byte>(recv.readbyte()));
 							break;
-						case EXP:
+						case MS_EXP:
 							app.getui()->getfield()->getplayer()->getstats()->setexp(recv.readint());
 							break;
-						case FAME:
-							app.getui()->getfield()->getplayer()->getstats()->setfame(recv.readint());
-							break;
-						case MESO:
+						case MS_MESO:
 							app.getui()->getfield()->getplayer()->getstats()->setmeso(recv.readint());
+							break;
+						case MS_AP:
+							app.getui()->getfield()->getplayer()->getstats()->setstat(MS_AP, recv.readshort());
+							if (app.getui()->getelement(UI_STATSINFO))
+							{
+								app.getui()->getelement(UI_STATSINFO)->sendbool(app.getui()->getfield()->getplayer()->getstats()->getstat(MS_AP) > 0);
+							}
 							break;
 						default:
 							app.getui()->getfield()->getplayer()->getstats()->setstat(stat, recv.readshort());
+							app.getui()->getfield()->getplayer()->recalcstats(false);
 							break;
 						}
 					}
@@ -1245,9 +1274,9 @@ namespace net
 		}
 	};
 
-	class move_mob_h : public vhandler
+	class mob_moved_h : public vhandler
 	{
-		void move_mob_h::handle(packet recv)
+		void mob_moved_h::handle(packet recv)
 		{
 			int oid = recv.readint();
 			recv.readbyte();
@@ -1258,7 +1287,19 @@ namespace net
 			char skill3 = recv.readbyte();
 			char skill4 = recv.readbyte();
 			vector2d startpos = recv.readpoint();
-			//app.getui()->getfield()->getmapobjects()->movemob(oid, movement, fleft);
+		}
+	};
+
+	class move_mob_response_h : public vhandler
+	{
+		void move_mob_response_h::handle(packet recv)
+		{
+			int oid = recv.readint();
+			short moveid = recv.readshort();
+			bool useskills = recv.readbool();
+			short curmp = recv.readshort();
+			char skill = recv.readbyte();
+			char skilllvl = recv.readbyte();
 		}
 	};
 
@@ -1378,7 +1419,8 @@ namespace net
 		handlers[SPAWN_MOB] = unique_ptr<vhandler>(new spawn_mob_h());
 		handlers[KILL_MOB] = unique_ptr<vhandler>(new kill_mob_h());
 		handlers[SPAWN_MOB_C] = unique_ptr<vhandler>(new spawn_mob_c_h());
-		handlers[MOVE_MOB] = unique_ptr<vhandler>(new move_mob_h());
+		handlers[MOB_MOVED] = unique_ptr<vhandler>(new mob_moved_h());
+		handlers[MOVE_MOB_RESPONSE] = unique_ptr<vhandler>(new move_mob_response_h());
 		handlers[SHOW_MOB_HP] = unique_ptr<vhandler>(new show_mob_hp_h());
 		handlers[SPAWN_NPC] = unique_ptr<vhandler>(new spawn_npc_h());
 		handlers[SPAWN_NPC_C] = unique_ptr<vhandler>(new spawn_npc_c_h());

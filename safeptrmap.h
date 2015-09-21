@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
-// Copyright Â© 2015 SYJourney                                               //
+// Copyright © 2015 SYJourney                                               //
 //                                                                          //
 // This program is free software: you can redistribute it and/or modify     //
 // it under the terms of the GNU Affero General Public License as           //
@@ -23,12 +23,68 @@ using namespace std;
 namespace util
 {
 	template <typename K, typename V>
+	class spmit
+	{
+	public:
+		spmit(map<K, V>* std, vector<K>* ky, SRWLOCK* lock, int t)
+		{
+			stdmap = std;
+			keys = ky;
+			maplock = lock;
+			top = t;
+			index = 0;
+		}
+
+		~spmit()
+		{
+			ReleaseSRWLockShared(maplock);
+		}
+
+		V operator -> ()
+		{
+			return stdmap->at(keys->at(index));
+		}
+
+		V get()
+		{
+			return stdmap->at(keys->at(index));
+		}
+
+		void operator ++ ()
+		{
+			index++;
+		}
+
+		bool belowtop()
+		{
+			return index < top;
+		}
+
+		int getindex()
+		{
+			return index;
+		}
+
+		K getkey()
+		{
+			return keys->at(index);
+		}
+	private:
+		map<K, V>* stdmap;
+		vector<K>* keys;
+		SRWLOCK* maplock;
+		int index;
+		int top;
+	};
+
+	template <typename K, typename V>
 	class safeptrmap
 	{
 	public:
 		safeptrmap()
 		{
 			top = 0;
+			maplock = SRWLOCK_INIT;
 		}
 
 		~safeptrmap() 
@@ -39,19 +95,6 @@ namespace util
 		V get(K key)
 		{
 			return contains(key) ? stdmap[key] : 0;
-		}
-
-		V getnext(int i)
-		{
-			if (i >= top)
-			{
-				return 0;
-			}
-			else
-			{
-				K key = keys[i];
-				return stdmap[key];
-			}
 		}
 
 		K getnextkey(int i)
@@ -71,14 +114,11 @@ namespace util
 			return top;
 		}
 
-		/*void foreach(void(*V::*func)(ID2D1HwndRenderTarget*), ID2D1HwndRenderTarget* targ)
+		spmit<K, V> getit()
 		{
-			for (int i = 0; i < top; i++)
-			{
-				K key = keys[i];
-				stdmap[key]->func(targ);
-			}
-		}*/
+			AcquireSRWLockShared(&maplock);
+			return spmit<K, V>(&stdmap, &keys, &maplock, top);
+		}
 
 		bool contains(K k)
 		{
@@ -92,15 +132,19 @@ namespace util
 				if (contains(key))
 				{
 					removekey(key);
+					AcquireSRWLockExclusive(&maplock);
 					stdmap[key] = value;
 					keys.push_back(key);
 					top += 1;
+					ReleaseSRWLockExclusive(&maplock);
 				}
 				else
 				{
+					AcquireSRWLockExclusive(&maplock);
 					stdmap[key] = value;
 					keys.push_back(key);
 					top += 1;
+					ReleaseSRWLockExclusive(&maplock);
 				}
 			}
 		}
@@ -109,24 +153,33 @@ namespace util
 		{
 			if (top > 0 && i < top)
 			{
+				AcquireSRWLockExclusive(&maplock);
 				top -= 1;
 				delete stdmap[keys[i]];
 				stdmap.erase(keys[i]);
 				keys.erase(keys.begin() + i);
+				ReleaseSRWLockExclusive(&maplock);
 			}
 		}
 
-		void removekey(K key)
+		int findkey(K key)
 		{
-			int toremove = -1;
+			int ret = -1;
+			AcquireSRWLockShared(&maplock); 
 			for (int i = 0; i < top; i++)
 			{
 				if (keys[i] == key)
 				{
-					toremove = i;
+					ret = i;
 				}
 			}
+			ReleaseSRWLockShared(&maplock);
+			return ret;
+		}
 
+		void removekey(K key)
+		{
+			int toremove = findkey(key);
 			if (toremove >= 0)
 			{
 				remove(toremove);
@@ -135,23 +188,19 @@ namespace util
 
 		void pushtotop(K key)
 		{
-			int toremove = -1;
-			for (int i = 0; i < top; i++)
+			int toreplace = findkey(key);
+			if (toreplace >= 0)
 			{
-				if (keys[i] == key)
-				{
-					toremove = i;
-				}
-			}
-			if (toremove >= 0)
-			{
-				keys.erase(keys.begin() + toremove);
+				AcquireSRWLockExclusive(&maplock);
+				keys.erase(keys.begin() + toreplace);
 				keys.push_back(key);
+				ReleaseSRWLockExclusive(&maplock);
 			}
 		}
 
 		void clear()
 		{
+			AcquireSRWLockExclusive(&maplock);
 			for (int i = 0; i < top; i++)
 			{
 				delete stdmap[keys[i]];
@@ -159,11 +208,13 @@ namespace util
 			top = 0;
 			stdmap.clear();
 			keys.clear();
+			ReleaseSRWLockExclusive(&maplock);
 		}
 	private:
 		vector<K> keys;
 		map<K, V> stdmap;
 		int top;
+		SRWLOCK maplock;
 	};
 }
 

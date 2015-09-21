@@ -19,33 +19,26 @@
 
 namespace io
 {
-	dragicon::dragicon(texture txt, char kb, keyaction ka, texture key, vector2d p)
+	dragicon::dragicon(dragicontype t, texture txt, texture key, vector2d p, char kb, int ka)
 	{
 		keyicon.first = txt;
 		keyicon.second = key;
+		pos = p;
 		keybind = kb;
 		action = ka;
-		pos = p;
 		drag = false;
-		type = dit_keyconfig;
+		type = t;
 	}
 
-	dragicon::dragicon(itemicon ic, texture key, vector2d p)
+	dragicon::dragicon(dragicontype t, itemicon ic, texture key, vector2d p, char slot, int iid)
 	{
 		item_ico = ic;
 		keyicon.second = key;
 		pos = p;
+		keybind = slot;
+		action = iid;
 		drag = false;
-		type = dit_keyitem;
-	}
-
-	dragicon::dragicon(skillicon ic, texture key, vector2d p)
-	{
-		skill_ico = ic;
-		keyicon.second = key;
-		pos = p;
-		drag = false;
-		type = dit_skill;
+		type = t;
 	}
 
 	void dragicon::setdrag(vector2d cursor, vector2d parentpos)
@@ -62,29 +55,26 @@ namespace io
 
 			switch (type)
 			{
-			case dit_keyconfig:
+			case DIT_KEY:
+			case DIT_SKILLKEY:
 				keyicon.first.draw(absp + vector2d(0, 32));
-				if (keyicon.second.isloaded())
-				{
-					keyicon.second.draw(absp + vector2d(3, 4));
-				}
+				keyicon.second.draw(absp + vector2d(3, 4));
 				break;
-			case dit_keyitem:
+			case DIT_ITEMKEY:
 				item_ico.draw(absp + vector2d(0, 32), 1.0f);
-				if (keyicon.second.isloaded())
-				{
-					keyicon.second.draw(absp + vector2d(3, 4));
-				}
+				keyicon.second.draw(absp + vector2d(3, 4));
 				break;
-			case dit_skill:
-				skill_ico.draw(absp + vector2d(0, 32), 1.0f);
-				if (keyicon.second.isloaded())
-				{
-					keyicon.second.draw(absp + vector2d(3, 4));
-				}
+			case DIT_ITEM:
+				item_ico.draw(absp + vector2d(0, 32), 1.0f);
 				break;
 			}
 		}
+	}
+
+	rectangle2d dragicon::bounds(vector2d parentpos)
+	{
+		vector2d absp = pos + parentpos;
+		return rectangle2d(absp, absp + vector2d(32, 32));
 	}
 
 	void dragicon::dragdraw(ID2D1HwndRenderTarget* target, vector2d cursor)
@@ -93,14 +83,16 @@ namespace io
 		{
 			switch (type)
 			{
-			case dit_keyconfig:
+			case DIT_KEY:
+			case DIT_SKILLKEY:
 				keyicon.first.draw(cursor + rel, 0.5f);
 				break;
-			case dit_keyitem:
-				item_ico.draw(cursor + rel, 0.5f);
-				break;
-			case dit_skill:
+			case DIT_SKILL:
 				skill_ico.draw(cursor + rel, 0.5f);
+				break;
+			case DIT_ITEMKEY:
+			case DIT_ITEM:
+				item_ico.draw(cursor + rel, 0.5f);
 				break;
 			}
 		}

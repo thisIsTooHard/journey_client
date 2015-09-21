@@ -28,17 +28,32 @@ namespace gameplay
 		actionframe = 0;
 		frame = 0;
 		elapsed = 0;
+		state_f = "default";
+		elapsed_f = 0;
+		frame_f = 0;
 		faceleft = true;
 		loaded = false;
 	}
 
-	void maplelook::init(map<string, map<byte, short>> dl, map<string, map<byte, bodyaction>> ba)
+	void maplelook::init(bodydrawinfo* bdi)
 	{
-		delays = dl;
-		bodyactions = ba;
-		state = clothes["Weapon"].istwo_h() ? "stand2" : "stand1";
+		bodyinfo = bdi;
+		state = clothes[EQL_WEAPON]->istwo_h() ? "stand2" : "stand1";
 		anispeed = 1.0f;
 		loaded = true;
+	}
+
+	void maplelook::addcloth(clothing* cloth)
+	{
+		if (cloth)
+		{
+			addcloth(cloth, cloth->getlayer());
+		}
+	}
+
+	void maplelook::addcloth(clothing* cloth, equiplayer layer)
+	{
+		clothes[layer] = cloth;
 	}
 
 	void maplelook::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
@@ -59,99 +74,98 @@ namespace gameplay
 
 			if (state == "ladder" || state == "rope")
 			{
-				body.draw(CL_BODY, state, frame, absp);
-				clothes["Glove"].draw(CL_GLOVE, state, frame, absp);
-				clothes["Shoes"].draw(CL_SHOES, state, frame, absp);
-				clothes["Pants"].draw(CL_PANTS, state, frame, absp);
-				clothes["Coat"].draw(CL_TOP, state, frame, absp);
-				clothes["Longcoat"].draw(CL_MAIL, state, frame, absp);
-				clothes["Cape"].draw(CL_CAPE, state, frame, absp);
-				body.draw(CL_HEAD, state, frame, absp);
-				clothes["Earrings"].draw(CL_EARRINGS, state, frame, absp);
+				body->draw(CL_BODY, state, frame, absp);
+				clothes[EQL_GLOVES]->draw(CL_GLOVE, state, frame, absp);
+				clothes[EQL_SHOES]->draw(CL_SHOES, state, frame, absp);
+				clothes[EQL_PANTS]->draw(CL_PANTS, state, frame, absp);
+				clothes[EQL_COAT]->draw(CL_TOP, state, frame, absp);
+				clothes[EQL_LONGCOAT]->draw(CL_MAIL, state, frame, absp);
+				clothes[EQL_CAPE]->draw(CL_CAPE, state, frame, absp);
+				body->draw(CL_HEAD, state, frame, absp);
+				clothes[EQL_EARRINGS]->draw(CL_EARRINGS, state, frame, absp);
 
-				if (clothes.count("Cap"))
+				if (clothes.count(EQL_CAP))
 				{
-					if (clothes["Cap"].getname() == "Transparent Hat" || clothes["Cap"].getname() == "")
+					if (clothes[EQL_CAP]->istransparent())
 					{
-						hair.draw(CL_BACKHAIR, state, frame, absp);
+						hair->draw(CL_BACKHAIR, state, frame, absp);
 					}
 					else
 					{
-						hair.draw(CL_BACKHAIRBCAP, state, frame, absp);
-						clothes["Cap"].draw(CL_HAT, state, frame, absp);
+						hair->draw(CL_BACKHAIRBCAP, state, frame, absp);
+						clothes[EQL_CAP]->draw(CL_HAT, state, frame, absp);
 					}
 				}
 				else
 				{
-					hair.draw(CL_BACKHAIR, state, frame, absp);
+					hair->draw(CL_BACKHAIR, state, frame, absp);
 				}
 
-				clothes["Shield"].draw(CL_BACKSHIELD, state, frame, absp);
-				clothes["Weapon"].draw(CL_BACKWEAPON, state, frame, absp);
+				clothes[EQL_SHIELD]->draw(CL_BACKSHIELD, state, frame, absp);
+				clothes[EQL_WEAPON]->draw(CL_BACKWEAPON, state, frame, absp);
 			}
 			else
 			{
-				hair.draw(CL_HAIRBBODY, state, frame, absp);
-				clothes["Cape"].draw(CL_CAPE, state, frame, absp);
-				clothes["Shield"].draw(CL_SHIELDBBODY, state, frame, absp);
-				body.draw(CL_BODY, state, frame, absp);
-				clothes["Shoes"].draw(CL_SHOES, state, frame, absp);
-				clothes["Pants"].draw(CL_PANTS, state, frame, absp);
-				clothes["Coat"].draw(CL_TOP, state, frame, absp);
-				clothes["Longcoat"].draw(CL_MAIL, state, frame, absp);
-				body.draw(CL_LHAND, state, frame, absp);
-				clothes["Glove"].draw(CL_GLOVE, state, frame, absp);
-				hair.draw(CL_HAIR, state, frame, absp);
-				clothes["Shield"].draw(CL_SHIELDOHAIR, state, frame, absp);
-				clothes["Earrings"].draw(CL_EARRINGS, state, frame, absp);
-				body.draw(CL_HEAD, state, frame, absp);
-				hair.draw(CL_HAIRSHADE, state, frame, absp);
+				hair->draw(CL_HAIRBBODY, state, frame, absp);
+				clothes[EQL_CAPE]->draw(CL_CAPE, state, frame, absp);
+				clothes[EQL_SHIELD]->draw(CL_SHIELDBBODY, state, frame, absp);
+				body->draw(CL_BODY, state, frame, absp);
+				clothes[EQL_SHOES]->draw(CL_SHOES, state, frame, absp);
+				clothes[EQL_PANTS]->draw(CL_PANTS, state, frame, absp);
+				clothes[EQL_COAT]->draw(CL_TOP, state, frame, absp);
+				clothes[EQL_LONGCOAT]->draw(CL_MAIL, state, frame, absp);
+				body->draw(CL_LHAND, state, frame, absp);
+				clothes[EQL_GLOVES]->draw(CL_GLOVE, state, frame, absp);
+				hair->draw(CL_HAIR, state, frame, absp);
+				clothes[EQL_SHIELD]->draw(CL_SHIELDOHAIR, state, frame, absp);
+				clothes[EQL_EARRINGS]->draw(CL_EARRINGS, state, frame, absp);
+				body->draw(CL_HEAD, state, frame, absp);
+				hair->draw(CL_HAIRSHADE, state, frame, absp);
 
-				string expression = face.getexp();
-				vector2d facepos = absp + face.getshift(state, frame);
-				face.draw(facepos);
-				clothes["FaceAcc"].draw(CL_FACEACC, (expression == "default") ? "blink" : expression, 0, facepos);
-				clothes["EyeAcc"].draw(CL_EYEACC, state, frame, absp);
-				clothes["Shield"].draw(CL_SHIELD, state, frame, absp);
+				vector2d facepos = absp + bodyinfo->facepos[state][frame];
+				face->draw(state_f, frame_f, facepos);
+				clothes[EQL_FACEACC]->draw(CL_FACEACC, (state_f == "default") ? "blink" : state_f, 0, facepos);
+				clothes[EQL_EYEACC]->draw(CL_EYEACC, state, frame, absp);
+				clothes[EQL_SHIELD]->draw(CL_SHIELD, state, frame, absp);
 
-				if (clothes.count("Cap"))
+				if (clothes.count(EQL_CAP))
 				{
-					if (clothes["Cap"].getname() == "Transparent Hat" || clothes["Cap"].getname() == "")
+					if (clothes[EQL_CAP]->istransparent())
 					{
-						hair.draw(CL_HAIROHEAD, state, frame, absp);
-						hair.draw(CL_BACKHAIR, state, frame, absp);
+						hair->draw(CL_HAIROHEAD, state, frame, absp);
+						hair->draw(CL_BACKHAIR, state, frame, absp);
 					}
 					else
 					{
-						hair.draw(CL_BACKHAIRBCAP, state, frame, absp);
-						clothes["Cap"].draw(CL_HAT, state, frame, absp);
+						hair->draw(CL_BACKHAIRBCAP, state, frame, absp);
+						clothes[EQL_CAP]->draw(CL_HAT, state, frame, absp);
 					}
 				}
 				else
 				{
-					hair.draw(CL_HAIROHEAD, state, frame, absp);
-					hair.draw(CL_BACKHAIR, state, frame, absp);
+					hair->draw(CL_HAIROHEAD, state, frame, absp);
+					hair->draw(CL_BACKHAIR, state, frame, absp);
 				}
 
-				if (clothes["Weapon"].istwo_h())
+				if (clothes[EQL_WEAPON]->istwo_h())
 				{
-					clothes["Coat"].draw(CL_MAILARM, state, frame, absp);
-					body.draw(CL_ARM, state, frame, absp);
-					clothes["Weapon"].draw(CL_WEAPON, state, frame, absp);
+					clothes[EQL_COAT]->draw(CL_MAILARM, state, frame, absp);
+					body->draw(CL_ARM, state, frame, absp);
+					clothes[EQL_WEAPON]->draw(CL_WEAPON, state, frame, absp);
 				}
 				else
 				{
-					clothes["Weapon"].draw(CL_WEAPON, state, frame, absp);
-					body.draw(CL_ARM, state, frame, absp);
-					clothes["Coat"].draw(CL_MAILARM, state, frame, absp);
+					clothes[EQL_WEAPON]->draw(CL_WEAPON, state, frame, absp);
+					body->draw(CL_ARM, state, frame, absp);
+					clothes[EQL_COAT]->draw(CL_MAILARM, state, frame, absp);
 				}
-				body.draw(CL_RHAND, state, frame, absp);
+				body->draw(CL_RHAND, state, frame, absp);
 
-				body.draw(CL_ARMOHAIR, state, frame, absp);
-				clothes["Weapon"].draw(CL_WEAPONOHAND, state, frame, absp);
-				body.draw(CL_HANDOWEP, state, frame, absp);
-				clothes["Glove"].draw(CL_RGLOVE, state, frame, absp);
-				clothes["Weapon"].draw(CL_WEAPONOGLOVE, state, frame, absp);
+				body->draw(CL_ARMOHAIR, state, frame, absp);
+				clothes[EQL_WEAPON]->draw(CL_WEAPONOHAND, state, frame, absp);
+				body->draw(CL_HANDOWEP, state, frame, absp);
+				clothes[EQL_GLOVES]->draw(CL_RGLOVE, state, frame, absp);
+				clothes[EQL_WEAPON]->draw(CL_WEAPONOGLOVE, state, frame, absp);
 			}
 
 			if (!faceleft)
@@ -176,12 +190,12 @@ namespace gameplay
 
 			if (action == "")
 			{
-				short delay = delays[state][frame] / anispeed;
+				short delay = bodyinfo->delays[state][frame] / anispeed;
 
 				if (elapsed > delay)
 				{
 					elapsed -= delay;
-					frame = (delays[state].count(frame + 1)) ? frame + 1 : 0;
+					frame = (bodyinfo->delays[state].count(frame + 1)) ? frame + 1 : 0;
 
 					if (frame == 0)
 					{
@@ -196,17 +210,17 @@ namespace gameplay
 			}
 			else
 			{
-				short delay = bodyactions[action][actionframe].delay / anispeed;
+				short delay = bodyinfo->actions[action][actionframe].delay / anispeed;
 
 				if (elapsed > delay)
 				{
 					elapsed -= delay;
-					actionframe = bodyactions[action].count(actionframe + 1) ? actionframe + 1 : 0;
+					actionframe = bodyinfo->actions[action].count(actionframe + 1) ? actionframe + 1 : 0;
 
 					if (actionframe > 0)
 					{
-						frame = bodyactions[action][actionframe].frame;
-						state = bodyactions[action][actionframe].state;
+						frame = bodyinfo->actions[action][actionframe].frame;
+						state = bodyinfo->actions[action][actionframe].state;
 					}
 					else
 					{
@@ -218,7 +232,25 @@ namespace gameplay
 				}
 			}
 
-			face.update();
+			elapsed_f += 16;
+
+			short delay_f = face->getdelay(state_f, frame_f);
+			if (elapsed_f > delay_f)
+			{
+				elapsed_f -= delay_f;
+				frame_f = (frame_f < face->getlastf(state_f)) ? frame_f + 1 : 0;
+				if (frame_f == 0)
+				{
+					if (state_f == "default")
+					{
+						state_f = "blink";
+					}
+					else
+					{
+						state_f = "default";
+					}
+				}
+			}
 		}
 		
 		return aniend;
@@ -235,7 +267,7 @@ namespace gameplay
 		{
 			if (st == "attack")
 			{
-				char atttype = clothes["Weapon"].getattack();
+				char atttype = clothes[EQL_WEAPON]->getattack();
 
 				switch (atttype)
 				{
@@ -259,7 +291,7 @@ namespace gameplay
 			{
 				if (st == "stand" || st == "walk")
 				{
-					char stnum = clothes["Weapon"].istwo_h() ? '2' : '1';
+					char stnum = clothes[EQL_WEAPON]->istwo_h() ? '2' : '1';
 					st.push_back(stnum);
 				}
 
@@ -287,8 +319,44 @@ namespace gameplay
 			actionframe = 0;
 			anispeed = sp;
 			action = act;
-			state = bodyactions[action][actionframe].state;
-			frame = bodyactions[action][actionframe].frame;
+			state = bodyinfo->actions[action][actionframe].state;
+			frame = bodyinfo->actions[action][actionframe].frame;
+		}
+	}
+
+	void maplelook::setexpression(char id)
+	{
+		string exp;
+		switch (id)
+		{
+		case 0:
+			exp = "hit";
+			break;
+		case 1:
+			exp = "smile";
+			break;
+		case 2:
+			exp = "troubled";
+			break;
+		case 3:
+			exp = "cry";
+			break;
+		case 4:
+			exp = "angry";
+			break;
+		case 5:
+			exp = "bewildered";
+			break;
+		case 6:
+			exp = "stunned";
+			break;
+		}
+
+		if (exp != state_f)
+		{
+			frame_f = 0;
+			elapsed_f = 0;
+			state_f = exp;
 		}
 	}
 }

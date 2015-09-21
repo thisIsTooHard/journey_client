@@ -21,59 +21,82 @@
 
 namespace io
 {
-	worldselect::worldselect(char num, vector<char> chloads)
+	worldselect::worldselect(char num, vector<char> chl)
 	{
 		app.getimgcache()->setmode(ict_login);
 		nl::nx::view_file("UI");
 		nl::nx::view_file("Map");
-		node back = nl::nx::nodes["Map"].resolve("Back/login.img/back/");
-		node login = nl::nx::nodes["UI"].resolve("Login.img/");
-		node worlds = login.resolve("WorldSelect/BtWorld/release/");
+
+		node back = nx::nodes["Map"]["Back"]["login.img"]["back"];
+		node login = nx::nodes["UI"]["Login.img"];
+		node worlds = login["WorldSelect"]["BtWorld"]["release"];
+		node channels = login["WorldSelect"]["BtChannel"];
+
+		byte defworld = config.getdefworld();
+		byte defch = config.getdefch();
 
 		sprites.push_back(sprite(animation(back.resolve("11")), vector2d(370, 300)));
 		sprites.push_back(sprite(animation(worlds.resolve("layer:bg")), vector2d(650, 45)));
 		sprites.push_back(sprite(animation(login.resolve("Common/frame")), vector2d(400, 290)));
 
-		byte defworld = config.getdefworld();
-		byte defch = config.getdefch();
-
-		buttons.insert(make_pair(BT_WORLDSEL0, button(worlds.resolve("button:15"), 650, 20)));
+		buttons[BT_WORLDSEL0] = button(worlds["button:15"], 650, 20);
 		buttons[BT_WORLDSEL0].setstate("pressed");
 
-		sprites.push_back(sprite(animation(worlds.resolve("button:16/normal")), vector2d(650, 74)));
+		sprites.push_back(sprite(animation(worlds["button:16"]["normal"]), vector2d(650, 74)));
 
 		for (char i = 14; i >= 0; i--)
 		{
-			sprites.push_back(sprite(animation(worlds.resolve("button:" + to_string(i) + "/normal")), vector2d(650, 47)));
+			sprites.push_back(sprite(animation(worlds["button:" + to_string(i)]["normal"]), vector2d(650, 47)));
 		}
 
-		node channels = login.resolve("WorldSelect/BtChannel/");
 
-		sprites.push_back(sprite(animation(channels.resolve("layer:bg")), vector2d(200, 170)));
-		sprites.push_back(sprite(animation(channels.resolve("release/layer:15")), vector2d(200, 170)));
+		sprites.push_back(sprite(animation(channels["layer:bg"]), vector2d(200, 170)));
+		sprites.push_back(sprite(animation(channels["release"]["layer:15"]), vector2d(200, 170)));
 
 		for (char i = 0; i < num; i++)
 		{
-			button chi = button(
-				texture(channels.resolve("button:" + to_string(i) + "/normal/0")),
-				texture(channels.resolve("button:" + to_string(i) + "/keyFocused/0")),
-				200, 170);
+			short buttonid = BT_CHANNELSEL0 + i;
+
+			buttons[buttonid] = button(texture(channels["button:" + to_string(i)]["normal"]["0"]), texture(channels["button:" + to_string(i)]["keyFocused"]["0"]), 200, 170);
 			if (i == defch)
 			{
-				chi.setstate("pressed");
+				buttons[buttonid].setstate("pressed");
 			}
-			buttons.insert(make_pair(BT_CHANNELSEL0 + i, chi));
 		}
 
-		buttons.insert(make_pair(BT_GOWORLD, button(channels.resolve("button:GoWorld"), 200, 170)));
+		buttons[BT_GOWORLD] = button(channels["button:GoWorld"], 200, 170);
+
+		chltxt = texture(channels["gauge"]);
+
+		chloads = chl;
+		worldid = defworld;
+		channelid = defch;
 
 		nl::nx::unview_file("UI");
 		app.getimgcache()->unlock();
 		position = vector2d(0, 0);
 		dimensions = vector2d(800, 600);
 		active = true;
-		worldid = defworld;
-		channelid = defch;
+		dragged = false;
+		buttoncd = 0;
+	}
+
+	void worldselect::draw(ID2D1HwndRenderTarget* target)
+	{
+		uielement::draw(target);
+
+		if (active)
+		{
+			int i = 0;
+			for (vector<char>::iterator chit = chloads.begin(); chit != chloads.end(); ++chit)
+			{
+				char chl = min(100, *chit);
+				chl = max(10, chl);
+				int fill = (chl * chltxt.getdimension().x()) / 100;
+				//chltxt.draw(vector2d(228 + (i % 6) * 71, 262 + (i / 6) * 30), vector2d(fill, 0));
+				i++;
+			}
+		}
 	}
 
 	void worldselect::buttonpressed(short id)
@@ -103,7 +126,10 @@ namespace io
 		else if (id == BT_GOWORLD)
 		{
 			app.getui()->disableactions();
-			app.getui()->getfield()->setworldchannel(worldid, channelid);
+			app.getui()->getfield()->getlogin()->worldid = worldid;
+			app.getui()->getfield()->getlogin()->channelid = channelid;
+			config.setdefworld(worldid);
+			config.setdefchannel(channelid);
 			packet_c.charlrequest(worldid, channelid);
 		}
 	}

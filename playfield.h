@@ -24,13 +24,15 @@
 #include "mapinfo.h"
 #include "mapbackgrounds.h"
 #include "maplayer.h"
-#include "mapobjects.h"
 #include "footholdtree.h"
 #include "laddersropes.h"
 #include "mapchars.h"
 #include "mapportals.h"
+#include "mapmobs.h"
+#include "mapnpcs.h"
 #include "mapdrops.h"
 #include "attackfactory.h"
+#include "itemcache.h"
 
 using namespace action;
 using namespace maplemap;
@@ -43,6 +45,10 @@ namespace gameplay
 		account mapleacc;
 		char worldid;
 		char channelid;
+
+		void addworld(char c, world w) { worlds[c] = w; }
+		world* getworld(char c) { return &worlds[c]; }
+		account* getacc() { return &mapleacc; }
 	};
 
 	class playfield
@@ -50,39 +56,37 @@ namespace gameplay
 	public:
 		playfield();
 		~playfield() {}
-		void init();
 		void draw(ID2D1HwndRenderTarget*);
 		void update();
-		void setplayer(player);
 		void setfield(int, char);
 		void changechannel(char) {}
 		bool moveup(bool);
 		void useattack(int);
 		void useitem(int);
+		void buildplayer();
 		vector2d getviewpos() { return cam.getposition(); }
 		player* getplayer() { return &playerchar; }
 		mapchars* getchars() { return &chars; }
 		mapmobs* getmobs() { return &mobs; }
 		mapdrops* getdrops() { return &drops; }
-		mapobjects* getmapobjects() { return &objects; }
-		char getchannel() { return login.channelid; }
-		char getworld() { return login.worldid; }
-		account* getaccount() { return &login.mapleacc; }
-		map<char, world>* getworlds() { return &login.worlds; }
-		void setworldchannel(char wld, char chd) { login.worldid = wld; login.channelid = chd; }
+		mapnpcs* getnpcs() { return &npcs; }
+		logininfo* getlogin() { return &login; }
+		itemcache* getitems() { return &items; }
+		attackfactory* getattacks() { return &attfactory; }
 	private:
 		attackfactory attfactory;
+		itemcache items;
 		player playerchar;
 		camera cam;
 		mapinfo maplemap;
-		mapbackgrounds backgrounds;
-		map<char, maplayer> layers;
-		mapobjects objects;
-		mapchars chars;
-		mapmobs mobs;
-		mapdrops drops;
 		footholdtree footholds;
 		laddersropes landr;
+		mapbackgrounds backgrounds;
+		map<char, maplayer> layers;
+		mapchars chars;
+		mapmobs mobs;
+		mapnpcs npcs;
+		mapdrops drops;
 		mapportals portals;
 		logininfo login;
 		bool active;

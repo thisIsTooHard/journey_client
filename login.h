@@ -26,11 +26,12 @@ namespace io
 		login();
 		~login() {}
 		void draw(ID2D1HwndRenderTarget*);
-		void update();
 		void buttonpressed(short);
 	private:
 		bool saveid;
-		sprite saveidcheck;
+		map<bool, texture> saveidcheck;
+		textfield txtacc;
+		textfield txtpass;
 	};
 }
 

@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "drop.h"
-#include "icon.h"
+#include "texture.h"
 
 using namespace graphics;
 
@@ -26,12 +26,12 @@ namespace maplemap
 	class itemdrop : public drop
 	{
 	public:
-		itemdrop(short, int, int, vector2d, vector2d, char, bool, footholdtree*);
+		itemdrop(short, int, texture, int, vector2d, vector2d, char, bool, footholdtree*);
 		itemdrop() {}
 		~itemdrop() {}
 		void draw(ID2D1HwndRenderTarget*, vector2d);
 	private:
-		icon ico;
+		texture ico;
 		int itemid;
 	};
 }

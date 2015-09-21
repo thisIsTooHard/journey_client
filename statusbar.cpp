@@ -24,16 +24,16 @@ namespace io
 	statusbar::statusbar(maplestats* pstats)
 	{
 		app.getimgcache()->setmode(ict_sys);
-		nl::nx::view_file("UI");
+		nx::view_file("UI");
 
-		node mainbar = nl::nx::nodes["UI"].resolve("StatusBar2.img/mainBar");
-		node chat = nl::nx::nodes["UI"].resolve("StatusBar2.img/chat");
+		node mainbar = nx::nodes["UI"]["StatusBar2.img"]["mainBar"];
+		node chat = nx::nodes["UI"]["StatusBar2.img"]["chat"];
 
-		sprites.push_back(sprite(animation(mainbar.resolve("backgrnd")), vector2d(0, 0)));
-		sprites.push_back(sprite(animation(mainbar.resolve("gaugeBackgrd")), vector2d(0, 0)));
-		sprites.push_back(sprite(animation(mainbar.resolve("notice")), vector2d(0, 0)));
-		sprites.push_back(sprite(animation(mainbar.resolve("lvBacktrnd")), vector2d(0, 0)));
-		sprites.push_back(sprite(animation(mainbar.resolve("lvCover")), vector2d(0, 0)));
+		sprites.push_back(sprite(animation(mainbar["backgrnd"]), vector2d(0, 0)));
+		sprites.push_back(sprite(animation(mainbar["gaugeBackgrd"]), vector2d(0, 0)));
+		sprites.push_back(sprite(animation(mainbar["notice"]), vector2d(0, 0)));
+		sprites.push_back(sprite(animation(mainbar["lvBacktrnd"]), vector2d(0, 0)));
+		sprites.push_back(sprite(animation(mainbar["lvCover"]), vector2d(0, 0)));
 
 		exp = uibar(texture(mainbar.resolve("gauge/exp/0")), texture(mainbar.resolve("gauge/exp/1")), texture(mainbar.resolve("gauge/exp/2")), 308, vector2d(-261, -15));
 		hp = uibar(texture(mainbar.resolve("gauge/hp/0")), texture(mainbar.resolve("gauge/hp/1")), texture(mainbar.resolve("gauge/hp/2")), 137, vector2d(-261, -31));
@@ -45,29 +45,32 @@ namespace io
 		job = textlabel(DWF_12L, TXC_YELLOW, "");
 		name = textlabel(DWF_14L, TXC_WHITE, "");
 
-		buttons.insert(make_pair(BT_CHAT, button(mainbar.resolve("BtChat"), 0, 0)));
-		buttons.insert(make_pair(BT_CALLGM, button(mainbar.resolve("BtClaim"), 0, 0)));
+		buttons[BT_BAR_WHISPER] = button(mainbar["BtChat"]);
+		buttons[BT_BAR_CALLGM] = button(mainbar["BtClaim"]);
 
-		buttons.insert(make_pair(BT_CASHSHOP, button(mainbar.resolve("BtCashShop"), 0, 0)));
-		buttons.insert(make_pair(BT_TRADE, button(mainbar.resolve("BtMTS"), 0, 0)));
-		buttons.insert(make_pair(BT_MENU, button(mainbar.resolve("BtMenu"), 0, 0)));
-		buttons.insert(make_pair(BT_SYSOP, button(mainbar.resolve("BtSystem"), 0, 0)));
+		buttons[BT_BAR_CASHSHOP] = button(mainbar["BtCashShop"]);
+		buttons[BT_BAR_TRADE] = button(mainbar["BtMTS"]);
+		buttons[BT_BAR_MENU] = button(mainbar["BtMenu"]);
+		buttons[BT_BAR_SYSOP] = button(mainbar["BtSystem"]);
 		//buttons.insert(make_pair(BT_CHANNEL, button(button(mainbar.resolve("BtChannel")), 0, 0)));
 
-		buttons.insert(make_pair(BT_CHARINFO, button(mainbar.resolve("BtCharacter"), 0, 0)));
-		buttons.insert(make_pair(BT_STATS, button(mainbar.resolve("BtStat"), 0, 0)));
-		buttons.insert(make_pair(BT_QUEST, button(mainbar.resolve("BtQuest"), 0, 0)));
-		buttons.insert(make_pair(BT_INVENTORY, button(mainbar.resolve("BtInven"), 0, 0)));
-		buttons.insert(make_pair(BT_EQUIPS, button(mainbar.resolve("BtEquip"), 0, 0)));
-		buttons.insert(make_pair(BT_SKILL, button(mainbar.resolve("BtSkill"), 0, 0)));
+		buttons[BT_BAR_CHARINFO] = button(mainbar["BtCharacter"]);
+		buttons[BT_BAR_STATS] = button(mainbar["BtStat"]);
+		buttons[BT_BAR_QUEST] = button(mainbar["BtQuest"]);
+		buttons[BT_BAR_INVENTORY] = button(mainbar["BtInven"]);
+		buttons[BT_BAR_EQUIPS] = button(mainbar["BtEquip"]);
+		buttons[BT_BAR_SKILL] = button(mainbar["BtSkill"]);
 		//buttons.insert(make_pair(BT_FARM, button(button(mainbar.resolve("BtFarm")), 0, 0)));
 		//buttons.insert(make_pair(BT_KEYMAP, button(button(mainbar.resolve("BtKeysetting")), 0, 0)));
 
 		nl::nx::unview_file("UI");
 		app.getimgcache()->unlock();
+
 		position = vector2d(512, 590);
 		dimensions = vector2d(1366, 80);
 		active = true;
+		dragged = false;
+		buttoncd = 0;
 		stats = pstats;
 	}
 
@@ -79,10 +82,10 @@ namespace io
 		{
 			int cexp = stats->getexp();
 			int expneed = stats->getexpneeded();
-			short chp = stats->getstat(HP);
-			short cmp = stats->getstat(MP);
-			int maxhp = stats->getmaxhp();
-			int maxmp = stats->getmaxmp();
+			short chp = stats->getstat(MS_HP);
+			short cmp = stats->getstat(MS_MP);
+			short maxhp = stats->gettotal(MS_MAXHP);
+			short maxmp = stats->gettotal(MS_MAXMP);
 
 			exp.draw(target, position, cexp, expneed);
 			hp.draw(target, position, chp, maxhp);
@@ -93,7 +96,7 @@ namespace io
 			statset.draw("[" + to_string(chp) + "/" + to_string(maxhp) + "]", cha_right, position + vector2d(-124, -29));
 			statset.draw("[" + to_string(cmp) + "/" + to_string(maxmp) + "]", cha_right, position + vector2d(47, -29));
 
-			lvset.draw(to_string(stats->getstat(LEVEL)), cha_left, position + vector2d(-495, -25));
+			lvset.draw(to_string(stats->getstat(MS_LEVEL)), cha_left, position + vector2d(-495, -25));
 
 			job.settext(stats->getjobname());
 			name.settext(stats->getname());
@@ -104,28 +107,28 @@ namespace io
 
 	void statusbar::update()
 	{
-
+		uielement::update();
 	}
 
 	void statusbar::buttonpressed(short id)
 	{
 		switch (id)
 		{
-		case BT_SYSOP:
+		case BT_BAR_SYSOP:
 			app.getui()->add(UI_SYSTEM);
 			break;
-		case BT_STATS:
+		case BT_BAR_STATS:
 			app.getui()->add(UI_STATSINFO);
 			break;
-		case BT_EQUIPS:
+		case BT_BAR_EQUIPS:
 			app.getui()->add(UI_EQUIPS);
 			break;
 		}
 		buttons[id].setstate("mouseOver");
 	}
 
-	pair<vector2d, vector2d> statusbar::bounds()
+	rectangle2d statusbar::bounds()
 	{
-		return pair<vector2d, vector2d>(position - vector2d(512, 84), dimensions);
+		return rectangle2d(position - vector2d(512, 84), position - vector2d(512, 84) + dimensions);
 	}
 }

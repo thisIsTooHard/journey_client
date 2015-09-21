@@ -72,7 +72,7 @@ namespace util
 
 	bool vector2d::overlaps(vector2d v)
 	{
-		return (b >= v.x() && a <= v.x()) || (a <= v.y() && b >= v.y());
+		return (b >= v.x() && a <= v.x()) || (a <= v.y() && b >= v.y()) || (a >= v.x() && b <= v.y()) || (a <= v.x() && b >= v.y());
 	}
 
 	bool vector2d::iswithin(vector2d lt, vector2d rb)

@@ -46,10 +46,11 @@ namespace io
 		void init();
 		void addstatusinfo(bool, string);
 		void showdamage(vector<pair<int, char>>, vector2d);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
 		void drawmobhp(char, vector2d);
-		void drawnpctag(string, string, vector2d);
+		void addnpcbutton(int, vector2d, vector2d);
+		void draw(ID2D1HwndRenderTarget*, vector2d);
 		void update();
+		mousestate sendmouse();
 	private:
 		charset dmgset;
 		charset critset;
@@ -57,6 +58,7 @@ namespace io
 		nametag npctag;
 		textlabel infotextw;
 		textlabel infotexty;
+		map<int, button> npcbuttons;
 		map<string, texture> mobhpbar;
 		vector<dmgeffect> dmgeffects;
 		vector<statusinfo> statusinfos;

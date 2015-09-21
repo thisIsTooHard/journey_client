@@ -28,13 +28,46 @@ namespace graphics
 		}
 		else
 		{
-			for (node nodeit = src.begin(); nodeit != src.end(); nodeit++)
+			byte frame = 0;
+			node nodeit = src[to_string(frame)];
+			while (nodeit.istype(bitmapnode))
+			{
+				node delay = nodeit["delay"];
+				if (delay.istype(integernode))
+					delays[frame] = static_cast<short>(delay.get_integer());
+				else if (delay.istype(stringnode))
+					delays[frame] = static_cast<short>(stoi(delay.get_string()));
+				else
+					delays[frame] = DEF_DELAY;
+
+				textures[frame] = texture(nodeit);
+
+				node a0_node = nodeit.resolve("a0");
+				if (a0_node.istype(integernode))
+				{
+					byte a0 = static_cast<byte>(a0_node.get_integer());
+
+					node a1_node = nodeit.resolve("a1");
+					if (a1_node.istype(integernode))
+						alphablends[frame] = pair<byte, byte>(a0, static_cast<byte>(a1_node.get_integer()));
+					else
+						alphablends[frame] = pair<byte, byte>(a0, 255 - a0);
+				}
+				else
+				{
+					alphablends[frame] = pair<byte, byte>(255, 255);
+				}
+
+				frame++;
+				nodeit = src[to_string(frame)];
+			}
+			/*for (node nodeit = src.begin(); nodeit != src.end(); ++nodeit)
 			{
 				if (nodeit.istype(bitmapnode))
 				{
 					byte frame = static_cast<byte>(stoi(nodeit.name()));
 
-					node delay = nodeit.resolve("delay");
+					node delay = nodeit["delay"];
 					if (delay.istype(integernode))
 						delays[frame] = static_cast<short>(delay.get_integer());
 					else if (delay.istype(stringnode))
@@ -60,7 +93,7 @@ namespace graphics
 						alphablends[frame] = pair<byte, byte>(255, 255);
 					}
 				}
-			}
+			}*/
 		}
 
 		frame = 0;
