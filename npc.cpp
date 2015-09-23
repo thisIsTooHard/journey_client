@@ -23,8 +23,6 @@ namespace maplemap
 {
 	npc::npc(int id, int o, bool fr, short f, vector2d pos)
 	{
-		nx::view_file("Npc");
-
 		string fullname;
 		string strid = to_string(id);
 		size_t extend = 7 - strid.length();
@@ -64,9 +62,6 @@ namespace maplemap
 			}
 		}
 
-		nx::unview_file("Npc");
-		nx::view_file("String");
-
 		node stringdata = nx::nodes["String"].resolve("Npc.img/" + strid);
 
 		node namenode = stringdata.resolve("name");
@@ -88,13 +83,8 @@ namespace maplemap
 			}
 		}
 
-		nx::unview_file("String");
-		nx::view_file("UI");
-
 		ntag = textlabel(DWF_14BC, TXC_YELLOW, name, TXB_NAMETAG);
 		ftag = textlabel(DWF_14BC, TXC_YELLOW, func, TXB_NAMETAG);
-
-		nx::unview_file("UI");
 
 		oid = o;
 		front = fr;
@@ -103,17 +93,22 @@ namespace maplemap
 		state = "stand";
 	}
 
-	void npc::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	void npc::draw(vector2d parentpos)
 	{
 		vector2d absp = parentpos + position;
 
-		textures[state].draw(target, absp);
-		ntag.draw(target, absp);
-		ftag.draw(target, absp + vector2d(0, 18));
+		graphicobject::draw(&textures[state], absp, flip);
+
+		ntag.draw(absp);
+		ftag.draw(absp + vector2d(0, 18));
 	}
 
-	void npc::update()
+	void npc::setstate(string st)
 	{
-		textures[state].update();
+		if (state != st)
+		{
+			state = st;
+			resetani();
+		}
 	}
 }

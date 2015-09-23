@@ -38,7 +38,7 @@ namespace maplemap
 	public:
 		drop() {}
 		virtual ~drop() {}
-		virtual void draw(ID2D1HwndRenderTarget*, vector2d) {}
+		virtual void draw(vector2d) {}
 		virtual bool update();
 		void makeactive() { state = DST_FLOATING; }
 		void expire(char);
@@ -50,7 +50,7 @@ namespace maplemap
 		char pickuptype;
 		bool playerdrop;
 		dropstate state;
-		float alpha;
+		float dalpha;
 		float basey;
 		float moved;
 	};

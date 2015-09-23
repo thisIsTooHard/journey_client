@@ -19,7 +19,7 @@
 
 namespace maplemap
 {
-	itemdrop::itemdrop(short o, int id, texture ic, int own, vector2d pos, vector2d dst, char type, bool pld, footholdtree* fht)
+	itemdrop::itemdrop(short o, int id, texture ic, int own, vector2d pos, vector2d dst, char type, bool pld)
 	{
 		oid = o;
 		itemid = id;
@@ -28,11 +28,12 @@ namespace maplemap
 		pickuptype = type;
 		playerdrop = pld;
 
-		footholds = fht;
-		fh = footholds->getbelow(pos);
 		fx = static_cast<float>(pos.x());
 		fy = static_cast<float>(pos.y());
-		alpha = 1.0f;
+
+		updatefht();
+
+		dalpha = 1.0f;
 		moved = 0.0f;
 
 		if (pos == dst)
@@ -50,11 +51,11 @@ namespace maplemap
 		}
 	}
 
-	void itemdrop::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	void itemdrop::draw(vector2d viewpos)
 	{
 		if (state != DST_INACTIVE)
 		{
-			ico.draw(viewpos + getposition(), alpha);
+			ico.draw(viewpos + getposition(), dalpha);
 		}
 	}
 }

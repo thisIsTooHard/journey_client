@@ -16,17 +16,17 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "lookfactory.h"
+#include "equipcache.h"
 #include "nxfile.h"
 
-namespace program
+namespace data
 {
-	void lookfactory::init()
+	void equipcache::init()
 	{
 		initbodyinfo();
 	}
 
-	void lookfactory::initbodyinfo()
+	void equipcache::initbodyinfo()
 	{
 		node bodynode = nx::nodes["Character"].resolve("00002000.img");
 		node headnode = nx::nodes["Character"].resolve("00012000.img");
@@ -111,7 +111,7 @@ namespace program
 		}
 	}
 
-	void lookfactory::loadcharlook(maplelook* plook)
+	void equipcache::loadcharlook(maplelook* plook)
 	{
 		if (!(plook->isloaded()))
 		{
@@ -142,7 +142,7 @@ namespace program
 		}
 	}
 
-	bodytype* lookfactory::getbody(char sk)
+	bodytype* equipcache::getbody(char sk)
 	{
 		if (!bodytypes.count(sk))
 		{
@@ -151,7 +151,7 @@ namespace program
 		return &bodytypes[sk];
 	}
 
-	facetype* lookfactory::getface(int fid)
+	facetype* equipcache::getface(int fid)
 	{
 		if (!faces.count(fid))
 		{
@@ -160,7 +160,7 @@ namespace program
 		return &faces[fid];
 	}
 
-	hairstyle* lookfactory::gethair(int hid)
+	hairstyle* equipcache::gethair(int hid)
 	{
 		if (!hairstyles.count(hid))
 		{
@@ -169,7 +169,7 @@ namespace program
 		return &hairstyles[hid];
 	}
 	
-	clothing* lookfactory::getcloth(int iid)
+	clothing* equipcache::getcloth(int iid)
 	{
 		if (!clothes.count(iid))
 		{

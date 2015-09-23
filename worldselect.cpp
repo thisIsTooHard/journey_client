@@ -81,17 +81,24 @@ namespace io
 		buttoncd = 0;
 	}
 
-	void worldselect::draw(ID2D1HwndRenderTarget* target)
+	void worldselect::draw()
 	{
-		uielement::draw(target);
+		uielement::draw();
 
 		if (active)
 		{
 			int i = 0;
 			for (vector<char>::iterator chit = chloads.begin(); chit != chloads.end(); ++chit)
 			{
-				char chl = min(100, *chit);
-				chl = max(10, chl);
+				char chl = *chit;
+				if (chl > 100)
+				{
+					chl = 100;
+				}
+				else if (chl < 10)
+				{
+					chl = 10;
+				}
 				int fill = (chl * chltxt.getdimension().x()) / 100;
 				//chltxt.draw(vector2d(228 + (i % 6) * 71, 262 + (i / 6) * 30), vector2d(fill, 0));
 				i++;

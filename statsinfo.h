@@ -29,7 +29,7 @@ namespace io
 	public:
 		statsinfo(maplestats*, inventory*);
 		~statsinfo() {}
-		void draw(ID2D1HwndRenderTarget*);
+		void draw();
 		void sendbool(bool);
 		void buttonpressed(short);
 		rectangle2d dragarea();

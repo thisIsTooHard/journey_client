@@ -19,29 +19,17 @@
 
 namespace gameplay
 {
-	playereffects::playereffects()
+	void playereffects::add(sprite efc)
 	{
-		efflock = SRWLOCK_INIT;
-		top = 0;
-	}
-
-	void playereffects::add(effect efc)
-	{
-		AcquireSRWLockExclusive(&efflock);
-		effects[top] = efc;
+		effects.add(top, efc);
 		top++;
-		ReleaseSRWLockExclusive(&efflock);
 	}
 
-	void playereffects::draw(ID2D1HwndRenderTarget* target, vector2d playerpos)
+	void playereffects::draw(vector2d playerpos)
 	{
-		if (TryAcquireSRWLockShared(&efflock))
+		for (smit<int, sprite> efit = effects.getit(); efit.belowtop(); ++efit)
 		{
-			for (map<int, effect>::iterator efit = effects.begin(); efit != effects.end(); ++efit)
-			{
-				efit->second.draw(target, playerpos);
-			}
-			ReleaseSRWLockShared(&efflock);
+			efit->draw(playerpos);
 		}
 	}
 
@@ -49,28 +37,22 @@ namespace gameplay
 	{
 		vector<int> toremove;
 
-		if (TryAcquireSRWLockShared(&efflock))
+		for (smit<int, sprite> efit = effects.getit(); efit.belowtop(); ++efit)
 		{
-			for (map<int, effect>::iterator efit = effects.begin(); efit != effects.end(); ++efit)
-			{
-				bool remove = efit->second.update();
+			bool remove = efit->update();
 
-				if (remove)
-				{
-					toremove.push_back(efit->first);
-				}
+			if (remove)
+			{
+				toremove.push_back(efit.getindex());
 			}
-			ReleaseSRWLockShared(&efflock);
 		}
 
 		if (toremove.size() > 0)
 		{
-			AcquireSRWLockExclusive(&efflock);
 			for (vector<int>::iterator rmit = toremove.begin(); rmit != toremove.end(); ++rmit)
 			{
-				effects.erase(*rmit);
+				effects.remove(*rmit);
 			}
-			ReleaseSRWLockExclusive(&efflock);
 		}
 	}
 }

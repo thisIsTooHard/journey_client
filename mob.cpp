@@ -22,59 +22,8 @@
 
 namespace gameplay
 {
-	mob::mob(int id, int o, bool con, vector2d p, char s, short f, char e, bool fd, char t, footholdtree* fht)
+	mob::mob(int id, int o, bool con, vector2d p, char s, short f, char e, bool fd, char t)
 	{
-		app.getimgcache()->setmode(ict_map);
-
-		string fullname;
-		string strid = to_string(id);
-		size_t extend = 7 - strid.length();
-		for (char i = 0; i < extend; i++)
-		{
-			fullname.append("0");
-		}
-		fullname.append(strid);
-		node mobdata = nx::nodes["Mob"].resolve(fullname + ".img");
-
-		for (node subnode = mobdata.begin(); subnode != mobdata.end(); ++subnode)
-		{
-			string state = subnode.name();
-
-			if (state == "info")
-			{
-				level = subnode["level"];
-				watk = subnode["PADamage"];
-				matk = subnode["MADamage"];
-				wdef = subnode["PDDamage"];
-				mdef = subnode["MDDamage"];
-				acc = subnode["acc"];
-				eva = subnode["eva"];
-				knockback = subnode["pushed"];
-				speed = subnode["speed"];
-				touchdamage = subnode["bodyAttack"].get_bool();
-				undead = subnode["undead"].get_bool();
-			}
-			else
-			{
-				textures[state] = animation(subnode);
-				hitrect[state] = rectangle2d(subnode["0"]["lt"].tov2d(), subnode["0"]["rb"].tov2d());
-			}
-		}
-
-		node namenode = nx::nodes["String"]["Mob.img"][strid]["name"];
-		name = namenode.istype(stringnode) ? namenode.get_string() : "";
-
-		app.getimgcache()->unlock();
-
-		sndpath = "Sound\\Mob.img\\Mob.img\\";
-		string idstr = to_string(id);
-		if (idstr.size() < 7)
-		{
-			sndpath.append("0");
-		}
-		sndpath.append(idstr);
-
-		state = "stand";
 		mid = id;
 		oid = o;
 		control = con;
@@ -82,11 +31,20 @@ namespace gameplay
 		effect = e;
 		fadein = fd;
 		team = t;
+
+		mdata = cache.getmobs()->getmob(mid);
+		state = "stand";
+		
+		elapsed = 0;
+		frame = 0;
+		blending = false;
+		alpha = (fadein) ? 0.0f : 1.0f;
+		alphastep = 0.0f;
 		fx = static_cast<float>(p.x());
 		fy = static_cast<float>(p.y());
-		footholds = fht;
 
-		fh = fht->getbelow(p);
+		updatefht();
+
 		hspeed = 0;
 		vspeed = 0;
 		walls = footholds->getpfedges(fh.getid());
@@ -94,8 +52,7 @@ namespace gameplay
 		hppercent = 0;
 		moved = 0;
 		fleft = stance == 1;
-		alpha = (fadein) ? 0.0f : 1.0f;
-		speed = speed + 100;
+		speed = mdata->getspeed() + 100;
 		fade = false;
 		dead = false;
 	}
@@ -108,18 +65,16 @@ namespace gameplay
 			vector<int> dmgnumbers;
 			long totaldamage = 0;
 
-			byte ldelta = (level > attack->pllevel) ? level - attack->pllevel : 0;
+			short ldelta = mdata->getldelta(attack->pllevel);
+			float hitchance = static_cast<float>(attack->accuracy) / ((1.84f + 0.07f * ldelta) * mdata->geteva()) - 1;
 
-			float hitchance = static_cast<float>(attack->accuracy) / ((1.84f + 0.07f * ldelta) * eva) - 1;
-
-			int mindamage = static_cast<int>(attack->skillmult * attack->mindamage * (1 - 0.01f * ldelta) - wdef * 0.5f);
-			int maxdamage = static_cast<int>(attack->skillmult * attack->maxdamage * (1 - 0.01f * ldelta) - wdef * 0.5f);
+			int mindamage = static_cast<int>(attack->skillmult * attack->mindamage * (1 - 0.01f * ldelta) - mdata->getwdef() * 0.5f);
+			int maxdamage = static_cast<int>(attack->skillmult * attack->maxdamage * (1 - 0.01f * ldelta) - mdata->getwdef() * 0.6f);
 
 			uniform_int_distribution<int> dmgrange(mindamage, maxdamage);
 
 			for (char i = 0; i < attack->numdamage; i++)
 			{
-				bool critical = false; //TODO
 				pair<int, bool> damage = calcdamage(dmgrange, hitchance, attack->critical);
 
 				dmgnumbers.push_back(damage.first);
@@ -128,16 +83,16 @@ namespace gameplay
 				totaldamage += damage.first;
 			}
 
-			if (totaldamage > knockback)
+			if (totaldamage > mdata->getkb())
 			{
 				bool froml = attack->direction == 1;
 				hspeed = froml ? -0.15f : 0.15f;
 				fleft = !froml;
 				moved = 0;
-				state = "hit1";
+				setstate("hit1");
 			}
 
-			app.getui()->getbase()->showdamage(dmgeffects, getposition() - vector2d(0, textures[state].getdimension(0).y()));
+			app.getui()->getbase()->showdamage(dmgeffects, getposition() + vector2d(0, mdata->bounds(state).getlt().y()));
 
 			attack->mobsdamaged[oid] = dmgnumbers;
 		}
@@ -181,18 +136,9 @@ namespace gameplay
 
 	rectangle2d mob::bounds()
 	{
-		rectangle2d bounds = hitrect[state];
-		if (bounds.straight())
-		{
-			vector2d dim = textures[state].getdimension(0);
-			vector2d lt = getposition() - vector2d(dim.y(), dim.x() / 2);
-			bounds = rectangle2d(lt, lt + dim);
-		}
-		else
-		{
-			bounds.setlt(bounds.getlt() + getposition());
-			bounds.setrb(bounds.getrb() + getposition());
-		}
+		rectangle2d bounds = mdata->bounds(state);
+		bounds.setlt(bounds.getlt() + getposition());
+		bounds.setrb(bounds.getrb() + getposition());
 		return bounds;
 	}
 
@@ -204,7 +150,7 @@ namespace gameplay
 			active = false;
 			break;
 		case 1:
-			state = "die1";
+			setstate("die1");
 			dead = true;
 			break;
 		case 2:
@@ -230,11 +176,11 @@ namespace gameplay
 		switch (movement)
 		{
 		case 0:
-			state = "stand";
+			setstate("stand");
 			hspeed = 0;
 			break;
 		case 1:
-			state = "move";
+			setstate("move");
 			hspeed = (fleft) ? -fspeed : fspeed;
 			break;
 		}
@@ -244,116 +190,150 @@ namespace gameplay
 	{
 		if (active)
 		{
-			bool aniend = textures[state].update();
+			animation* ani = mdata->getani(state);
 
-			bool groundhit = gravityobject::update();
-
-			if (state == "hit1")
+			if (ani)
 			{
-				moved += abs(hspeed);
+				bool aniend = graphicobject::update(ani);
 
-				if (moved > 10)
-				{
-					hspeed = 0;
-					state = "stand";
-				}
-				else
-				{
-					hspeed *= 1.25;
-				}
-			}
-			else if (control)
-			{
-				float fspeed = static_cast<float>(speed) / 100;
+				bool groundhit = gravityobject::update();
 
-				if (state == "stand")
+				if (state == "hit1")
 				{
-					if (moved < 100)
+					moved += abs(hspeed);
+
+					if (moved > 10)
 					{
-						moved += 1;
+						hspeed = 0;
+						setstate("stand");
 					}
-					else if (aniend || !textures[state].isanimated())
+					else
 					{
-						moved = 0;
-						state = "move";
-
-						random_device rd;
-						uniform_int_distribution<int> udist(0, 1);
-						default_random_engine e1(rd());
-
-						fleft = udist(e1) == 1;
-						hspeed = (fleft) ? -fspeed : fspeed;
+						hspeed *= 1.25;
 					}
 				}
-				else
+				else if (control)
 				{
-					if (moved < 100)
-					{
-						moved += 1;
-					}
-					else if (aniend || !textures[state].isanimated())
-					{
-						moved = 0;
+					float fspeed = static_cast<float>(speed) / 100;
 
-						random_device rd;
-						uniform_int_distribution<int> udist(0, 2);
-						default_random_engine e1(rd());
-						int result = udist(e1);
-
-						if (result == 2)
+					if (state == "stand")
+					{
+						if (moved < 100)
 						{
-							hspeed = 0;
-							state = "stand";
+							moved += 1;
 						}
-						else
+						else if (aniend || !(ani->isanimated()))
 						{
+							moved = 0;
+							setstate("move");
+
+							random_device rd;
+							uniform_int_distribution<int> udist(0, 1);
+							default_random_engine e1(rd());
+
 							fleft = udist(e1) == 1;
 							hspeed = (fleft) ? -fspeed : fspeed;
 						}
 					}
-
-					if (hspeed != 0)
+					else
 					{
-						int posx = static_cast<int>(fx + hspeed);
-						int mobwidth = textures[state].getdimension(0).x() / 2;
-						if (posx + mobwidth >= walls.y())
+						if (moved < 100)
 						{
-							fleft = true;
-							hspeed = -fspeed;
+							moved += 1;
 						}
-						else if (posx - mobwidth <= walls.x())
+						else if (aniend || !(ani->isanimated()))
 						{
-							fleft = false;
-							hspeed = fspeed;
+							moved = 0;
+
+							random_device rd;
+							uniform_int_distribution<int> udist(0, 2);
+							default_random_engine e1(rd());
+							int result = udist(e1);
+
+							if (result == 2)
+							{
+								hspeed = 0;
+								setstate("stand");
+							}
+							else
+							{
+								fleft = udist(e1) == 1;
+								hspeed = (fleft) ? -fspeed : fspeed;
+							}
+						}
+
+						if (hspeed != 0)
+						{
+							int posx = static_cast<int>(fx + hspeed);
+							int mobwidth = mdata->getani(state)->getdimension(frame).x() / 2;
+							if (posx + mobwidth >= walls.y())
+							{
+								fleft = true;
+								hspeed = -fspeed;
+							}
+							else if (posx - mobwidth <= walls.x())
+							{
+								fleft = false;
+								hspeed = fspeed;
+							}
+						}
+
+						if (moved == 0)
+						{
+							movefragment firstmove;
+							firstmove.type = MVT_ABSOLUTE;
+							firstmove.command = 0;
+							firstmove.newstate = 1;
+							firstmove.xpps = 0;
+							firstmove.ypps = 0;
+							firstmove.xpos = static_cast<short>(fx);
+							firstmove.ypos = static_cast<short>(fy);
+							firstmove.unk = 0;
+							firstmove.duration = 50;
+
+							moves.push_back(firstmove);
+						}
+						else if (moved == 100)
+						{
+							movefragment lastmove;
+							lastmove.type = MVT_ABSOLUTE;
+							lastmove.command = 0;
+							lastmove.newstate = 1;
+							lastmove.xpps = static_cast<short>(hspeed * 3);
+							lastmove.ypps = static_cast<short>(vspeed * 3);
+							lastmove.xpos = static_cast<short>(fx);
+							lastmove.ypos = static_cast<short>(fy);
+							lastmove.unk = 0;
+							lastmove.duration = 50;
+
+							moves.push_back(lastmove);
+							packet_c.movemonster(oid, 1, 0, 0, 0, 0, 0, 0, getposition(), &moves);
+
+							moves.clear();
 						}
 					}
+				}
 
-					if (moved % 10 == 0)
+				if (fade)
+				{
+					alpha -= 0.25f;
+					if (alpha < 0.25f)
 					{
-						//sendmoves(10);
+						aniend = true;
 					}
 				}
-			}
-
-			if (fade)
-			{
-				alpha -= 0.25f;
-				if (alpha < 0.25f)
+				else if (fadein)
 				{
-					aniend = true;
+					alpha += 0.025f;
+					if (alpha > 0.975f)
+					{
+						alpha = 1.0f;
+						fadein = false;
+					}
 				}
-			}
-			else if (fadein)
-			{
-				alpha += 0.025f;
-				if (alpha > 0.975f)
-				{
-					alpha = 1.0f;
-					fadein = false;
-				}
-			}
 
-			return dead && aniend;
+				return dead && aniend;
+			}
 		}
 
 		return false;
@@ -361,54 +341,19 @@ namespace gameplay
 
 	void mob::sendmoves(byte elapsed)
 	{
-		vector<movefragment> moves;
-		movefragment lastmove;
-		lastmove.type = MVT_ABSOLUTE;
-		lastmove.command = 1;
-		lastmove.newstate = 1;
-		lastmove.xpos = static_cast<short>(fx);
-		lastmove.ypos = static_cast<short>(fy);
-		lastmove.xpps = hspeed * elapsed;
-		lastmove.ypps = vspeed * elapsed;
-		lastmove.duration = elapsed;
-		moves.push_back(lastmove);
-
-		packet_c.movemonster(oid, 1, 0, 0, 0, 0, 0, 0, getposition(), moves);
 	}
 
-	void mob::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	void mob::setstate(string st)
+	{
+		state = st;
+		resetani();
+	}
+
+	void mob::draw(vector2d parentpos)
 	{
 		if (active)
 		{
-			vector2d pos = getposition();
-			absp = pos + parentpos;
-
-			if (!fleft)
-			{
-				target->SetTransform(
-					D2D1::Matrix3x2F::Scale(
-					D2D1::Size(-1.0f, 1.0f),
-					D2D1::Point2F(
-					(float)absp.x(),
-					(float)absp.y())));
-			}
-
-			textures[state].draw(target, absp, alpha);
-
-			if (!fleft)
-			{
-				target->SetTransform(
-					D2D1::Matrix3x2F::Scale(
-					D2D1::Size(1.0f, 1.0f),
-					D2D1::Point2F(
-					(float)absp.x(),
-					(float)absp.y())));
-			}
-
-			if (hppercent > 1)
-			{
-				app.getui()->getbase()->drawmobhp(hppercent, absp - vector2d(30, textures[state].getdimension(0).y() + 25));
-			}
+			mdata->draw(state, frame, alpha, !fleft, getposition() + parentpos);
 		}
 	}
 }

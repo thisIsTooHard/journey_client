@@ -37,12 +37,12 @@ namespace io
 		textfield(textid, dwfonts, textcolor, string, vector2d, int);
 		textfield() {}
 		~textfield() {}
-		rectangle2d bounds();
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		void update();
 		void setfocus(bool);
 		void sendchar(char);
 		void setbg(texture, int, int);
+		rectangle2d bounds(vector2d);
 		void setactive(bool a) { active = a; }
 		void settext(string s) { content.settext(s); }
 		bool isactive() { return active; }

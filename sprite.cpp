@@ -26,6 +26,9 @@ namespace graphics
 		position = pos;
 		visible = true;
 		flipped = false;
+
+		blending = true;
+		resetani();
 	}
 
 	sprite::sprite(animation ani, vector2d pos, bool vis, bool flp)
@@ -34,32 +37,19 @@ namespace graphics
 		position = pos;
 		visible = vis;
 		flipped = flp;
+
+		blending = true;
+		resetani();
 	}
 
-	void sprite::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	void sprite::draw(vector2d parentpos)
 	{
 		if (visible)
 		{
-			if (flipped)
+			texture* txt = anim.gettexture(frame);
+			if (txt)
 			{
-				target->SetTransform(
-					D2D1::Matrix3x2F::Scale(
-					D2D1::Size(-1.0f, 1.0f),
-					D2D1::Point2F(
-					(float)(parentpos + position).x(),
-					(float)(parentpos + position).y())));
-			}
-
-			anim.draw(target, position + parentpos);
-
-			if (flipped)
-			{
-				target->SetTransform(
-					D2D1::Matrix3x2F::Scale(
-					D2D1::Size(1.0f, 1.0f),
-					D2D1::Point2F(
-					(float)(parentpos + position).x(),
-					(float)(parentpos + position).y())));
+				txt->draw(position + parentpos, flipped);
 			}
 		}
 	}

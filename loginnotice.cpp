@@ -24,7 +24,6 @@ namespace io
 	loginnotice::loginnotice(char param)
 	{
 		app.getimgcache()->setmode(ict_login);
-		nl::nx::view_file("UI");
 
 		node notice = nl::nx::nodes["UI"].resolve("Login.img/Notice/");
 
@@ -49,7 +48,6 @@ namespace io
 		sprites.push_back(sprite(animation(notice.resolve(back)), vector2d()));
 		sprites.push_back(sprite(animation(notice.resolve("text/" + to_string(param))), vector2d(17, 13)));
 
-		nl::nx::unview_file("UI");
 		app.getimgcache()->unlock();
 		position = vector2d(292, 200);
 		dimensions = vector2d(362, 219);

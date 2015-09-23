@@ -42,7 +42,7 @@ namespace gameplay
 		rank = PTR_NONE;
 
 		short totaldelta = 0;
-		clothing* cloth = app.getlookfactory()->getcloth(id);
+		clothing* cloth = cache.getequips()->getcloth(id);
 		for (equipstat es = ES_STR; es <= ES_JUMP; es = static_cast<equipstat>(es + 1))
 		{
 			if (stats.count(es))

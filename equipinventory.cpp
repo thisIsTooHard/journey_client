@@ -58,7 +58,7 @@ namespace io
 			{
 				mapleequip* equip = reinterpret_cast<mapleequip*>(eqit.get());
 				int id = equip->getid();
-				clothing* cloth = app.getlookfactory()->getcloth(id);
+				clothing* cloth = cache.getequips()->getcloth(id);
 				dragicons.push_back(dragicon(DIT_ITEM, itemicon(cloth->geticons(), false, 1), texture(), iconpositions[slot], slot, id));
 			}
 		}
@@ -74,9 +74,9 @@ namespace io
 		showpet = false;
 	}
 
-	void equipinventory::draw(ID2D1HwndRenderTarget* target)
+	void equipinventory::draw()
 	{
-		uielement::draw(target);
+		uielement::draw();
 
 		if (active)
 		{

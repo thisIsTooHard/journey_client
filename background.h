@@ -16,9 +16,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "stdfax.h"
-#include "animation.h"
+#include "graphicobject.h"
+#include "moveobject.h"
 
+using namespace action;
 using namespace graphics;
 
 namespace gameplay
@@ -29,34 +30,31 @@ namespace gameplay
 		BGT_HTILED,
 		BGT_VTILED,
 		BGT_TILED,
+		BGT_HSTRETCH,
+		BGT_VSTRETCH,
+		BGT_STRETCH,
 		BGT_HMOVEA,
 		BGT_VMOVEA,
 		BGT_HMOVEB,
 		BGT_VMOVEB
 	};
 
-	class background
+	class background : public moveobject, public graphicobject
 	{
 	public:
 		background(node, node, vector2d, vector2d);
 		background() {}
 		~background() {}
-		void draw(ID2D1HwndRenderTarget*, vector2d);
-		void update();
+		void draw(vector2d);
+		bool update();
 	private:
 		animation ani;
 		bgtype type;
-		vector2d pos;
 		vector2d rpos;
 		vector2d cpos;
 		vector2d mapwalls;
 		vector2d mapborders;
-		float alpha;
 		bool flipped;
-		float vspeed;
-		float hspeed;
-		float fx;
-		float fy;
 	};
 }
 

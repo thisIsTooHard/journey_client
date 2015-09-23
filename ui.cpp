@@ -32,21 +32,23 @@
 
 namespace io
 {
-	void ui::init(imagecache* img)
+	void ui::init()
 	{
+		app.getimgcache()->setmode(ict_sys);
 		base.init();
-		mouse.init(img);
+		field.init();
+		mouse.init();
+		equipinfo.init();
+		iteminfo.init();
+		app.getimgcache()->unlock();
 
-		equipinfo = new equiptooltip(img);
-		equipinfo->clear();
-
-		miteminfo = new itemtooltip(img);
-		miteminfo->clear();
-
-		//field.playbgm("Sound\\BgmUI.img\\BgmUI.img\\Title.mp3");
+		cache.getequips()->init();
 
 		activetext = 0;
 		activeicon = 0;
+		activeinfo = 0;
+
+		add(UI_LOGIN);
 
 		active = true;
 		shift = false;
@@ -56,7 +58,6 @@ namespace io
 	ui::~ui()
 	{
 		elements.clear();
-		delete equipinfo;
 	}
 
 	void ui::add(uielements type, char param)
@@ -123,26 +124,26 @@ namespace io
 		elements.removekey(type);
 	}
 
-	void ui::draw(ID2D1HwndRenderTarget* target)
+	void ui::draw()
 	{
-		field.draw(target);
-		base.draw(target, field.getviewpos());
+		field.draw();
+		base.draw(field.getviewpos());
 		if (active)
 		{
 			for (spmit<uielements, uielement*> elit = elements.getit(); elit.belowtop(); ++elit)
 			{
-				elit->draw(target);
+				elit->draw();
 			}
 			if (activeicon)
 			{
-				activeicon->dragdraw(target, mouse.getposition());
+				activeicon->dragdraw(mouse.getposition());
 			}
 			if (activeinfo)
 			{
-				activeinfo->draw(target, mouse.getposition());
+				activeinfo->draw(mouse.getposition());
 			}
 		}
-		mouse.draw(target);
+		mouse.draw();
 	}
 
 	void ui::update()
@@ -371,7 +372,7 @@ namespace io
 			if (activeinfo)
 			{
 				activeinfo = 0;
-				equipinfo->clear();
+				equipinfo.clear();
 			}
 		}
 	}
@@ -380,20 +381,20 @@ namespace io
 	{
 		if (itemid > 0)
 		{
-			if (itemid != equipinfo->getid())
+			if (itemid != equipinfo.getid())
 			{
-				iteminfo* info = field.getitems()->getitem(itemid);
-				if (info)
+				itemdata* item = cache.getitems()->getitem(itemid);
+				if (item)
 				{
-					miteminfo->setitem(info);
-					activeinfo = miteminfo;
+					iteminfo.setitem(item);
+					activeinfo = &iteminfo;
 				}
 			}
 		}
 		else
 		{
 			activeinfo = 0;
-			miteminfo->clear();
+			iteminfo.clear();
 		}
 	}
 
@@ -401,21 +402,21 @@ namespace io
 	{
 		if (itemid > 0)
 		{
-			if (itemid != equipinfo->getid() && slot != equipinfo->getslot())
+			if (itemid != equipinfo.getid() && slot != equipinfo.getslot())
 			{
-				clothing* cloth = app.getlookfactory()->getcloth(itemid);
+				clothing* cloth = cache.getequips()->getcloth(itemid);
 				mapleequip* equip = field.getplayer()->getinventory()->getequip(IVT_EQUIPPED, slot);
 				if (cloth && equip)
 				{
-					equipinfo->setequip(cloth, equip, field.getplayer()->getstats());
-					activeinfo = equipinfo;
+					equipinfo.setequip(cloth, equip, field.getplayer()->getstats());
+					activeinfo = &equipinfo;
 				}
 			}
 		}
 		else
 		{
 			activeinfo = 0;
-			equipinfo->clear();
+			equipinfo.clear();
 		}
 	}
 }

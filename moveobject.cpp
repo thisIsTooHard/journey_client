@@ -19,6 +19,14 @@
 
 namespace action
 {
+	moveobject::moveobject()
+	{
+		fx = 0.0f;
+		fy = 0.0f;
+		hspeed = 0;
+		vspeed = 0;
+	}
+
 	moveobject::moveobject(vector2d pos)
 	{
 		fx = static_cast<float>(pos.x());
@@ -32,7 +40,7 @@ namespace action
 		fx += hspeed;
 		fy += vspeed;
 
-		return false;
+		return hspeed == 0 && vspeed == 0;
 	}
 
 	vector2d moveobject::getposition()

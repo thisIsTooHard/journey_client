@@ -27,21 +27,27 @@ namespace io
 		state = MST_IDLE;
 	}
 
-	void cursor::init(imagecache* img)
+	void cursor::init()
 	{
-		img->setmode(ict_sys);
-		nl::nx::view_file("UI");
-		node cursornode = nl::nx::nodes["UI"]["Basic.img"]["Cursor"];
-		for (mousestate i = MST_IDLE; i <= MST_RCLICK; i = (mousestate) (i + 1))
+		node cursornode = nx::nodes["UI"]["Basic.img"]["Cursor"];
+
+		for (mousestate i = MST_IDLE; i <= MST_RCLICK; i = static_cast<mousestate>(i + 1))
 		{
-			sprites[i] = animation(cursornode[to_string(i)]);
+			animations[i] = animation(cursornode[to_string(i)]);
 		}
-		nl::nx::unview_file("UI");
-		img->unlock();
 	}
 
-	void cursor::draw(ID2D1HwndRenderTarget* target)
+	void cursor::draw()
 	{
-		sprites[state].draw(target, position);
+		animations[state].draw(frame, position);
+	}
+
+	void cursor::setstate(mousestate s)
+	{
+		if (state != s)
+		{
+			state = s;
+			resetani();
+		}
 	}
 }

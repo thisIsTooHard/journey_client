@@ -24,11 +24,12 @@ namespace maplemap
 	class mapportals
 	{
 	public:
-		mapportals(node, int);
 		mapportals() {}
 		~mapportals() {}
+		void init();
+		void load(node, int);
 		void addportal(char, portaltype, string, int, bool, string, vector2d);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		void update(rectangle2d);
 		vector2d getspawnpoint(char);
 		vector2d getspawnpoint(string);

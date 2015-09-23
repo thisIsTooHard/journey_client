@@ -19,19 +19,20 @@
 #include "moveobject.h"
 #include "footholdtree.h"
 
-using namespace gameplay;
+using namespace data;
 
 namespace action
 {
-	const float maxvspeed = 7.7f;
-	const float grvacc = 0.5f;
+	const float MAXVSPEED = 7.7f;
+	const float GRAVITYACC = 0.5f;
 
 	class gravityobject : public moveobject
 	{
 	public:
-		gravityobject(vector2d, footholdtree*);
-		gravityobject() {}
+		gravityobject(vector2d);
+		gravityobject();
 		virtual ~gravityobject() {}
+		bool updatefht();
 		bool update();
 	protected:
 		footholdtree* footholds;

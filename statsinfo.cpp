@@ -77,24 +77,24 @@ namespace io
 		invent = iv;
 	}
 
-	void statsinfo::draw(ID2D1HwndRenderTarget* target)
+	void statsinfo::draw()
 	{
-		uielement::draw(target);
+		uielement::draw();
 
 		if (active)
 		{
-			statlabel.draw(stats->getname(), target, position + vector2d(73, 25));
-			statlabel.draw(stats->getjobname(), target, position + vector2d(73, 43));
-			statlabel.draw("", target, position + vector2d(73, 61)); //guild
-			statlabel.draw(to_string(stats->getstat(MS_FAME)), target, position + vector2d(73, 79));
-			statlabel.draw(to_string(stats->getmindamage()) + " ~ " + to_string(stats->getmaxdamage()), target, position + vector2d(73, 97));
-			statlabel.draw(to_string(stats->getstat(MS_HP)) + " / " + to_string(stats->gettotal(MS_MAXHP)), target, position + vector2d(73, 115));
-			statlabel.draw(to_string(stats->getstat(MS_MP)) + " / " + to_string(stats->gettotal(MS_MAXMP)), target, position + vector2d(73, 133));
-			statlabel.draw(to_string(stats->getstat(MS_AP)), target, position + vector2d(79, 175));
-			statlabel.draw(to_string(stats->getstat(MS_STR) + invent->gettotal(ES_STR)) + " (" + to_string(stats->getstat(MS_STR)) + " + " + to_string(invent->gettotal(ES_STR)) + ")", target, position + vector2d(73, 202));
-			statlabel.draw(to_string(stats->getstat(MS_DEX) + invent->gettotal(ES_DEX)) + " (" + to_string(stats->getstat(MS_DEX)) + " + " + to_string(invent->gettotal(ES_DEX)) + ")", target, position + vector2d(73, 220));
-			statlabel.draw(to_string(stats->getstat(MS_INT) + invent->gettotal(ES_INT)) + " (" + to_string(stats->getstat(MS_INT)) + " + " + to_string(invent->gettotal(ES_INT)) + ")", target, position + vector2d(73, 238));
-			statlabel.draw(to_string(stats->getstat(MS_LUK) + invent->gettotal(ES_LUK)) + " (" + to_string(stats->getstat(MS_LUK)) + " + " + to_string(invent->gettotal(ES_LUK)) + ")", target, position + vector2d(73, 256));
+			statlabel.draw(stats->getname(), position + vector2d(73, 25));
+			statlabel.draw(stats->getjobname(), position + vector2d(73, 43));
+			statlabel.draw("", position + vector2d(73, 61)); //guild
+			statlabel.draw(to_string(stats->getstat(MS_FAME)), position + vector2d(73, 79));
+			statlabel.draw(to_string(stats->getmindamage()) + " ~ " + to_string(stats->getmaxdamage()), position + vector2d(73, 97));
+			statlabel.draw(to_string(stats->getstat(MS_HP)) + " / " + to_string(stats->gettotal(MS_MAXHP)), position + vector2d(73, 115));
+			statlabel.draw(to_string(stats->getstat(MS_MP)) + " / " + to_string(stats->gettotal(MS_MAXMP)), position + vector2d(73, 133));
+			statlabel.draw(to_string(stats->getstat(MS_AP)), position + vector2d(79, 175));
+			statlabel.draw(to_string(stats->getstat(MS_STR) + invent->gettotal(ES_STR)) + " (" + to_string(stats->getstat(MS_STR)) + " + " + to_string(invent->gettotal(ES_STR)) + ")", position + vector2d(73, 202));
+			statlabel.draw(to_string(stats->getstat(MS_DEX) + invent->gettotal(ES_DEX)) + " (" + to_string(stats->getstat(MS_DEX)) + " + " + to_string(invent->gettotal(ES_DEX)) + ")", position + vector2d(73, 220));
+			statlabel.draw(to_string(stats->getstat(MS_INT) + invent->gettotal(ES_INT)) + " (" + to_string(stats->getstat(MS_INT)) + " + " + to_string(invent->gettotal(ES_INT)) + ")", position + vector2d(73, 238));
+			statlabel.draw(to_string(stats->getstat(MS_LUK) + invent->gettotal(ES_LUK)) + " (" + to_string(stats->getstat(MS_LUK)) + " + " + to_string(invent->gettotal(ES_LUK)) + ")", position + vector2d(73, 256));
 
 			if (showdetail)
 			{
@@ -115,23 +115,23 @@ namespace io
 				string resistr = to_string(static_cast<int>(stats->getresist() * 100));
 				string stancestr = to_string(static_cast<int>(stats->getstance() * 100));
 
-				statlabel.draw(to_string(stats->getattack()), target, detailpos + vector2d(73, 35));
-				statlabel.draw(critstr + "%", target, detailpos + vector2d(73, 53));
-				statlabel.draw(mincritstr + "%", target, detailpos + vector2d(73, 71));
-				statlabel.draw(maxcritstr + "%", target, detailpos + vector2d(168, 71));
-				statlabel.draw(bdmstr + "%", target, detailpos + vector2d(73, 89));
-				statlabel.draw(idefstr + "%", target, detailpos + vector2d(168, 89));
-				statlabel.draw(resistr + "%", target, detailpos + vector2d(73, 107));
-				statlabel.draw(stancestr + "%", target, detailpos + vector2d(168, 107));
-				statlabel.draw(to_string(invent->gettotal(ES_WDEF)), target, detailpos + vector2d(73, 125));
-				statlabel.draw(to_string(invent->gettotal(ES_MDEF)), target, detailpos + vector2d(73, 143));
-				statlabel.draw(to_string(stats->getaccuracy() + invent->getaccuracy()), target, detailpos + vector2d(73, 161));
-				statlabel.draw("0", target, detailpos + vector2d(73, 179));
-				statlabel.draw(to_string(invent->gettotal(ES_AVOID)), target, detailpos + vector2d(73, 197));
-				statlabel.draw("0", target, detailpos + vector2d(73, 215));
-				statlabel.draw(to_string(invent->gettotal(ES_SPEED) + 100) + "%", target, detailpos + vector2d(73, 233));
-				statlabel.draw(to_string(invent->gettotal(ES_JUMP) + 100) + "%", target, detailpos + vector2d(168, 233));
-				statlabel.draw(to_string(stats->gethonor()), target, detailpos + vector2d(73, 351));
+				statlabel.draw(to_string(stats->getattack()), detailpos + vector2d(73, 35));
+				statlabel.draw(critstr + "%", detailpos + vector2d(73, 53));
+				statlabel.draw(mincritstr + "%", detailpos + vector2d(73, 71));
+				statlabel.draw(maxcritstr + "%", detailpos + vector2d(168, 71));
+				statlabel.draw(bdmstr + "%", detailpos + vector2d(73, 89));
+				statlabel.draw(idefstr + "%", detailpos + vector2d(168, 89));
+				statlabel.draw(resistr + "%", detailpos + vector2d(73, 107));
+				statlabel.draw(stancestr + "%", detailpos + vector2d(168, 107));
+				statlabel.draw(to_string(invent->gettotal(ES_WDEF)), detailpos + vector2d(73, 125));
+				statlabel.draw(to_string(invent->gettotal(ES_MDEF)), detailpos + vector2d(73, 143));
+				statlabel.draw(to_string(stats->getaccuracy() + invent->getaccuracy()), detailpos + vector2d(73, 161));
+				statlabel.draw("0", detailpos + vector2d(73, 179));
+				statlabel.draw(to_string(invent->gettotal(ES_AVOID)), detailpos + vector2d(73, 197));
+				statlabel.draw("0", detailpos + vector2d(73, 215));
+				statlabel.draw(to_string(invent->gettotal(ES_SPEED) + 100) + "%", detailpos + vector2d(73, 233));
+				statlabel.draw(to_string(invent->gettotal(ES_JUMP) + 100) + "%", detailpos + vector2d(168, 233));
+				statlabel.draw(to_string(stats->gethonor()), detailpos + vector2d(73, 351));
 			}
 		}
 	}

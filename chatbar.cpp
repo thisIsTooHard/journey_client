@@ -24,7 +24,6 @@ namespace io
 	chatbar::chatbar()
 	{
 		app.getimgcache()->setmode(ict_sys);
-		nx::view_file("UI");
 
 		node mainbar = nx::nodes["UI"]["StatusBar2.img"]["mainBar"];
 		node chat = nx::nodes["UI"]["StatusBar2.img"]["chat"];
@@ -49,10 +48,9 @@ namespace io
 		chattargets[CHT_PARTY] = texture(mainbar["chatTarget"]["party"]);
 		chattargets[CHT_SQUAD] = texture(mainbar["chatTarget"]["expedition"]);
 
-		chatfield = textfield(TXT_CHAT, DWF_12L, TXC_BLACK, "defaulttext", vector2d(), 32);
-		chatfield.setactive(true);
+		textfields[TXT_CHAT] = textfield(TXT_CHAT, DWF_12L, TXC_BLACK, "defaulttext", vector2d(-415, -60), 32);
+		textfields[TXT_CHAT].setactive(true);
 
-		nl::nx::unview_file("UI");
 		app.getimgcache()->unlock();
 
 		position = vector2d(512, 590);
@@ -71,19 +69,19 @@ namespace io
 			open = true;
 			buttons[BT_BAR_OPENCHAT].setactive(false);
 			buttons[BT_BAR_CLOSECHAT].setactive(true);
-			chatfield.setactive(true);
+			textfields[TXT_CHAT].setactive(true);
 			break;
 		case BT_BAR_CLOSECHAT:
 			open = false;
 			buttons[BT_BAR_OPENCHAT].setactive(true);
 			buttons[BT_BAR_CLOSECHAT].setactive(false);
-			chatfield.setactive(false);
+			textfields[TXT_CHAT].setactive(false);
 			break;
 		}
 		buttons[id].setstate("normal");
 	}
 
-	void chatbar::draw(ID2D1HwndRenderTarget* target)
+	void chatbar::draw()
 	{
 		if (active)
 		{
@@ -95,7 +93,7 @@ namespace io
 			}
 		}
 
-		uielement::draw(target);
+		uielement::draw();
 
 		if (active)
 		{

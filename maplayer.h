@@ -28,7 +28,6 @@ namespace gameplay
 	{
 		texture txt;
 		vector2d pos;
-
 		void draw(vector2d p) { txt.draw(pos + p); }
 	};
 
@@ -38,7 +37,7 @@ namespace gameplay
 		maplayer(node);
 		maplayer() {}
 		~maplayer() {}
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		void update();
 	private:
 		map<char, vector<tile>> tiles;

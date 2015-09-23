@@ -17,13 +17,16 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "mapbackgrounds.h"
-#include "nxfile.h"
+#include "Journey.h"
 
 namespace gameplay
 {
-	mapbackgrounds::mapbackgrounds(node bgnodes, vector2d mapwalls, vector2d mapborders)
+	mapbackgrounds::mapbackgrounds(node bgnodes)
 	{
 		node back = nx::nodes["Map"]["Back"];
+
+		vector2d mapwalls = cache.getmap()->getinfo()->getwalls();
+		vector2d mapborders = cache.getmap()->getinfo()->getborders();
 
 		for (node backnode = bgnodes.begin(); backnode != bgnodes.end(); ++backnode)
 		{
@@ -41,19 +44,19 @@ namespace gameplay
 		}
 	}
 
-	void mapbackgrounds::drawbackgrounds(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	void mapbackgrounds::drawbackgrounds(vector2d viewpos)
 	{
 		for (vector<background>::iterator back = backgrounds.begin(); back != backgrounds.end(); ++back)
 		{
-			back->draw(target, viewpos);
+			back->draw(viewpos);
 		}
 	}
 
-	void mapbackgrounds::drawforegrounds(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	void mapbackgrounds::drawforegrounds(vector2d viewpos)
 	{
 		for (vector<background>::iterator fore = foregrounds.begin(); fore != foregrounds.end(); ++fore)
 		{
-			fore->draw(target, viewpos);
+			fore->draw(viewpos);
 		}
 	}
 

@@ -19,7 +19,7 @@
 
 namespace character
 {
-	void charsprites::draw(charlayer layer, string state, byte frame, vector2d pos)
+	void charsprites::draw(charlayer layer, string state, byte frame, vector2d pos, bool flip)
 	{
 		if (textures.count(layer))
 		{
@@ -27,7 +27,22 @@ namespace character
 			{
 				if (textures[layer][state].count(frame))
 				{
-					textures[layer][state][frame].draw(pos);
+					textures[layer][state][frame].draw(pos, flip);
+				}
+			}
+		}
+	}
+
+	void charsprites::draw(charlayer layer, string state, byte frame, vector2d pos, vector2d shift)
+	{
+		if (textures.count(layer))
+		{
+			if (textures[layer].count(state))
+			{
+				if (textures[layer][state].count(frame))
+				{
+					textures[layer][state][frame].setshift(shift);
+					textures[layer][state][frame].draw(pos, true);
 				}
 			}
 		}

@@ -30,10 +30,11 @@ namespace io
 	class equiptooltip : public tooltip
 	{
 	public:
-		equiptooltip(imagecache*);
+		equiptooltip() {}
 		~equiptooltip() {}
+		void init();
 		void setequip(clothing*, mapleequip*, maplestats*);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		void clear() { itemid = 0; slot = 0; }
 		int getid() { return itemid; }
 		short getslot() { return slot; }

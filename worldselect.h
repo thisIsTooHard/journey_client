@@ -26,7 +26,7 @@ namespace io
 		worldselect(char, vector<char>);
 		~worldselect() {}
 		void buttonpressed(short);
-		void draw(ID2D1HwndRenderTarget*);
+		void draw();
 	private:
 		vector<char> chloads;
 		texture chltxt;

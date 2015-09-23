@@ -17,7 +17,6 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "mapmobs.h"
-#include "collision.h"
 
 namespace gameplay
 {
@@ -29,7 +28,7 @@ namespace gameplay
 		}
 		else
 		{
-			mobs.add(oid, mob(id, oid, control, pos, stance, fh, effect, fadein, team, footholds));
+			mobs.add(oid, mob(id, oid, control, pos, stance, fh, effect, fadein, team));
 		}
 	}
 
@@ -69,11 +68,11 @@ namespace gameplay
 		}
 	}
 
-	void mapmobs::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	void mapmobs::draw(vector2d viewpos)
 	{
 		for (smit<int, mob> mbit = mobs.getit(); mbit.belowtop(); mbit++)
 		{
-			mbit->draw(target, viewpos);
+			mbit->draw(viewpos);
 		}
 	}
 

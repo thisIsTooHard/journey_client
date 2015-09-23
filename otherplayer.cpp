@@ -42,13 +42,13 @@ namespace gameplay
 		}
 	}
 
-	void otherplayer::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	void otherplayer::draw(vector2d viewpos)
 	{
 		vector2d absp = viewpos + getposition();
 
-		look.draw(target, absp);
-		effects.draw(target, absp);
-		name.draw(target, absp);
+		look.draw(absp);
+		effects.draw(absp);
+		name.draw(absp);
 	}
 
 	bool otherplayer::update()

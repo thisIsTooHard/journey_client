@@ -40,8 +40,8 @@ namespace io
 		dragicon(dragicontype, itemicon, texture, vector2d, char, int);
 		dragicon() {}
 		~dragicon() {}
-		void draw(ID2D1HwndRenderTarget*, vector2d);
-		void dragdraw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
+		void dragdraw(vector2d);
 		void setdrag(vector2d, vector2d);
 		void resetdrag() { drag = false; }
 		void setposition(vector2d p) { pos = p; }

@@ -32,12 +32,13 @@ namespace io
 		markpos = default.length();
 	}
 
-	rectangle2d textfield::bounds()
+	rectangle2d textfield::bounds(vector2d parentpos)
 	{
-		return rectangle2d(position, position + vector2d(12 * maxlength, 24));
+		vector2d absp = position + parentpos;
+		return rectangle2d(absp, absp + vector2d(content.getlength(), 24));
 	}
 
-	void textfield::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	void textfield::draw(vector2d parentpos)
 	{
 		if (active)
 		{
@@ -61,7 +62,7 @@ namespace io
 					content.setmarker(false);
 				}
 
-				content.draw(target, absp);
+				content.draw(absp);
 			}
 		}
 	}

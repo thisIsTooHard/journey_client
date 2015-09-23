@@ -36,9 +36,7 @@ namespace program
 		imgcache.init(image_factory);
 		fonts.init(dwrite_factory);
 
-		lookf.init();
-		uinterface.init(&imgcache);
-		uinterface.add(UI_LOGIN);
+		uinterface.init();
 
 		if (result == 0)
 		{
@@ -255,7 +253,7 @@ namespace program
 		{
 			d2d_rtarget->BeginDraw();
 			d2d_rtarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
-			uinterface.draw(d2d_rtarget);
+			uinterface.draw();
 			d2d_rtarget->EndDraw();
 		}
 		else

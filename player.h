@@ -24,16 +24,18 @@
 #include "attackinfo.h"
 #include "skillbook.h"
 #include "questlog.h"
+#include "telerock.h"
+#include "monsterbook.h"
 
-using namespace std;
 using namespace character;
+using namespace data;
 
 namespace gameplay
 {
 	const float FALLSPEED = 7.7f;
 	const float GRAVITYACC = 0.5f;
 	const float JUMPSPEED = 8.5f;
-	const float WALKSPEED = 2.0f;
+	const float WALKSPEED = 1.8f;
 
 	enum moveinput : char
 	{
@@ -46,13 +48,15 @@ namespace gameplay
 
 	enum playerstate : char
 	{
-		PST_STAND,
-		PST_WALK,
-		PST_FALL,
-		PST_PRONE,
-		PST_DASH,
-		PST_SKILL,
-		PST_CLIMB
+		PST_WALK = 2,
+		PST_STAND = 4,
+		PST_FALL = 6,
+		PST_ALERT = 8,
+		PST_PRONE = 10,
+		PST_SWIM = 12,
+		PST_LADDER = 14,
+		PST_ROPE = 16,
+		PST_SKILL = 18
 	};
 
 	class player
@@ -62,6 +66,7 @@ namespace gameplay
 		~player() {}
 		player(maplechar*);
 		void setposition(vector2d);
+		void updatefht();
 		void setlr(ladderrope);
 		void sit(bool);
 		void key_jump(bool);
@@ -70,39 +75,40 @@ namespace gameplay
 		void key_down(bool);
 		void key_up(bool);
 		bool tryattack(attackinfo*, int, short, short);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
-		movefragment update();
+		void draw(vector2d);
 		void setaction(string);
 		void recalcstats(bool);
-		void init(int, skillbook, questlog, pair<vector<int>, vector<int>>, int, map<short, char>, map<short, string>);
+		bool update();
+		float getattspeed();
+		void init(int, skillbook, questlog, map<short, string>);
 		void setinventory(inventory ivt) { invent = ivt; }
-		void setfh(footholdtree* f) { footholds = f; }
-		void setexpression(char c) { look.setexpression(c); }
+		void setexpression(char c) { look->setexpression(c); }
 		bool getleft() { return fleft; }
-		bool onladderrope() { return state == PST_CLIMB; }
 		vector2d getposition() { return vector2d(static_cast<int>(floor(fx)), static_cast<int>(floor(fy))); }
 		rectangle2d bounds() { return rectangle2d(position, position + vector2d(50, 80)); }
-		maplestats* getstats() { return &stats; }
-		maplelook* getlook() { return &look; }
+		maplestats* getstats() { return stats; }
+		maplelook* getlook() { return look; }
 		playereffects* geteffects() { return &effects; }
 		inventory* getinventory() { return &invent; }
 		skillbook* getskills() { return &skills; }
+		telerock* gettrock() { return &trock; }
+		monsterbook* getbook() { return &book; }
 	private:
-		float getattspeed();
-		maplestats stats;
-		maplelook look;
-		textlabel name;
+		maplestats* stats;
+		maplelook* look;
+		playereffects effects;
 		inventory invent;
 		skillbook skills;
-		playereffects effects;
 		questlog quests;
-		pair<vector<int>, vector<int>> trockmaps;
-		int bookcover;
-		map<short, char> bookcards;
+		telerock trock;
+		monsterbook book;
 		map<short, string> areainfo;
-		ladderrope ladrrope;
+		textlabel name;
+		vector<movefragment> moves;
 		footholdtree* footholds;
+		ladderrope* ladrrope;
 		foothold fh;
+		bool fleft;
 		short elapsed;
 		short speed;
 		short jump;
@@ -112,7 +118,6 @@ namespace gameplay
 		float fx;
 		float fy;
 		float ground;
-		bool fleft;
 		bool nofriction;
 		bool candjump;
 		playerstate state;

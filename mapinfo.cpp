@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "mapinfo.h"
 
-namespace gameplay
+namespace data
 {
 	mapinfo::mapinfo(int id, node info, vector2d walls, vector2d borders)
 	{

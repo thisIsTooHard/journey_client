@@ -37,8 +37,8 @@ namespace io
 	public:
 		ui() {}
 		~ui();
-		void init(imagecache*);
-		void draw(ID2D1HwndRenderTarget*);
+		void init();
+		void draw();
 		void update();
 		void add(uielements t) { add(t, 0); }
 		void add(uielements, char);
@@ -63,9 +63,8 @@ namespace io
 		baseinterface base;
 		cursor mouse;
 		keyboard keys;
-		equiptooltip* equipinfo;
-		itemtooltip* miteminfo;
-		tooltip* uiinfo;
+		equiptooltip equipinfo;
+		itemtooltip iteminfo;
 		textfield* activetext;
 		dragicon* activeicon;
 		tooltip* activeinfo;

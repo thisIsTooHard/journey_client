@@ -31,8 +31,6 @@
 #include "mapmobs.h"
 #include "mapnpcs.h"
 #include "mapdrops.h"
-#include "attackfactory.h"
-#include "itemcache.h"
 
 using namespace action;
 using namespace maplemap;
@@ -56,7 +54,8 @@ namespace gameplay
 	public:
 		playfield();
 		~playfield() {}
-		void draw(ID2D1HwndRenderTarget*);
+		void init();
+		void draw();
 		void update();
 		void setfield(int, char);
 		void changechannel(char) {}
@@ -71,23 +70,16 @@ namespace gameplay
 		mapdrops* getdrops() { return &drops; }
 		mapnpcs* getnpcs() { return &npcs; }
 		logininfo* getlogin() { return &login; }
-		itemcache* getitems() { return &items; }
-		attackfactory* getattacks() { return &attfactory; }
 	private:
-		attackfactory attfactory;
-		itemcache items;
-		player playerchar;
-		camera cam;
-		mapinfo maplemap;
-		footholdtree footholds;
-		laddersropes landr;
-		mapbackgrounds backgrounds;
 		map<char, maplayer> layers;
+		mapbackgrounds backgrounds;
+		player playerchar;
 		mapchars chars;
 		mapmobs mobs;
 		mapnpcs npcs;
 		mapdrops drops;
 		mapportals portals;
+		camera cam;
 		logininfo login;
 		bool active;
 	};

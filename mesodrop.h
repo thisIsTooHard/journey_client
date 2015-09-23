@@ -17,22 +17,30 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "drop.h"
-#include "animation.h"
+#include "graphicobject.h"
 
 using namespace graphics;
 
 namespace maplemap
 {
-	class mesodrop : public drop
+	enum mesoamount
+	{
+		MES_BRONZE,
+		MES_GOLD,
+		MES_BUNDLE,
+		MES_BAG
+	};
+
+	class mesodrop : public drop, public graphicobject
 	{
 	public:
-		mesodrop(short, int, int, vector2d, vector2d, char, bool, footholdtree*);
+		mesodrop(short, animation*, int, vector2d, vector2d, char, bool);
 		mesodrop() {}
 		~mesodrop() {}
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		bool update();
 	private:
-		animation anim;
+		animation* anim;
 	};
 }
 

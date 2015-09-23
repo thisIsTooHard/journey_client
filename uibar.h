@@ -28,7 +28,7 @@ namespace io
 		uibar() {}
 		uibar(texture, texture, texture, int, vector2d);
 		~uibar() {}
-		void draw(ID2D1HwndRenderTarget*, vector2d, int, int);
+		void draw(vector2d, float);
 	private:
 		texture front;
 		texture barmid;

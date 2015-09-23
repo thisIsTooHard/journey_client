@@ -24,14 +24,12 @@ namespace io
 	loginwait::loginwait()
 	{
 		app.getimgcache()->setmode(ict_login);
-		nl::nx::view_file("UI");
 
 		node loading = nl::nx::nodes["UI"].resolve("Login.img/Notice/Loading/");
 
 		sprites.push_back(sprite(animation(loading.resolve("backgrnd")), vector2d()));
 		sprites.push_back(sprite(animation(loading.resolve("circle")), vector2d(125, 72)));
 
-		nl::nx::unview_file("UI");
 		app.getimgcache()->unlock();
 		position = vector2d(292, 200);
 		dimensions = vector2d(282, 144);

@@ -25,6 +25,7 @@ namespace graphics
 	{
 		origin = vector2d();
 		dimension = vector2d();
+		shf = vector2d();
 		loaded = false;
 	}
 
@@ -44,6 +45,7 @@ namespace graphics
 
 		source = app.getimgcache()->createimage(bmp);
 		dimension = vector2d(bmp.width(), bmp.height());
+		shf = vector2d();
 
 		loaded = bmp.width() > 0 && bmp.height() > 0;
 	}
@@ -58,6 +60,11 @@ namespace graphics
 		draw(position, vector2d(), 1.0f, false);
 	}
 
+	void texture::draw(vector2d position, float xscale, float yscale)
+	{
+		draw(position, vector2d(), 1.0f, xscale, yscale);
+	}
+
 	void texture::draw(vector2d position, bool flip)
 	{
 		draw(position, vector2d(), 1.0f, flip);
@@ -68,12 +75,27 @@ namespace graphics
 		draw(position, vector2d(), alpha, false);
 	}
 
+	void texture::draw(vector2d position, float alpha, bool flip)
+	{
+		draw(position, vector2d(), alpha, flip);
+	}
+
 	void texture::draw(vector2d position, vector2d stretch)
 	{
 		draw(position, stretch, 1.0f, false);
 	}
 
+	void texture::draw(vector2d position, vector2d stretch, bool flip)
+	{
+		draw(position, stretch, 1.0f, flip);
+	}
+
 	void texture::draw(vector2d position, vector2d stretch, float alpha, bool flip)
+	{
+		draw(position, stretch, 1.0f, flip ? -1.0f : 1.0f, 1.0f);
+	}
+
+	void texture::draw(vector2d position, vector2d stretch, float alpha, float xscale, float yscale)
 	{
 		if (loaded)
 		{
@@ -85,22 +107,26 @@ namespace graphics
 			if (h == 0)
 				h = dimension.y();
 
-			vector2d absp = position - origin;
+			vector2d absp = position - origin + shf;
 
 			if (absp.x() <= 816 && absp.y() <= 624 && absp.x() > -dimension.x() && absp.y() > -dimension.y())
 			{
-				D2D1_RECT_F r = { static_cast<float>(absp.x()),
+				D2D1_RECT_F r = { 
+					static_cast<float>(absp.x()),
 					static_cast<float>(absp.y()),
 					static_cast<float>(absp.x() + w),
-					static_cast<float>(absp.y() + h) };
+					static_cast<float>(absp.y() + h) 
+				};
 
-				app.getimgcache()->draw(source.first, source.second, r, alpha);
+				if (xscale != 1.0f || yscale != 1.0f)
+				{
+					app.getimgcache()->draw(source.first, source.second, r, alpha, xscale, yscale, position);
+				}
+				else
+				{
+					app.getimgcache()->draw(source.first, source.second, r, alpha);
+				}
 			}
 		}
-	}
-
-	void texture::shift(vector2d shf)
-	{
-		origin = origin - shf;
 	}
 }

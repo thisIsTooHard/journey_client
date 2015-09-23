@@ -85,6 +85,27 @@ namespace program
 		}
 	}
 
+	void imagecache::draw(imgcontext ict, size_t id, D2D1_RECT_F r, float alpha, float xscale, float yscale, vector2d center)
+	{
+		target->SetTransform(
+			D2D1::Matrix3x2F::Scale(
+			D2D1::Size(xscale, yscale),
+			D2D1::Point2F(
+			static_cast<float>(center.x()),
+			static_cast<float>(center.y())
+			)));
+
+		draw(ict, id, r, alpha);
+
+		target->SetTransform(
+			D2D1::Matrix3x2F::Scale(
+			D2D1::Size(1.0f, 1.0f),
+			D2D1::Point2F(
+			static_cast<float>(center.x()),
+			static_cast<float>(center.y())
+			)));
+	}
+
 	void imagecache::setmode(imgcontext ict)
 	{
 		modelock.lock();

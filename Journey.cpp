@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
+#pragma once
 #include "Journey.h"
 
 HANDLE gTimerDoneEvent;
@@ -23,7 +24,9 @@ HANDLE hTimerQueue = NULL;
 
 packetcreator packet_c;
 winapp app;
+//window app;
 session server;
+datacache cache;
 settings config;
 
 int result = 0;
@@ -73,6 +76,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					if (WaitForSingleObject(gTimerDoneEvent, DPF) == WAIT_OBJECT_0)
 					{
 						server.receive();
+						//app.draw();
 
 						if (GetMessage(&winmsg, NULL, 0, 0))
 						{

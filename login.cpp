@@ -24,7 +24,6 @@ namespace io
 	login::login()
 	{
 		app.getimgcache()->setmode(ict_login);
-		nl::nx::view_file("UI");
 
 		node title = nl::nx::nodes["UI"]["Login.img"]["Title"];
 		node common = nl::nx::nodes["UI"]["Login.img"]["Common"];
@@ -66,7 +65,6 @@ namespace io
 			app.getui()->settextfield(&textfields[TXT_ACC]);
 		}
 
-		nl::nx::unview_file("UI");
 		app.getimgcache()->unlock();
 		position = vector2d(0, 0);
 		dimensions = vector2d(800, 600);
@@ -75,9 +73,9 @@ namespace io
 		buttoncd = 0;
 	}
 
-	void login::draw(ID2D1HwndRenderTarget* target)
+	void login::draw()
 	{
-		uielement::draw(target);
+		uielement::draw();
 
 		if (active)
 		{

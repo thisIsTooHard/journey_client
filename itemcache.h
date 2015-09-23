@@ -16,18 +16,18 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "iteminfo.h"
+#include "itemdata.h"
 
-namespace gameplay
+namespace data
 {
 	class itemcache
 	{
 	public:
 		itemcache() {}
 		~itemcache() {}
-		iteminfo* getitem(int);
+		itemdata* getitem(int);
 	private:
-		map<int, iteminfo> items;
+		map<int, itemdata> items;
 	};
 }
 

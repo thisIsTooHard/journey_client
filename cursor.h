@@ -16,15 +16,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "stdfax.h"
-#include "animation.h"
+#include "graphicobject.h"
 
-using namespace std;
 using namespace graphics;
 
 namespace io
 {
-	enum mousestate : char {
+	enum mousestate : char 
+	{
 		MST_IDLE = 0,
 		MST_CANCLICK = 1,
 		MST_GAME = 2,
@@ -41,21 +40,21 @@ namespace io
 		MST_RCLICK = 13
 	};
 
-	class cursor
+	class cursor : public graphicobject
 	{
 	public:
 		cursor();
 		~cursor() {}
-		void init(imagecache*);
-		void draw(ID2D1HwndRenderTarget*);
-		void setstate(mousestate s) { state = s; }
-		void update() { sprites[state].update(); }
+		void init();
+		void draw();
+		void setstate(mousestate);
+		void update() { graphicobject::update(&animations[state]); }
 		void setposition(vector2d p) { position = p; }
 		mousestate getstate() { return state; }
 		vector2d getposition() { return position; }
 	private:
 		mousestate state;
-		map<mousestate, animation> sprites;
+		map<mousestate, animation> animations;
 		vector2d position;
 	};
 }

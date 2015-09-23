@@ -17,30 +17,33 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "laddersropes.h"
 
-namespace gameplay
+namespace data
 {
 	laddersropes::laddersropes(node src)
 	{
 		for (node lrnode = src.begin(); lrnode != src.end(); ++lrnode)
 		{
 			ladderrope lr;
-			lr.vertical = vector2d(lrnode["y1"], lrnode["y2"]);
 			lr.x = lrnode["x"];
 			lr.ladder = lrnode["l"].get_bool();
+			lr.vertical = vector2d(lrnode["y1"], lrnode["y2"]);
 			landr.push_back(lr);
 		}
 	}
 
-	ladderrope laddersropes::getlr(vector2d pos)
+	ladderrope* laddersropes::getlr(vector2d pos, bool up)
 	{
 		for (vector<ladderrope>::iterator lrit = landr.begin(); lrit != landr.end(); ++lrit)
 		{
-			if (vector2d(pos.x() - 25, pos.x() + 25).contains(lrit->x) && lrit->vertical.contains(pos.y()))
+			ladderrope* lr = lrit._Ptr;
+			vector2d hor = vector2d(pos.x() - 50, pos.x() + 50);
+			vector2d ver = up ? vector2d(lr->vertical.x(), lr->vertical.y() + 5) : vector2d(lr->vertical.x() - 5, lr->vertical.y());
+			if (hor.contains(lr->x) && ver.contains(pos.y()))
 			{
-				return *lrit;
+				return lr;
 			}
 		}
 
-		return ladderrope();
+		return 0;
 	}
 }

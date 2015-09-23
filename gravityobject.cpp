@@ -15,63 +15,97 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
+#pragma once
 #include "gravityobject.h"
+#include "Journey.h"
 
 namespace action
 {
-	gravityobject::gravityobject(vector2d pos, footholdtree* fht)
+	gravityobject::gravityobject()
+	{
+		fx = 0.0f;
+		fy = 0.0f;
+		hspeed = 0;
+		vspeed = 0;
+
+		updatefht();
+	}
+
+	gravityobject::gravityobject(vector2d pos)
 	{
 		fx = static_cast<float>(pos.x());
 		fy = static_cast<float>(pos.y());
-		footholds = fht;
-		fh = fht->getbelow(pos);
 		hspeed = 0;
 		vspeed = 0;
+
+		updatefht();
 	}
 
 	bool gravityobject::update()
 	{
 		bool groundhit = false;
 
-		if (hspeed != 0 && vspeed == 0)
+		if (footholds)
 		{
-			if (fx > fh.horizontal.y())
+			if (hspeed != 0 && vspeed == 0)
 			{
-				fh = footholds->getnext(false, fh);
+				if (fx > fh.horizontal.y())
+				{
+					fh = footholds->getnext(false, fh);
+				}
+				else if (fx < fh.horizontal.x())
+				{
+					fh = footholds->getnext(true, fh);
+				}
 			}
-			else if (fx < fh.horizontal.x())
+			else
 			{
-				fh = footholds->getnext(true, fh);
+				fh = footholds->getbelow(getposition());
 			}
-		}
-		else
-		{
-			fh = footholds->getbelow(getposition());
-		}
 
-		float ground = fh.resolvex(static_cast<int>(fx));
+			float ground = fh.resolvex(static_cast<int>(fx));
 
-		if (ground - fy <= fh.getslope() * abs(hspeed))
-		{
-			fy = ground;
-			groundhit = true;
-		}
-
-		if (ground > fy)
-		{
-			vspeed += grvacc;
-			vspeed = min(vspeed, maxvspeed);
-
-			if (fy + vspeed >= ground)
+			if (ground - fy <= fh.getslope() * abs(hspeed))
 			{
-				vspeed = 0;
 				fy = ground;
 				groundhit = true;
 			}
+
+			if (ground > fy)
+			{
+				vspeed += GRAVITYACC;
+				if (vspeed > MAXVSPEED)
+				{
+					vspeed = MAXVSPEED;
+				}
+
+				if (fy + vspeed >= ground)
+				{
+					vspeed = 0;
+					fy = ground;
+					groundhit = true;
+				}
+			}
 		}
 
-		bool moveend = moveobject::update();
+		moveobject::update();
 
 		return groundhit;
+	}
+
+	bool gravityobject::updatefht()
+	{
+		footholds = cache.getmap()->getfht();
+
+		if (footholds)
+		{
+			fh = footholds->getbelow(getposition());
+		}
+		else
+		{
+			fh = foothold();
+		}
+
+		return footholds == 0;
 	}
 }

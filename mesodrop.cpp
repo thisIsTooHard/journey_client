@@ -21,37 +21,20 @@
 
 namespace maplemap
 {
-	mesodrop::mesodrop(short o, int id, int own, vector2d pos, vector2d dst, char type, bool pld, footholdtree* fht)
+	mesodrop::mesodrop(short o, animation* ani, int own, vector2d pos, vector2d dst, char type, bool pld)
 	{
 		oid = o;
-
-		nl::node mesonode;
-		if (id > 999)
-		{
-			mesonode = nx::nodes["Item"]["Special"]["0900.img"]["09000003"]["iconRaw"];
-		}
-		else if (id > 99)
-		{
-			mesonode = nx::nodes["Item"]["Special"]["0900.img"]["09000002"]["iconRaw"];
-		}
-		else if (id > 9)
-		{
-			mesonode = nx::nodes["Item"]["Special"]["0900.img"]["09000001"]["iconRaw"];
-		}
-		else
-		{
-			mesonode = nx::nodes["Item"]["Special"]["0900.img"]["09000000"]["iconRaw"];
-		}
-		anim = animation(mesonode);
-
+		anim = ani;
 		owner = own;
 		pickuptype = type;
 		playerdrop = pld;
 
-		footholds = fht;
-		fh = footholds->getbelow(pos);
 		fx = static_cast<float>(pos.x());
 		fy = static_cast<float>(pos.y());
+
+		updatefht();
+
+		dalpha = 1.0f;
 		alpha = 1.0f;
 		moved = 0.0f;
 
@@ -70,11 +53,11 @@ namespace maplemap
 		}
 	}
 
-	void mesodrop::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	void mesodrop::draw(vector2d viewpos)
 	{
 		if (state != DST_INACTIVE)
 		{
-			anim.draw(target, viewpos + getposition(), alpha);
+			graphicobject::draw(anim, pos + viewpos, false);
 		}
 	}
 
@@ -82,8 +65,9 @@ namespace maplemap
 	{
 		if (state != DST_INACTIVE)
 		{
-			anim.update(8);
+			graphicobject::update(anim, 8);
 		}
+		alpha = dalpha;
 
 		return drop::update();
 	}

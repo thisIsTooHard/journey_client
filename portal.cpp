@@ -19,7 +19,7 @@
 
 namespace maplemap
 {
-	portal::portal(portaltype tp, string nm, int tid, bool in, string tpn, animation ani, vector2d pos)
+	portal::portal(portaltype tp, string nm, int tid, bool in, string tpn, animation* ani, vector2d pos)
 	{
 		type = tp;
 		name = nm;
@@ -31,17 +31,17 @@ namespace maplemap
 		touched = false;
 	}
 
-	void portal::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	void portal::draw(vector2d parentpos)
 	{
 		if (type == PT_REGULAR)
 		{
-			anim.draw(target, position + parentpos);
+			graphicobject::draw(anim, position + parentpos, false);
 		}
 		else if (type == PT_HIDDEN || type == PT_SCRIPTED_HIDDEN)
 		{
 			if (touched)
 			{
-				anim.draw(target, position + parentpos);
+				graphicobject::draw(anim, position + parentpos, false);
 			}
 		}
 	}

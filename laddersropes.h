@@ -18,13 +18,13 @@
 #pragma once
 #include "stdfax.h"
 #include "node.h"
-#include "vector2d.h"
+#include "rectangle2d.h"
 
 using namespace nl;
 using namespace util;
 using namespace std;
 
-namespace gameplay
+namespace data
 {
 	struct ladderrope
 	{
@@ -39,7 +39,7 @@ namespace gameplay
 		laddersropes(node);
 		laddersropes() {}
 		~laddersropes() {}
-		ladderrope getlr(vector2d);
+		ladderrope* getlr(vector2d, bool);
 	private:
 		vector<ladderrope> landr;
 	};

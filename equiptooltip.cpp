@@ -21,10 +21,8 @@
 
 namespace io
 {
-	equiptooltip::equiptooltip(imagecache* imgcache)
+	void equiptooltip::init()
 	{
-		imgcache->setmode(ict_sys);
-
 		node itemtt = nx::nodes["UI"]["UIToolTip.img"]["Item"];
 
 		top = texture(itemtt["Frame"]["top"]);
@@ -71,11 +69,8 @@ namespace io
 		jobs[true][4] = texture(itemtt["Equip"]["Job"]["enable"]["4"]);
 		jobs[true][5] = texture(itemtt["Equip"]["Job"]["enable"]["5"]);
 
-		imgcache->unlock();
-
-		position = vector2d();
-		info = textlabel(DWF_12L, TXC_WHITE, "");
-		flag = textlabel(DWF_12L, TXC_YELLOW, "");
+		itemid = 0;
+		slot = 0;
 		active = false;
 	}
 
@@ -220,7 +215,7 @@ namespace io
 				{
 					statstr.append(" (");
 					statstr.append((delta < 0) ? "-" : "+");
-					statstr.append(to_string(delta) + ")");
+					statstr.append(to_string(abs(delta)) + ")");
 				}
 				statlabels[es] = textlabel(DWF_12LL, TXC_WHITE, cloth->getdisplaystat(es) + ": " + statstr);
 			}
@@ -233,18 +228,18 @@ namespace io
 		active = true;
 	}
 
-	void equiptooltip::draw(ID2D1HwndRenderTarget* target, vector2d pos)
+	void equiptooltip::draw(vector2d pos)
 	{
 		if (active)
 		{
 			top.draw(pos);
 			mid.draw(pos + vector2d(0, 13), vector2d(0, filllength));
 			bot.draw(pos + vector2d(0, filllength + 13));
-			name.draw(target, pos + vector2d(130, 3));
+			name.draw(pos + vector2d(130, 3));
 
 			if (equip->getrank() != PTR_NONE)
 			{
-				potflag.draw(target, pos + vector2d(130, 20));
+				potflag.draw(pos + vector2d(130, 20));
 				pos = pos + vector2d(0, 16);
 			}
 
@@ -257,21 +252,8 @@ namespace io
 
 			vector2d iconpos = pos + vector2d(20, 82);
 
-			target->SetTransform(
-				D2D1::Matrix3x2F::Scale(
-				D2D1::Size(2.0f, 2.0f),
-				D2D1::Point2F(
-				static_cast<float>(iconpos.x()),
-				static_cast<float>(iconpos.y()))));
-
-			cloth->geticon(true).draw(iconpos);
-
-			target->SetTransform(
-				D2D1::Matrix3x2F::Scale(
-				D2D1::Size(1.0f, 1.0f),
-				D2D1::Point2F(
-				static_cast<float>(iconpos.x()),
-				static_cast<float>(iconpos.y()))));
+			texture* ico = &cloth->geticon(true);
+			ico->draw(iconpos, 2.0f, 2.0f);
 
 			potential[rank].draw(pos + vector2d(10, 10));
 			cover.draw(pos + vector2d(10, 10));
@@ -316,27 +298,27 @@ namespace io
 
 			pos = pos + vector2d(0, 32);
 
-			category.draw(target, pos + vector2d(10, 0));
+			category.draw(pos + vector2d(10, 0));
 
 			pos = pos + vector2d(0, 18);
 
 			if (cloth->getwspeed() > 0)
 			{
-				wepspeed.draw(target, pos + vector2d(10, 0));
+				wepspeed.draw(pos + vector2d(10, 0));
 				pos = pos + vector2d(0, 18);
 			}
 
 			for (map<equipstat, textlabel>::iterator stit = statlabels.begin(); stit != statlabels.end(); ++stit)
 			{
-				stit->second.draw(target, pos + vector2d(10, 0));
+				stit->second.draw(pos + vector2d(10, 0));
 				pos = pos + vector2d(0, 18);
 			}
 
 			if (cloth->getslots() > 0)
 			{
-				slots.draw(target, pos + vector2d(10, 0));
+				slots.draw(pos + vector2d(10, 0));
 				pos = pos + vector2d(0, 18); 
-				hammers.draw(target, pos + vector2d(10, 0));
+				hammers.draw(pos + vector2d(10, 0));
 				pos = pos + vector2d(0, 18);
 			}
 		}

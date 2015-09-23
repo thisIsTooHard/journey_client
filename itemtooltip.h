@@ -17,24 +17,25 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "tooltip.h"
-#include "iteminfo.h"
+#include "itemdata.h"
 
-using namespace gameplay;
+using namespace data;
 
 namespace io
 {
 	class itemtooltip : public tooltip
 	{
 	public:
-		itemtooltip(imagecache*);
+		itemtooltip() {}
 		~itemtooltip() {}
-		void draw(ID2D1HwndRenderTarget*, vector2d);
-		void setitem(iteminfo*);
+		void init();
+		void draw(vector2d);
+		void setitem(itemdata*);
 		void clear() { itemid = 0; }
 		int getid() { return itemid; }
 	private:
 		int itemid;
-		iteminfo* item;
+		itemdata* item;
 		int filllength;
 		textlabel name;
 		texture top;

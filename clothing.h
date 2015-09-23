@@ -66,6 +66,7 @@ namespace character
 		bool istwo_h() { return isweapon() ? twohanded : false; }
 		byte getwspeed() { return isweapon() ? attackspeed : 0; }
 		byte getattack() { return isweapon() ? attack : 0; }
+		rectangle2d getrange();
 		weapontype getweptype() { return isweapon() ? weptype : WEP_NONE; }
 		byte getslots() { return slots; }
 		int getid() { return itemid; }

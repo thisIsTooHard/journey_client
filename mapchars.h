@@ -31,7 +31,7 @@ namespace maplemap
 		void addchar(int, maplelook, byte, short, string, vector2d);
 		void movechar(int, vector<movefragment>);
 		void removechar(int);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		void update();
 		void clear() { chars.clear(); }
 	private:

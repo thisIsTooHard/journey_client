@@ -18,60 +18,49 @@
 #pragma once
 #include "animation.h"
 #include "attackinfo.h"
-#include "charset.h"
+#include "mobdata.h"
+#include "maplelook.h"
+#include "graphicobject.h"
 #include "gravityobject.h"
 
 using namespace graphics;
 using namespace action;
+using namespace data;
 
 namespace gameplay
 {
 	const int DAMAGECAP = 999999;
 
-	class mob : public gravityobject
+	class mob : public graphicobject, public gravityobject
 	{
 	public:
-		mob(int, int, bool, vector2d, char, short, char, bool, char, footholdtree*);
+		mob(int, int, bool, vector2d, char, short, char, bool, char);
 		mob() {}
 		~mob() {}
 		bool update();
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		void damage(attackinfo*);
 		void showhp(char);
 		void setmove(char, bool);
 		void kill(char);
 		rectangle2d bounds();
-		void setstate(string st) { state = st; }
+		void setstate(string);
+		pair<int, bool> calcdamage(uniform_int_distribution<int>, float, float);
 		void makeactive() { active = true; }
 		bool isalive() { return state != "die1"; }
 		bool isactive() { return active && isalive(); }
 	private:
-		pair<int, bool> calcdamage(uniform_int_distribution<int>, float, float);
 		void sendmoves(byte);
-		map<string, animation> textures;
-		map<string, texture> uitextures;
-		map<string, rectangle2d> hitrect;
-		float alpha;
+		mobdata* mdata;
+		int mid;
 		bool active;
 		int oid;
-		int mid;
-		string name;
-		string sndpath;
-		short level;
-		short speed;
-		short watk;
-		short matk;
-		short wdef;
-		short mdef;
-		short acc;
-		short eva;
-		short knockback;
-		bool undead;
-		bool touchdamage;
 		char hppercent;
+		vector<movefragment> moves;
 		vector2d absp;
 		vector2d walls;
 		string state;
+		short speed;
 		bool control;
 		byte moved;
 		char stance;

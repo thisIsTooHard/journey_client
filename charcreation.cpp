@@ -193,7 +193,7 @@ namespace io
 		newchar = maplelook(info);
 		newchar.setposition(vector2d(360, 348));
 		newchar.setfleft(false);
-		app.getlookfactory()->loadcharlook(&newchar);
+		cache.getequips()->loadcharlook(&newchar);
 
 		app.getimgcache()->unlock();
 		position = vector2d(0, 0);
@@ -276,67 +276,67 @@ namespace io
 			{
 			case BT_CHARC_FACEL:
 				face = (face > 0) ? face - 1 : faces[female].size() - 1;
-				newchar.setface(app.getlookfactory()->getface(faces[female][face]));
+				newchar.setface(cache.getequips()->getface(faces[female][face]));
 				break;
 			case BT_CHARC_FACER:
 				face = (face < faces[female].size() - 1) ? face + 1 : 0;
-				newchar.setface(app.getlookfactory()->getface(faces[female][face]));
+				newchar.setface(cache.getequips()->getface(faces[female][face]));
 				break;
 			case BT_CHARC_HAIRL:
 				hair = (hair > 0) ? hair - 1 : hairs[female].size() - 1;
-				newchar.sethair(app.getlookfactory()->gethair(hairs[female][hair] + haircolors[female][haircolor]));
+				newchar.sethair(cache.getequips()->gethair(hairs[female][hair] + haircolors[female][haircolor]));
 				break;
 			case BT_CHARC_HAIRR:
 				hair = (hair < hairs[female].size() - 1) ? hair + 1 : 0;
-				newchar.sethair(app.getlookfactory()->gethair(hairs[female][hair] + haircolors[female][haircolor]));
+				newchar.sethair(cache.getequips()->gethair(hairs[female][hair] + haircolors[female][haircolor]));
 				break;
 			case BT_CHARC_HAIRCL:
 				haircolor = (haircolor > 0) ? haircolor - 1 : haircolors[female].size() - 1;
-				newchar.sethair(app.getlookfactory()->gethair(hairs[female][hair] + haircolors[female][haircolor]));
+				newchar.sethair(cache.getequips()->gethair(hairs[female][hair] + haircolors[female][haircolor]));
 				break;
 			case BT_CHARC_HAIRCR:
 				haircolor = (haircolor < haircolors[female].size() - 1) ? haircolor + 1 : 0;
-				newchar.sethair(app.getlookfactory()->gethair(hairs[female][hair] + haircolors[female][haircolor]));
+				newchar.sethair(cache.getequips()->gethair(hairs[female][hair] + haircolors[female][haircolor]));
 				break;
 			case BT_CHARC_SKINL:
 				skin = (skin > 0) ? skin - 1 : skins[female].size() - 1;
-				newchar.setbody(app.getlookfactory()->getbody(skins[female][skin]));
+				newchar.setbody(cache.getequips()->getbody(skins[female][skin]));
 				break;
 			case BT_CHARC_SKINR:
 				skin = (skin < skins[female].size() - 1) ? skin + 1 : 0;
-				newchar.setbody(app.getlookfactory()->getbody(skins[female][skin]));
+				newchar.setbody(cache.getequips()->getbody(skins[female][skin]));
 				break;
 			case BT_CHARC_TOPL:
 				top = (top > 0) ? top - 1 : tops[female].size() - 1;
-				newchar.addcloth(app.getlookfactory()->getcloth(tops[female][top]));
+				newchar.addcloth(cache.getequips()->getcloth(tops[female][top]));
 				break;
 			case BT_CHARC_TOPR:
 				top = (top < tops[female].size() - 1) ? top + 1 : 0;
-				newchar.addcloth(app.getlookfactory()->getcloth(tops[female][top]));
+				newchar.addcloth(cache.getequips()->getcloth(tops[female][top]));
 				break;
 			case BT_CHARC_BOTL:
 				bot = (bot > 0) ? bot - 1 : bots[female].size() - 1;
-				newchar.addcloth(app.getlookfactory()->getcloth(bots[female][bot]));
+				newchar.addcloth(cache.getequips()->getcloth(bots[female][bot]));
 				break;
 			case BT_CHARC_BOTR:
 				bot = (bot < bots[female].size() - 1) ? bot + 1 : 0;
-				newchar.addcloth(app.getlookfactory()->getcloth(bots[female][bot]));
+				newchar.addcloth(cache.getequips()->getcloth(bots[female][bot]));
 				break;
 			case BT_CHARC_SHOESL:
 				shoe = (shoe > 0) ? shoe - 1 : shoes[female].size() - 1;
-				newchar.addcloth(app.getlookfactory()->getcloth(shoes[female][shoe]));
+				newchar.addcloth(cache.getequips()->getcloth(shoes[female][shoe]));
 				break;
 			case BT_CHARC_SHOESR:
 				shoe = (shoe < shoes[female].size() - 1) ? shoe + 1 : 0;
-				newchar.addcloth(app.getlookfactory()->getcloth(shoes[female][shoe]));
+				newchar.addcloth(cache.getequips()->getcloth(shoes[female][shoe]));
 				break;
 			case BT_CHARC_WEPL:
 				weapon = (weapon > 0) ? weapon - 1 : weapons[female].size() - 1;
-				newchar.addcloth(app.getlookfactory()->getcloth(weapons[female][weapon]));
+				newchar.addcloth(cache.getequips()->getcloth(weapons[female][weapon]));
 				break;
 			case BT_CHARC_WEPR:
 				weapon = (weapon < weapons[female].size() - 1) ? weapon + 1 : 0;
-				newchar.addcloth(app.getlookfactory()->getcloth(weapons[female][weapon]));
+				newchar.addcloth(cache.getequips()->getcloth(weapons[female][weapon]));
 				break;
 			case BT_CHARC_GENDERL:
 			case BT_CHARC_GEMDERR:
@@ -362,13 +362,13 @@ namespace io
 				uniform_int_distribution<size_t> weapon_d(0, weapons[female].size() - 1);
 				weapon = weapon_d(e1);
 
-				newchar.setbody(app.getlookfactory()->getbody(skins[female][skin]));
-				newchar.setface(app.getlookfactory()->getface(faces[female][face]));
-				newchar.sethair(app.getlookfactory()->gethair(hairs[female][hair] + haircolors[female][haircolor]));
-				newchar.addcloth(app.getlookfactory()->getcloth(tops[female][top]));
-				newchar.addcloth(app.getlookfactory()->getcloth(bots[female][bot]));
-				newchar.addcloth(app.getlookfactory()->getcloth(shoes[female][shoe]));
-				newchar.addcloth(app.getlookfactory()->getcloth(weapons[female][weapon]));
+				newchar.setbody(cache.getequips()->getbody(skins[female][skin]));
+				newchar.setface(cache.getequips()->getface(faces[female][face]));
+				newchar.sethair(cache.getequips()->gethair(hairs[female][hair] + haircolors[female][haircolor]));
+				newchar.addcloth(cache.getequips()->getcloth(tops[female][top]));
+				newchar.addcloth(cache.getequips()->getcloth(bots[female][bot]));
+				newchar.addcloth(cache.getequips()->getcloth(shoes[female][shoe]));
+				newchar.addcloth(cache.getequips()->getcloth(weapons[female][weapon]));
 				break;
 			}
 			app.getimgcache()->unlock();
@@ -413,7 +413,7 @@ namespace io
 		}
 	}
 
-	void charcreation::draw(ID2D1HwndRenderTarget* target)
+	void charcreation::draw()
 	{
 		if (active)
 		{
@@ -431,34 +431,34 @@ namespace io
 
 			if (!named)
 			{
-				nameboard.draw(target, position);
+				nameboard.draw(position);
 			}
 			else
 			{
 				for (vector<sprite>::iterator lbit = lookboard.begin(); lbit != lookboard.end(); ++lbit)
 				{
-					lbit->draw(target, position);
+					lbit->draw(position);
 				}
 			}
 		}
 
-		uielement::draw(target);
+		uielement::draw();
 
 		if (active)
 		{
-			newchar.draw(target, position);
+			newchar.draw(position);
 
 			if (named)
 			{
-				setlabel.draw(newchar.getface()->getname(), target, vector2d(591, 214));
-				setlabel.draw(newchar.gethair()->getname(), target, vector2d(591, 233));
-				setlabel.draw(newchar.gethair()->getcolor(), target, vector2d(591, 252));
-				setlabel.draw(newchar.getbody()->getname(), target, vector2d(591, 271));
-				setlabel.draw(newchar.getcloth(EQL_COAT)->getname(), target, vector2d(591, 290));
-				setlabel.draw(newchar.getcloth(EQL_PANTS)->getname(), target, vector2d(591, 309));
-				setlabel.draw(newchar.getcloth(EQL_SHOES)->getname(), target, vector2d(591, 328));
-				setlabel.draw(newchar.getcloth(EQL_WEAPON)->getname(), target, vector2d(591, 347));
-				setlabel.draw(female? "Female" : "Male", target, vector2d(591, 366));
+				setlabel.draw(newchar.getface()->getname(), vector2d(591, 214));
+				setlabel.draw(newchar.gethair()->getname(), vector2d(591, 233));
+				setlabel.draw(newchar.gethair()->getcolor(), vector2d(591, 252));
+				setlabel.draw(newchar.getbody()->getname(), vector2d(591, 271));
+				setlabel.draw(newchar.getcloth(EQL_COAT)->getname(), vector2d(591, 290));
+				setlabel.draw(newchar.getcloth(EQL_PANTS)->getname(), vector2d(591, 309));
+				setlabel.draw(newchar.getcloth(EQL_SHOES)->getname(), vector2d(591, 328));
+				setlabel.draw(newchar.getcloth(EQL_WEAPON)->getname(), vector2d(591, 347));
+				setlabel.draw(female? "Female" : "Male", vector2d(591, 366));
 			}
 		}
 	}

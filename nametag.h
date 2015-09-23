@@ -31,7 +31,7 @@ namespace io
 		~nametag() {}
 		nametag(dwfonts, textcolor, vector<texture>, string, vector2d);
 		nametag(dwfonts, textcolor, map<bool, vector<texture>>, string, vector2d, bool);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		void setstate(bool a) { active = a; }
 	private:
 		textlabel content;

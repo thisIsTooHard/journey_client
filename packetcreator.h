@@ -69,16 +69,16 @@ namespace net
 		void playerlogin(int);
 		void checkcharname(string);
 		void createchar(string, int, int, int, int, int, int, int, int, int, bool);
-		void moveplayer(movefragment);
+		void moveplayer(vector<movefragment>*);
 		void changemap(bool, int, string, bool);
 		void close_attack(attackinfo);
 		void general_chat(string, bool);
 		void useitem(short, int);
 		void spendap(maplestat);
-		void movemonster(int, short, byte, byte, byte, byte, byte, byte, vector2d, vector<movefragment>);
+		void movemonster(int, short, byte, byte, byte, byte, byte, byte, vector2d, vector<movefragment>*);
 	private:
 		void send(packet*);
-		void writemoves(packet*, vector<movefragment>);
+		void writemoves(packet*, vector<movefragment>*);
 		unique_ptr<session> server;
 		byte version;
 	};

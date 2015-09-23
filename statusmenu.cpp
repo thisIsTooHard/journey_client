@@ -48,13 +48,13 @@ namespace io
 		buttoncd = 0;
 	}
 
-	void statusmenu::draw(ID2D1HwndRenderTarget* target)
+	void statusmenu::draw()
 	{
 		if (active)
 		{
 			backfill.draw(position + vector2d(0, 34), vector2d(0, 116));
 
-			uielement::draw(target);
+			uielement::draw();
 		}
 	}
 

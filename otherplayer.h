@@ -30,7 +30,7 @@ namespace gameplay
 		otherplayer(maplelook, byte, short, string, vector2d);
 		otherplayer() {}
 		~otherplayer() {}
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		bool update();
 		void addmoves(vector<movefragment>);
 	private:

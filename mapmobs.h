@@ -33,13 +33,11 @@ namespace gameplay
 		void sendmobhp(int, char);
 		void movemob(int, char, bool);
 		void killmob(int, char);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		void update();
 		void clear();
-		void setfh(footholdtree* f) { footholds = f; }
 	private:
 		safemap<int, mob> mobs;
-		footholdtree* footholds;
 	};
 }
 

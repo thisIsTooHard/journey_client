@@ -41,8 +41,8 @@ namespace io
 		button(vector2d, vector2d);
 		button() {}
 		~button() {}
-		pair<vector2d, vector2d> bounds();
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
+		rectangle2d bounds(vector2d);
 		void setstate(string s) { state = s; }
 		void setposition(vector2d p) { position = p; }
 		void setactive(bool a) { active = a; }

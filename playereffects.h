@@ -16,7 +16,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "effect.h"
+#include "sprite.h"
+#include "safemap.h"
 
 using namespace graphics;
 
@@ -25,15 +26,14 @@ namespace gameplay
 	class playereffects
 	{
 	public:
-		playereffects();
+		playereffects() { top = 0; }
 		~playereffects() {}
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		void update();
-		void add(effect);
+		void add(sprite);
 	private:
-		map<int, effect> effects;
+		safemap<int, sprite> effects;
 		int top;
-		SRWLOCK efflock;
 	};
 }
 

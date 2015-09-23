@@ -31,7 +31,7 @@ namespace io
 	public:
 		statusbar(maplestats*);
 		~statusbar() {}
-		void draw(ID2D1HwndRenderTarget*);
+		void draw();
 		void update();
 		void buttonpressed(short);
 		rectangle2d bounds();

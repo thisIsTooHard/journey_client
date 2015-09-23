@@ -24,7 +24,7 @@ using namespace util;
 using namespace std;
 using namespace nl;
 
-namespace gameplay
+namespace data
 {
 	struct foothold
 	{
@@ -55,11 +55,12 @@ namespace gameplay
 		~footholdtree() {}
 		float getgroundbelow(vector2d);
 		float nextground(bool, vector2d);
-		foothold getnext(bool, foothold);
-		foothold getbelow(vector2d);
 		vector2d getwalls();
 		vector2d getborders();
 		vector2d getpfedges(short);
+		foothold getfh(short);
+		foothold getnext(bool, foothold);
+		foothold getbelow(vector2d);
 	private:
 		map<short, foothold> footholds;
 		vector<map<short, short>> platforms;

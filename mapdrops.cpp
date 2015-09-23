@@ -21,6 +21,14 @@
 
 namespace maplemap
 {
+	void mapdrops::init()
+	{
+		mesos[MES_BRONZE] = animation(nx::nodes["Item"]["Special"]["0900.img"]["09000000"]["iconRaw"]);
+		mesos[MES_GOLD] = animation(nx::nodes["Item"]["Special"]["0900.img"]["09000001"]["iconRaw"]);
+		mesos[MES_BUNDLE] = animation(nx::nodes["Item"]["Special"]["0900.img"]["09000002"]["iconRaw"]);
+		mesos[MES_BAG] = animation(nx::nodes["Item"]["Special"]["0900.img"]["09000003"]["iconRaw"]);
+	}
+
 	void mapdrops::adddrop(short oid, int itemid, bool meso, int owner, vector2d pos, vector2d dest, char type, bool playerdrop)
 	{
 		if (drops.contains(oid))
@@ -33,9 +41,24 @@ namespace maplemap
 
 			if (meso)
 			{
-				app.getimgcache()->setmode(ict_sys);
-				toadd = new mesodrop(oid, itemid, owner, pos, dest, type, playerdrop, footholds);
-				app.getimgcache()->unlock();
+				mesoamount amount;
+				if (itemid > 999)
+				{
+					amount = MES_BAG;
+				}
+				else if (itemid > 99)
+				{
+					amount = MES_BUNDLE;
+				}
+				else if (itemid > 9)
+				{
+					amount = MES_GOLD;
+				}
+				else
+				{
+					amount = MES_BRONZE;
+				}
+				toadd = new mesodrop(oid, &mesos[amount], owner, pos, dest, type, playerdrop);
 			}
 			else
 			{
@@ -43,7 +66,7 @@ namespace maplemap
 				int prefix = itemid / 1000000;
 				if (prefix == 1)
 				{
-					clothing* cloth = app.getlookfactory()->getcloth(itemid);
+					clothing* cloth = cache.getequips()->getcloth(itemid);
 					if (cloth)
 					{
 						icon = cloth->geticon(true);
@@ -51,13 +74,13 @@ namespace maplemap
 				}
 				else
 				{
-					iteminfo* item = app.getui()->getfield()->getitems()->getitem(itemid);
+					itemdata* item = cache.getitems()->getitem(itemid);
 					if (item)
 					{
 						icon = item->geticon(true);
 					}
 				}
-				toadd = new itemdrop(oid, itemid, icon, owner, pos, dest, type, playerdrop, footholds);
+				toadd = new itemdrop(oid, itemid, icon, owner, pos, dest, type, playerdrop);
 			}
 
 			drops.add(oid, toadd);
@@ -72,11 +95,11 @@ namespace maplemap
 		}
 	}
 
-	void mapdrops::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	void mapdrops::draw(vector2d viewpos)
 	{
 		for (spmit<short, drop*> drit = drops.getit(); drit.belowtop(); drit++)
 		{
-			drit->draw(target, viewpos);
+			drit->draw(viewpos);
 		}
 	}
 
@@ -98,10 +121,5 @@ namespace maplemap
 		{
 			drops.remove(*rmit);
 		}
-	}
-
-	mapdrops::~mapdrops()
-	{
-		drops.clear();
 	}
 }

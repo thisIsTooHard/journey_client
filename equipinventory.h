@@ -28,7 +28,7 @@ namespace io
 	public:
 		equipinventory(player*);
 		~equipinventory() {}
-		void draw(ID2D1HwndRenderTarget*);
+		void draw();
 		void buttonpressed(short);
 		void oniteminfo(dragicon*);
 		rectangle2d dragarea();

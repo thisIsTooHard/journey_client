@@ -462,30 +462,26 @@ namespace net
 				recv.readpadascii(13);
 			}
 
-			pair<vector<int>, vector<int>> trockmaps;
+			telerock* trock = plc->gettrock();
+
 			for (char i = 0; i < 15; i++)
 			{
 				int trmap = recv.readint();
-				if (i < 5)
-				{
-					trockmaps.first.push_back(trmap);
-				}
-				else
-				{
-					trockmaps.second.push_back(trmap);
-				}
+				bool vip = i < 5;
+				trock->addmap(vip, trmap);
 			}
 
-			int bookcover = recv.readint();
+			monsterbook* book = plc->getbook();
+
+			book->setcover(recv.readint());
 			recv.readbyte();
-			map<short, char> bookcards;
+
 			size = recv.readshort();
-			char mblv;
 			for (short i = 0; i < size; i++)
 			{
-				short qid = recv.readshort();
-				mblv = recv.readbyte();
-				bookcards.insert(make_pair(qid, mblv));
+				short cid = recv.readshort();
+				char mblv = recv.readbyte();
+				book->addcard(cid, mblv);
 			}
 
 			size = recv.readshort();
@@ -505,7 +501,7 @@ namespace net
 			recv.readshort();
 			int64_t timestamp = recv.readlong();
 
-			plc->init(meso, skills, quests, trockmaps, bookcover, bookcards, areainfo);
+			plc->init(meso, skills, quests, areainfo);
 
 			app.getui()->remove(UI_CHARSEL);
 			app.getimgcache()->clearcache(ict_login);
@@ -530,9 +526,6 @@ namespace net
 
 			inventory* ivt = plc->getinventory();
 
-			map<short, mapleequip> equipped;
-			map<short, mapleequip> equippedcash;
-			map<short, mapleequip> equips;
 			for (char i = 0; i < 3; i++)
 			{
 				short pos = recv->readshort();
@@ -587,15 +580,12 @@ namespace net
 					switch (i)
 					{
 					case 0:
-						//equipped.insert(make_pair(pos, equip));
 						ivt->additem(equip, IVT_EQUIPPED);
 						break;
 					case 1:
-						//equippedcash.insert(make_pair(pos, equip));
 						ivt->additem(equip, IVT_EQUIPPED);
 						break;
 					case 2:
-						//equips.insert(make_pair(pos, equip));
 						ivt->additem(equip, IVT_EQUIP);
 						break;
 					}
@@ -605,10 +595,6 @@ namespace net
 			}
 			recv->readshort();
 
-			map<char, mapleitem> useitems;
-			map<char, mapleitem> setupitems;
-			map<char, mapleitem> etcitems;
-			map<char, mapleitem> cashitems;
 			for (char i = 0; i < 4; i++)
 			{
 				char pos = recv->readbyte();
@@ -625,7 +611,7 @@ namespace net
 					}
 					int64_t expire = recv->readlong();
 
-					mapleitem item;
+					mapleitem* item;
 					if (pet)
 					{
 						string petname = recv->readpadascii(13);
@@ -636,15 +622,15 @@ namespace net
 						recv->readint();
 						recv->readshort();
 						recv->readint();
-						item = mapleitem(id, pos, type, cash, uniqueid, expire, petname, petlevel, closeness, fullness);
+						item = new mapleitem(id, pos, type, cash, uniqueid, expire, petname, petlevel, closeness, fullness);
 					}
 					else
 					{
 						short count = recv->readshort();
 						string owner = recv->readascii();
 						short flag = recv->readshort();
-						item = mapleitem(id, count, pos, type, cash, uniqueid, expire, owner, flag);
-						if (item.canrecharge())
+						item = new mapleitem(id, count, pos, type, cash, uniqueid, expire, owner, flag);
+						if (item->canrecharge())
 						{
 							recv->readint();
 							recv->readint();
@@ -654,16 +640,16 @@ namespace net
 					switch (i)
 					{
 					case 0:
-						useitems.insert(make_pair(pos, item));
+						ivt->additem(item, IVT_USE);
 						break;
 					case 1:
-						setupitems.insert(make_pair(pos, item));
+						ivt->additem(item, IVT_SETUP);
 						break;
 					case 2:
-						etcitems.insert(make_pair(pos, item));
+						ivt->additem(item, IVT_ETC);
 						break;
 					case 3:
-						cashitems.insert(make_pair(pos, item));
+						ivt->additem(item, IVT_CASH);
 						break;
 					}
 
@@ -861,19 +847,32 @@ namespace net
 		void spawn_mob_h::handle(packet recv)
 		{
 			int oid = recv.readint();
-			bool hascontrol = recv.readbool();
+			bool hascontrol = recv.readbyte() == 5;
 			int id = recv.readint();
+			recv.skip(22);
 			vector2d pos = recv.readpoint();
 			char stance = recv.readbyte();
+			recv.readshort();
 			short fh = recv.readshort();
-			bool haseffect = recv.readbool();
-			char effect = 0;
-			if (haseffect)
+
+			bool fadein = false;
+			char effect = recv.readbyte();
+			if (effect > 0)
 			{
-				effect = recv.readbyte();
+				recv.readbyte();
+				recv.readshort();
+				if (effect == 15)
+				{
+					recv.readbyte();
+				}
 			}
-			bool fadein = recv.readbool();
+			else
+			{
+				fadein = effect == -2;
+			}
+
 			char team = recv.readbyte();
+			recv.readint();
 			app.getui()->getfield()->getmobs()->addmob(oid, id, hascontrol, pos, stance, fh, effect, fadein, team);
 		}
 	};
@@ -890,17 +889,32 @@ namespace net
 			}
 			recv.readbyte();
 			int id = recv.readint();
+
+			recv.skip(22);
+
 			vector2d pos = recv.readpoint();
 			char stance = recv.readbyte();
+			recv.readshort();
 			short fh = recv.readshort();
-			bool haseffect = recv.readbool();
-			char effect = 0;
-			if (haseffect)
+
+			bool fadein = false;
+			char effect = recv.readbyte();
+			if (effect > 0)
 			{
-				effect = recv.readbyte();
+				recv.readbyte();
+				recv.readshort();
+				if (effect == 15)
+				{
+					recv.readbyte();
+				}
 			}
-			bool fadein = recv.readbool();
+			else
+			{
+				fadein = effect == -2;
+			}
+
 			char team = recv.readbyte();
+			recv.readint();
 			app.getui()->getfield()->getmobs()->addmob(oid, id, true, pos, stance, fh, effect, fadein, team);
 		}
 	};
@@ -922,13 +936,13 @@ namespace net
 						switch (stat)
 						{
 						case MS_SKIN:
-							app.getui()->getfield()->getplayer()->getlook()->setbody(app.getlookfactory()->getbody(recv.readshort()));
+							app.getui()->getfield()->getplayer()->getlook()->setbody(cache.getequips()->getbody(recv.readshort()));
 							break;
 						case MS_FACE:
-							app.getui()->getfield()->getplayer()->getlook()->setface(app.getlookfactory()->getface(recv.readint()));
+							app.getui()->getfield()->getplayer()->getlook()->setface(cache.getequips()->getface(recv.readint()));
 							break;
 						case MS_HAIR:
-							app.getui()->getfield()->getplayer()->getlook()->sethair(app.getlookfactory()->gethair(recv.readint()));
+							app.getui()->getfield()->getplayer()->getlook()->sethair(cache.getequips()->gethair(recv.readint()));
 							break;
 						case MS_LEVEL:
 							app.getui()->getfield()->getplayer()->getstats()->setstat(MS_LEVEL, static_cast<byte>(recv.readbyte()));
@@ -1094,7 +1108,7 @@ namespace net
 			char team = recv.readbyte();
 
 			app.getimgcache()->setmode(ict_sys);
-			app.getlookfactory()->loadcharlook(&mlook);
+			cache.getequips()->loadcharlook(&mlook);
 			app.getimgcache()->unlock();
 
 			app.getui()->getfield()->getchars()->addchar(chrid, mlook, level, job, name, pos);
@@ -1193,6 +1207,14 @@ namespace net
 			recv.readint();
 			vector<movefragment> movements = parsemovement(&recv);
 			app.getui()->getfield()->getchars()->movechar(cid, movements);
+		}
+	};
+
+	class chat_received_h : public vhandler
+	{
+		void chat_received_h::handle(packet recv)
+		{
+			//TO DO
 		}
 	};
 
@@ -1409,6 +1431,7 @@ namespace net
 		handlers[CLOCK] = unique_ptr<vhandler>(new clock_h());
 		handlers[SPAWN_PLAYER] = unique_ptr<vhandler>(new spawn_player_h());
 		handlers[REMOVE_PLAYER] = unique_ptr<vhandler>(new remove_player_h());
+		handlers[CHAT_RECEIVED] = unique_ptr<vhandler>(new chat_received_h());
 		handlers[SPAWN_PET] = unique_ptr<vhandler>(new unhandled()); //TO DO
 		handlers[PLAYER_MOVED] = unique_ptr<vhandler>(new player_moved_h());
 		handlers[SHOW_ITEM_EFFECT] = unique_ptr<vhandler>(new unhandled()); //TO DO

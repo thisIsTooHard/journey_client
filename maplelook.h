@@ -76,8 +76,6 @@ namespace gameplay
 		short duration;
 	};
 
-	const string clothstrings[15] = { "Cap", "FaceAcc", "EyeAcc", "Earrings", "Coat", "Longcoat", "Pants", "Shoes", "Glove", "Shield", "Cape", "Weapon", "Pendant", "Belt", "Medal" };
-
 	class maplelook
 	{
 	public:
@@ -87,7 +85,7 @@ namespace gameplay
 		void init(bodydrawinfo*);
 		void addcloth(clothing*);
 		void addcloth(clothing*, equiplayer);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		bool update();
 		void setstate(string);
 		void setstate(string, float);
@@ -100,8 +98,8 @@ namespace gameplay
 		void sethair(hairstyle* h) { hair = h; }
 		void setbody(bodytype* b) { body = b; }
 		bool isloaded() { return loaded; }
-		weapontype getweptype() { return clothes[EQL_WEAPON]->getweptype(); }
 		string getstate() { return state; }
+		weapontype getweptype() { return clothes[EQL_WEAPON]->getweptype(); }
 		lookinfo* getinfo() { return &info; }
 		bodytype* getbody() { return body; }
 		facetype* getface() { return face; }

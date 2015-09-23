@@ -26,7 +26,7 @@ namespace io
 		active = true;
 	}
 
-	void tooltip::draw(ID2D1HwndRenderTarget* target, vector2d drawpos)
+	void tooltip::draw(vector2d drawpos)
 	{
 		if (active)
 		{

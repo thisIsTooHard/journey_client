@@ -22,7 +22,7 @@ namespace util
 	rectangle2d::rectangle2d(int l, int r, int t, int b)
 	{
 		lt = vector2d(l, t);
-		rb = vector2d(t, b);
+		rb = vector2d(r, b);
 	}
 
 	rectangle2d::rectangle2d(vector2d v1, vector2d v2)

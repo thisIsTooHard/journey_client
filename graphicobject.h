@@ -16,31 +16,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "maplelook.h"
+#include "animation.h"
 
-using namespace gameplay;
-
-namespace program
+namespace graphics
 {
-	class lookfactory
+	class graphicobject
 	{
 	public:
-		lookfactory() {}
-		~lookfactory() {}
-		void init();
-		void loadcharlook(maplelook*);
-		bodytype* getbody(char);
-		hairstyle* gethair(int);
-		facetype* getface(int);
-		clothing* getcloth(int);
-	private:
-		void initbodyinfo();
-		clothing emptycloth;
-		bodydrawinfo bodyinfo;
-		map<int, facetype> faces;
-		map<char, bodytype> bodytypes;
-		map<int, hairstyle> hairstyles;
-		map<int, clothing> clothes;
+		graphicobject();
+		virtual ~graphicobject() {}
+		virtual bool draw(animation*, vector2d, bool);
+		virtual bool update(animation*, short);
+		virtual bool update(animation*);
+		virtual void resetani();
+	protected:
+		short elapsed;
+		byte frame;
+		bool blending;
+		float alpha;
+		float alphastep;
 	};
 }
 

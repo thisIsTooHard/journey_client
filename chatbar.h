@@ -35,7 +35,7 @@ namespace io
 	public:
 		chatbar();
 		~chatbar() {}
-		void draw(ID2D1HwndRenderTarget*);
+		void draw();
 		void update();
 		void buttonpressed(short);
 		rectangle2d bounds();
@@ -44,7 +44,6 @@ namespace io
 		map<chattarget, texture> chattargets;
 		texture chatenter;
 		texture chatcover;
-		textfield chatfield;
 		bool open;
 		chattarget chattarget;
 	};

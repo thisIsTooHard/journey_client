@@ -28,12 +28,15 @@ namespace io
 		position = pos;
 	}
 
-	void uibar::draw(ID2D1HwndRenderTarget* target, vector2d pos, int value, int max)
+	void uibar::draw(vector2d pos, float percent)
 	{
 		vector2d absp = pos + position;
-		int percent = ((value / 100) * barmax) / (max / 100);
-		front.draw(absp);
-		barmid.draw(absp + vector2d(1, 0), vector2d(percent, 0));
-		barend.draw(absp + vector2d(percent + 1, 0));
+		int length = static_cast<int>(percent * barmax);
+		if (length > 0)
+		{
+			front.draw(absp);
+			barmid.draw(absp + vector2d(1, 0), vector2d(length, 0));
+			barend.draw(absp + vector2d(length + 1, 0));
+		}
 	}
 }

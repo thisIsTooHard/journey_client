@@ -132,11 +132,11 @@ namespace net
 		send(&p);
 	}
 
-	void packetcreator::writemoves(packet* p, vector<movefragment> moves)
+	void packetcreator::writemoves(packet* p, vector<movefragment>* moves)
 	{
-		p->writech(moves.size());
+		p->writech(moves->size());
 
-		for (vector<movefragment>::iterator mvit = moves.begin(); mvit != moves.end(); ++mvit)
+		for (vector<movefragment>::iterator mvit = moves->begin(); mvit != moves->end(); ++mvit)
 		{
 			p->writech(mvit->command);
 
@@ -178,11 +178,11 @@ namespace net
 		}
 	}
 
-	void packetcreator::moveplayer(movefragment move)
+	void packetcreator::moveplayer(vector<movefragment>* moves)
 	{
 		packet p = packet(MOVE_PLAYER);
-		vector<movefragment> moves;
-		moves.push_back(move);
+		p.writelg(0);
+		p.writech(0);
 		writemoves(&p, moves);
 		send(&p);
 	}
@@ -267,7 +267,7 @@ namespace net
 		send(&p);
 	}
 
-	void packetcreator::movemonster(int oid, short type, byte skillb, byte skill0, byte skill1, byte skill2, byte skill3, byte skill4, vector2d startpos, vector<movefragment> movements)
+	void packetcreator::movemonster(int oid, short type, byte skillb, byte skill0, byte skill1, byte skill2, byte skill3, byte skill4, vector2d startpos, vector<movefragment>* movements)
 	{
 		packet p = packet(MOVE_MONSTER);
 		p.writeint(oid);

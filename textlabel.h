@@ -63,10 +63,10 @@ namespace graphics
 	public:
 		textlabel(dwfonts, textcolor, string, textbg);
 		textlabel(dwfonts, textcolor, string);
-		textlabel() {}
+		textlabel() { font = 0; brush = 0; bgbrush = 0; }
 		~textlabel();
-		void draw(string, ID2D1HwndRenderTarget*, vector2d);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(string, vector2d);
+		void draw(vector2d);
 		float getlength() { return (font->GetFontSize() - 8.0f) * text.length() + 10.0f; }
 		void settext(string s) { text = s; }
 		void setmarker(bool b) { marker = b; }

@@ -28,7 +28,7 @@ namespace character
 		facetype(int);
 		facetype() {}
 		~facetype() {}
-		void draw(string, byte, vector2d);
+		void draw(string, byte, vector2d, vector2d, bool);
 		string getname() { return name; }
 		byte getlastf(string s) { return static_cast<byte>(delays[s].size() - 1); }
 		short getdelay(string s, byte f) { return delays[s][f]; }

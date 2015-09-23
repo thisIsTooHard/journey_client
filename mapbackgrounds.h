@@ -16,7 +16,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "stdfax.h"
 #include "background.h"
 
 namespace gameplay
@@ -24,11 +23,11 @@ namespace gameplay
 	class mapbackgrounds
 	{
 	public:
-		mapbackgrounds(nl::node, vector2d, vector2d);
+		mapbackgrounds(node);
 		mapbackgrounds() {}
 		~mapbackgrounds() {}
-		void drawbackgrounds(ID2D1HwndRenderTarget*, vector2d);
-		void drawforegrounds(ID2D1HwndRenderTarget*, vector2d);
+		void drawbackgrounds(vector2d);
+		void drawforegrounds(vector2d);
 		void update();
 	private:
 		vector<background> backgrounds;

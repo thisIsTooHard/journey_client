@@ -38,11 +38,11 @@ namespace maplemap
 		}
 	}
 
-	void mapnpcs::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	void mapnpcs::draw(vector2d viewpos)
 	{
 		for (smit<int, npc> npcit = npcs.getit(); npcit.belowtop(); npcit++)
 		{
-			npcit->draw(target, viewpos);
+			npcit->draw(viewpos);
 		}
 	}
 

@@ -25,7 +25,7 @@ namespace io
 	public:
 		login();
 		~login() {}
-		void draw(ID2D1HwndRenderTarget*);
+		void draw();
 		void buttonpressed(short);
 	private:
 		bool saveid;

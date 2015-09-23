@@ -22,6 +22,14 @@ using namespace std;
 
 namespace util
 {
+	enum direction
+	{
+		UP,
+		DOWN,
+		LEFT,
+		RIGHT
+	};
+
 	class vector2d
 	{
 	private:
@@ -49,6 +57,12 @@ namespace util
 		bool operator != (vector2d);
 		void setx(int v) { a = v; }
 		void sety(int v) { b = v; }
+		void shiftx(int v) { a += v; }
+		void shifty(int v) { b += v; }
+		void shift(int x, int y) { a += x; b += y; }
+		void shift(vector2d v) { a += v.x(); b += v.y(); }
+		void operator += (vector2d v) { a += v.x(); b += v.y(); }
+		void operator -= (vector2d v) { a -= v.x(); b -= v.y(); }
 	};
 }
 

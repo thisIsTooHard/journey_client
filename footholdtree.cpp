@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "footholdtree.h"
 
-namespace gameplay
+namespace data
 {
 	footholdtree::footholdtree(node source)
 	{
@@ -95,6 +95,18 @@ namespace gameplay
 					lowestg = yit->second;
 				}
 			}
+		}
+	}
+
+	foothold footholdtree::getfh(short fid)
+	{
+		if (footholds.count(fid))
+		{
+			return footholds[fid];
+		}
+		else
+		{
+			return foothold();
 		}
 	}
 

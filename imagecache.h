@@ -18,9 +18,11 @@
 #pragma once
 #include "stdfax.h"
 #include "bitmap.h"
+#include "vector2d.h"
 
 using namespace std;
 using namespace nl;
+using namespace util;
 
 namespace program
 {
@@ -41,8 +43,10 @@ namespace program
 		void settarget(ID2D1HwndRenderTarget* trg) { target = trg; }
 		void unlock();
 		void clearcache(imgcontext);
+		void draw(imgcontext, size_t, D2D1_RECT_F, float, float, float, vector2d);
 		void draw(imgcontext, size_t, D2D1_RECT_F, float);
 		pair<imgcontext, size_t> createimage(bitmap bmp);
+		ID2D1HwndRenderTarget* gettarget() { return target; }
 	private:
 		unique_ptr<IWICImagingFactory> imgfactory;
 		ID2D1HwndRenderTarget* target;

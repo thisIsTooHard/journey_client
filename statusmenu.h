@@ -26,7 +26,7 @@ namespace io
 		statusmenu();
 		~statusmenu() {}
 		void buttonpressed(short);
-		void draw(ID2D1HwndRenderTarget*);
+		void draw();
 	private:
 		texture backfill;
 	};

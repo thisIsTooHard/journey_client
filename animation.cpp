@@ -103,14 +103,24 @@ namespace graphics
 		alphastep = (alphablends[0].second - alpha) / (delays[0] / 16);
 	}
 
+	void animation::draw(byte fr, vector2d pos)
+	{
+		textures[fr].draw(pos, 1.0f);
+	}
+
+	void animation::draw(byte fr, float alp, vector2d pos)
+	{
+		textures[fr].draw(pos, alp);
+	}
+
 	void animation::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
 	{
 		textures[frame].draw(parentpos, alpha / 255);
 	}
 
-	void animation::draw(ID2D1HwndRenderTarget* target, vector2d parentpos, float alpha)
+	void animation::draw(ID2D1HwndRenderTarget* target, vector2d parentpos, float alp)
 	{
-		textures[frame].draw(parentpos, alpha);
+		textures[frame].draw(parentpos, alp);
 	}
 
 	bool animation::update(short frames)

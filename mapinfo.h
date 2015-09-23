@@ -24,7 +24,7 @@ using namespace std;
 using namespace util;
 using namespace nl;
 
-namespace gameplay
+namespace data
 {
 	class mapinfo
 	{

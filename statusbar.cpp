@@ -74,9 +74,9 @@ namespace io
 		stats = pstats;
 	}
 
-	void statusbar::draw(ID2D1HwndRenderTarget* target)
+	void statusbar::draw()
 	{
-		uielement::draw(target);
+		uielement::draw();
 
 		if (active)
 		{
@@ -87,21 +87,22 @@ namespace io
 			short maxhp = stats->gettotal(MS_MAXHP);
 			short maxmp = stats->gettotal(MS_MAXMP);
 
-			exp.draw(target, position, cexp, expneed);
-			hp.draw(target, position, chp, maxhp);
-			mp.draw(target, position, cmp, maxmp);
+			float expperc = static_cast<double>(cexp) / expneed;
+			float hpperc = static_cast<float>(chp) / maxhp;
+			float mpperc = static_cast<float>(cmp) / maxmp;
 
-			string exppercent = to_string(100 * static_cast<double>(cexp) / static_cast<double>(expneed));
+			exp.draw(position, expperc);
+			hp.draw(position, hpperc);
+			mp.draw(position, mpperc);
+
+			string exppercent = to_string(100 * expperc);
 			statset.draw(to_string(cexp) + "[" + exppercent.substr(0, exppercent.find('.') + 3) + "%]", cha_right, position + vector2d(47, -13));
 			statset.draw("[" + to_string(chp) + "/" + to_string(maxhp) + "]", cha_right, position + vector2d(-124, -29));
 			statset.draw("[" + to_string(cmp) + "/" + to_string(maxmp) + "]", cha_right, position + vector2d(47, -29));
 
-			lvset.draw(to_string(stats->getstat(MS_LEVEL)), cha_left, position + vector2d(-495, -25));
-
-			job.settext(stats->getjobname());
-			name.settext(stats->getname());
-			job.draw(target, position + vector2d(-435, -22));
-			name.draw(target, position + vector2d(-435, -37));
+			lvset.draw(to_string(stats->getstat(MS_LEVEL)), cha_left, position + vector2d(-492, -24));
+			job.draw(stats->getjobname(), position + vector2d(-435, -22));
+			name.draw(stats->getname(), position + vector2d(-435, -37));
 		}
 	}
 

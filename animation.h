@@ -31,15 +31,21 @@ namespace graphics
 		animation() {}
 		animation(node);
 		~animation() {}
+		void draw(byte, vector2d);
+		void draw(byte, float, vector2d);
 		void draw(ID2D1HwndRenderTarget*, vector2d);
 		void draw(ID2D1HwndRenderTarget*, vector2d, float);
 		void setframe(byte);
 		short gettotaldelay();
+		short getdelay(byte f) { return delays[f]; }
+		byte getalpha(byte f) { return alphablends[f].second; }
+		byte nextframe(byte f) { return (f == last_f) ? 0 : f + 1; }
 		vector2d getdimension(byte);
 		bool update(short);
 		bool update() { return update(DPF); }
 		bool isloaded() { return textures[0].isloaded(); }
-		bool isanimated() { return textures.size() > 1; }
+		bool isanimated() { return last_f > 0; }
+		texture* gettexture(byte f) { return textures.count(f) ? &textures[f] : 0; }
 	protected:
 		map<byte, texture> textures;
 		map<byte, short> delays;

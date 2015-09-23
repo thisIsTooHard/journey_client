@@ -48,7 +48,7 @@ namespace io
 		void showdamage(vector<pair<int, char>>, vector2d);
 		void drawmobhp(char, vector2d);
 		void addnpcbutton(int, vector2d, vector2d);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		void update();
 		mousestate sendmouse();
 	private:

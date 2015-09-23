@@ -28,7 +28,7 @@ namespace io
 	public:
 		charcreation(bool);
 		~charcreation() {}
-		void draw(ID2D1HwndRenderTarget*);
+		void draw();
 		void update();
 		void buttonpressed(short);
 		void sendbool(bool);

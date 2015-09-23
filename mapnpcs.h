@@ -27,7 +27,7 @@ namespace maplemap
 		mapnpcs() {}
 		~mapnpcs() {}
 		void addnpc(int, int, bool, short, vector2d);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		void update();
 		void clear() { npcs.clear(); }
 	private:

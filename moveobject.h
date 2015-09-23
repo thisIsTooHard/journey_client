@@ -26,7 +26,7 @@ namespace action
 	{
 	public:
 		moveobject(vector2d);
-		moveobject() {}
+		moveobject();
 		virtual ~moveobject() {}
 		virtual bool update();
 		virtual vector2d getposition();

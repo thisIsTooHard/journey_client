@@ -79,8 +79,10 @@ namespace character
 		name = nx::nodes["String"]["Eqp.img"]["Eqp"]["Face"][to_string(faceid)]["name"];
 	}
 
-	void facetype::draw(string exp, byte frame, vector2d pos)
+	void facetype::draw(string exp, byte frame, vector2d pos, vector2d shift, bool flip)
 	{
-		textures[exp][frame].draw(pos);
+		texture temp = textures[exp][frame];
+		temp.shift(shift);
+		temp.draw(pos, flip);
 	}
 }

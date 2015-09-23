@@ -44,11 +44,11 @@ namespace maplemap
 		chars.removekey(cid);
 	}
 
-	void mapchars::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	void mapchars::draw(vector2d viewpos)
 	{
 		for (smit<int, otherplayer> plit = chars.getit(); plit.belowtop(); plit++)
 		{
-			plit->draw(target, viewpos);
+			plit->draw(viewpos);
 		}
 	}
 

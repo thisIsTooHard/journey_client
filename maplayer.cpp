@@ -53,13 +53,13 @@ namespace gameplay
 
 	}
 
-	void maplayer::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	void maplayer::draw(vector2d viewpos)
 	{
 		for (map<char, vector<sprite>>::iterator lyit = objs.begin(); lyit != objs.end(); ++lyit)
 		{
 			for (vector<sprite>::iterator objit = lyit->second.begin(); objit != lyit->second.end(); ++objit)
 			{
-				objit->draw(target, viewpos);
+				objit->draw(viewpos);
 			}
 		}
 

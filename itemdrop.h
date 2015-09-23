@@ -26,10 +26,10 @@ namespace maplemap
 	class itemdrop : public drop
 	{
 	public:
-		itemdrop(short, int, texture, int, vector2d, vector2d, char, bool, footholdtree*);
+		itemdrop(short, int, texture, int, vector2d, vector2d, char, bool);
 		itemdrop() {}
 		~itemdrop() {}
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 	private:
 		texture ico;
 		int itemid;

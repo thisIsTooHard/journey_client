@@ -16,7 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "animation.h"
+#include "graphicobject.h"
 
 using namespace graphics;
 
@@ -41,14 +41,14 @@ namespace maplemap
 		PT_14
 	};
 
-	class portal
+	class portal : public graphicobject
 	{
 	public:
 		portal() {}
 		~portal() {}
-		portal(portaltype, string, int, bool, string, animation, vector2d);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
-		void update() { anim.update(8); }
+		portal(portaltype, string, int, bool, string, animation*, vector2d);
+		void draw(vector2d);
+		void update() { graphicobject::update(anim, 8); }
 		void settouch(bool t) { touched = t; }
 		vector2d getposition() { return position; }
 		rectangle2d bounds() { return rectangle2d(position, position + vector2d(30, 50)); }
@@ -56,7 +56,7 @@ namespace maplemap
 		pair<int, string> getwarpinfo() { return make_pair(targetid, intermap ? targetpname : name); }
 		string getname() { return name; }
 	private:
-		animation anim;
+		animation* anim;
 		portaltype type;
 		string name;
 		vector2d position;

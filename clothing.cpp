@@ -388,10 +388,30 @@ namespace character
 				return 3.4f;
 			}
 		}
-		else
+		return 0.0f;
+	}
+
+	rectangle2d clothing::getrange()
+	{
+		if (layer == EQL_WEAPON)
 		{
-			return 0.0f;
+			switch (weptype)
+			{
+			case WEP_1H_SWORD:
+			case WEP_1H_AXE:
+			case WEP_1H_MACE:
+			case WEP_KNUCKLE:
+				return rectangle2d(-75, -5, -50, 0);
+			case WEP_2H_SWORD:
+			case WEP_2H_AXE:
+			case WEP_2H_MACE:
+				return rectangle2d(-100, -5, -50, 0);
+			case WEP_SPEAR:
+			case WEP_POLEARM:
+				return rectangle2d(-130, -5, -50, 0);
+			}
 		}
+		return rectangle2d();
 	}
 
 	string clothing::getdisplayspeed()

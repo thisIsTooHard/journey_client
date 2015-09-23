@@ -20,7 +20,6 @@
 #include "imagecache.h"
 #include "fontcache.h"
 #include "audiomanager.h"
-#include "lookfactory.h"
 #include <d2d1.h>
 #include <d2d1helper.h>
 #include <dwrite.h>
@@ -41,7 +40,6 @@ namespace program
 		ui* getui() { return &uinterface; }
 		fontcache* getfonts() { return &fonts; }
 		imagecache* getimgcache() { return &imgcache; }
-		lookfactory* getlookfactory() { return &lookf; }
 		audiomanager* getaudio() { return &audio; }
 	private:
 		long initfactories();
@@ -49,7 +47,6 @@ namespace program
 		static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 		ui uinterface;
 		fontcache fonts;
-		lookfactory lookf;
 		imagecache imgcache;
 		audiomanager audio;
 		HWND window;

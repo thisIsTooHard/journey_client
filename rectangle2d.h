@@ -27,6 +27,7 @@ namespace util
 		rectangle2d(vector2d, vector2d);
 		rectangle2d();
 		~rectangle2d() {}
+		int getwidth() { return abs(lt.x() - rb.x()); }
 		bool contains(vector2d);
 		bool contains(int, vector2d);
 		bool overlaps(rectangle2d);

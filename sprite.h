@@ -16,23 +16,23 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "animation.h"
+#include "graphicobject.h"
 
 namespace graphics
 {
-	class sprite
+	class sprite : public graphicobject
 	{
 	public:
 		sprite() {}
 		sprite(animation, vector2d);
 		sprite(animation, vector2d, bool, bool);
 		~sprite() {}
-		void draw(ID2D1HwndRenderTarget*, vector2d parentpos);
-		void update() { anim.update(); }
-		void setframe(byte fr) { anim.setframe(fr); }
+		void draw(vector2d);
+		bool update() { return graphicobject::update(&anim); }
 		void setposition(vector2d pos) { position = pos; }
-		void togglevisible() { visible = !visible; }
+		void togglehide() { visible = !visible; }
 		void flip() { flipped = !flipped; }
+		animation* getani() { return &anim; }
 	private:
 		animation anim;
 		vector2d position;

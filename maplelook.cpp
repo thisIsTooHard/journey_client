@@ -56,126 +56,114 @@ namespace gameplay
 		clothes[layer] = cloth;
 	}
 
-	void maplelook::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	void maplelook::draw(vector2d parentpos)
 	{
 		if (loaded)
 		{
 			vector2d absp = parentpos + position;
 
-			if (!faceleft)
-			{
-				target->SetTransform(
-					D2D1::Matrix3x2F::Scale(
-					D2D1::Size(-1.0f, 1.0f),
-					D2D1::Point2F(
-					static_cast<float>(absp.x()),
-					static_cast<float>(absp.y()))));
-			}
-
 			if (state == "ladder" || state == "rope")
 			{
-				body->draw(CL_BODY, state, frame, absp);
-				clothes[EQL_GLOVES]->draw(CL_GLOVE, state, frame, absp);
-				clothes[EQL_SHOES]->draw(CL_SHOES, state, frame, absp);
-				clothes[EQL_PANTS]->draw(CL_PANTS, state, frame, absp);
-				clothes[EQL_COAT]->draw(CL_TOP, state, frame, absp);
-				clothes[EQL_LONGCOAT]->draw(CL_MAIL, state, frame, absp);
-				clothes[EQL_CAPE]->draw(CL_CAPE, state, frame, absp);
-				body->draw(CL_HEAD, state, frame, absp);
-				clothes[EQL_EARRINGS]->draw(CL_EARRINGS, state, frame, absp);
+				body->draw(CL_BODY, state, frame, absp, !faceleft);
+				clothes[EQL_GLOVES]->draw(CL_GLOVE, state, frame, absp, !faceleft);
+				clothes[EQL_SHOES]->draw(CL_SHOES, state, frame, absp, !faceleft);
+				clothes[EQL_PANTS]->draw(CL_PANTS, state, frame, absp, !faceleft);
+				clothes[EQL_COAT]->draw(CL_TOP, state, frame, absp, !faceleft);
+				clothes[EQL_LONGCOAT]->draw(CL_MAIL, state, frame, absp, !faceleft);
+				clothes[EQL_CAPE]->draw(CL_CAPE, state, frame, absp, !faceleft);
+				body->draw(CL_HEAD, state, frame, absp, !faceleft);
+				clothes[EQL_EARRINGS]->draw(CL_EARRINGS, state, frame, absp, !faceleft);
 
 				if (clothes.count(EQL_CAP))
 				{
 					if (clothes[EQL_CAP]->istransparent())
 					{
-						hair->draw(CL_BACKHAIR, state, frame, absp);
+						hair->draw(CL_BACKHAIR, state, frame, absp, !faceleft);
 					}
 					else
 					{
-						hair->draw(CL_BACKHAIRBCAP, state, frame, absp);
-						clothes[EQL_CAP]->draw(CL_HAT, state, frame, absp);
+						hair->draw(CL_BACKHAIRBCAP, state, frame, absp, !faceleft);
+						clothes[EQL_CAP]->draw(CL_HAT, state, frame, absp, !faceleft);
 					}
 				}
 				else
 				{
-					hair->draw(CL_BACKHAIR, state, frame, absp);
+					hair->draw(CL_BACKHAIR, state, frame, absp, !faceleft);
 				}
 
-				clothes[EQL_SHIELD]->draw(CL_BACKSHIELD, state, frame, absp);
-				clothes[EQL_WEAPON]->draw(CL_BACKWEAPON, state, frame, absp);
+				clothes[EQL_SHIELD]->draw(CL_BACKSHIELD, state, frame, absp, !faceleft);
+				clothes[EQL_WEAPON]->draw(CL_BACKWEAPON, state, frame, absp, !faceleft);
 			}
 			else
 			{
-				hair->draw(CL_HAIRBBODY, state, frame, absp);
-				clothes[EQL_CAPE]->draw(CL_CAPE, state, frame, absp);
-				clothes[EQL_SHIELD]->draw(CL_SHIELDBBODY, state, frame, absp);
-				body->draw(CL_BODY, state, frame, absp);
-				clothes[EQL_SHOES]->draw(CL_SHOES, state, frame, absp);
-				clothes[EQL_PANTS]->draw(CL_PANTS, state, frame, absp);
-				clothes[EQL_COAT]->draw(CL_TOP, state, frame, absp);
-				clothes[EQL_LONGCOAT]->draw(CL_MAIL, state, frame, absp);
-				body->draw(CL_LHAND, state, frame, absp);
-				clothes[EQL_GLOVES]->draw(CL_GLOVE, state, frame, absp);
-				hair->draw(CL_HAIR, state, frame, absp);
-				clothes[EQL_SHIELD]->draw(CL_SHIELDOHAIR, state, frame, absp);
-				clothes[EQL_EARRINGS]->draw(CL_EARRINGS, state, frame, absp);
-				body->draw(CL_HEAD, state, frame, absp);
-				hair->draw(CL_HAIRSHADE, state, frame, absp);
+				hair->draw(CL_HAIRBBODY, state, frame, absp, !faceleft);
+				clothes[EQL_CAPE]->draw(CL_CAPE, state, frame, absp, !faceleft);
+				clothes[EQL_SHIELD]->draw(CL_SHIELDBBODY, state, frame, absp, !faceleft);
+				body->draw(CL_BODY, state, frame, absp, !faceleft);
+				clothes[EQL_SHOES]->draw(CL_SHOES, state, frame, absp, !faceleft);
+				clothes[EQL_PANTS]->draw(CL_PANTS, state, frame, absp, !faceleft);
+				clothes[EQL_COAT]->draw(CL_TOP, state, frame, absp, !faceleft);
+				clothes[EQL_LONGCOAT]->draw(CL_MAIL, state, frame, absp, !faceleft);
+				body->draw(CL_LHAND, state, frame, absp, !faceleft);
+				clothes[EQL_GLOVES]->draw(CL_GLOVE, state, frame, absp, !faceleft);
+				hair->draw(CL_HAIR, state, frame, absp, !faceleft);
+				clothes[EQL_SHIELD]->draw(CL_SHIELDOHAIR, state, frame, absp, !faceleft);
+				clothes[EQL_EARRINGS]->draw(CL_EARRINGS, state, frame, absp, !faceleft);
+				body->draw(CL_HEAD, state, frame, absp, !faceleft);
+				hair->draw(CL_HAIRSHADE, state, frame, absp, !faceleft);
 
-				vector2d facepos = absp + bodyinfo->facepos[state][frame];
-				face->draw(state_f, frame_f, facepos);
-				clothes[EQL_FACEACC]->draw(CL_FACEACC, (state_f == "default") ? "blink" : state_f, 0, facepos);
-				clothes[EQL_EYEACC]->draw(CL_EYEACC, state, frame, absp);
-				clothes[EQL_SHIELD]->draw(CL_SHIELD, state, frame, absp);
+				vector2d facepos = bodyinfo->facepos[state][frame];
+				if (faceleft)
+				{
+					face->draw(state_f, frame_f, absp, facepos, false);
+					clothes[EQL_FACEACC]->draw(CL_FACEACC, (state_f == "default") ? "blink" : state_f, 0, absp + facepos, false);
+				}
+				else
+				{
+					face->draw(state_f, frame_f, absp, facepos, true);
+					clothes[EQL_FACEACC]->draw(CL_FACEACC, (state_f == "default") ? "blink" : state_f, 0, absp, facepos);
+				}
+				clothes[EQL_EYEACC]->draw(CL_EYEACC, state, frame, absp, !faceleft);
+				clothes[EQL_SHIELD]->draw(CL_SHIELD, state, frame, absp, !faceleft);
 
 				if (clothes.count(EQL_CAP))
 				{
 					if (clothes[EQL_CAP]->istransparent())
 					{
-						hair->draw(CL_HAIROHEAD, state, frame, absp);
-						hair->draw(CL_BACKHAIR, state, frame, absp);
+						hair->draw(CL_HAIROHEAD, state, frame, absp, !faceleft);
+						hair->draw(CL_BACKHAIR, state, frame, absp, !faceleft);
 					}
 					else
 					{
-						hair->draw(CL_BACKHAIRBCAP, state, frame, absp);
-						clothes[EQL_CAP]->draw(CL_HAT, state, frame, absp);
+						hair->draw(CL_BACKHAIRBCAP, state, frame, absp, !faceleft);
+						clothes[EQL_CAP]->draw(CL_HAT, state, frame, absp, !faceleft);
 					}
 				}
 				else
 				{
-					hair->draw(CL_HAIROHEAD, state, frame, absp);
-					hair->draw(CL_BACKHAIR, state, frame, absp);
+					hair->draw(CL_HAIROHEAD, state, frame, absp, !faceleft);
+					hair->draw(CL_BACKHAIR, state, frame, absp, !faceleft);
 				}
 
 				if (clothes[EQL_WEAPON]->istwo_h())
 				{
-					clothes[EQL_COAT]->draw(CL_MAILARM, state, frame, absp);
-					body->draw(CL_ARM, state, frame, absp);
-					clothes[EQL_WEAPON]->draw(CL_WEAPON, state, frame, absp);
+					clothes[EQL_COAT]->draw(CL_MAILARM, state, frame, absp, !faceleft);
+					body->draw(CL_ARM, state, frame, absp, !faceleft);
+					clothes[EQL_WEAPON]->draw(CL_WEAPON, state, frame, absp, !faceleft);
 				}
 				else
 				{
-					clothes[EQL_WEAPON]->draw(CL_WEAPON, state, frame, absp);
-					body->draw(CL_ARM, state, frame, absp);
-					clothes[EQL_COAT]->draw(CL_MAILARM, state, frame, absp);
+					clothes[EQL_WEAPON]->draw(CL_WEAPON, state, frame, absp, !faceleft);
+					body->draw(CL_ARM, state, frame, absp, !faceleft);
+					clothes[EQL_COAT]->draw(CL_MAILARM, state, frame, absp, !faceleft);
 				}
-				body->draw(CL_RHAND, state, frame, absp);
+				body->draw(CL_RHAND, state, frame, absp, !faceleft);
 
-				body->draw(CL_ARMOHAIR, state, frame, absp);
-				clothes[EQL_WEAPON]->draw(CL_WEAPONOHAND, state, frame, absp);
-				body->draw(CL_HANDOWEP, state, frame, absp);
-				clothes[EQL_GLOVES]->draw(CL_RGLOVE, state, frame, absp);
-				clothes[EQL_WEAPON]->draw(CL_WEAPONOGLOVE, state, frame, absp);
-			}
-
-			if (!faceleft)
-			{
-				target->SetTransform(
-					D2D1::Matrix3x2F::Scale(
-					D2D1::Size(1.0f, 1.0f),
-					D2D1::Point2F(
-					static_cast<float>(absp.x()),
-					static_cast<float>(absp.y()))));
+				body->draw(CL_ARMOHAIR, state, frame, absp, !faceleft);
+				clothes[EQL_WEAPON]->draw(CL_WEAPONOHAND, state, frame, absp, !faceleft);
+				body->draw(CL_HANDOWEP, state, frame, absp, !faceleft);
+				clothes[EQL_GLOVES]->draw(CL_RGLOVE, state, frame, absp, !faceleft);
+				clothes[EQL_WEAPON]->draw(CL_WEAPONOGLOVE, state, frame, absp, !faceleft);
 			}
 		}
 	}

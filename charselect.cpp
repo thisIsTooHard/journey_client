@@ -24,7 +24,6 @@ namespace io
 	charselect::charselect(account* acc)
 	{
 		app.getimgcache()->setmode(ict_login);
-		nl::nx::view_file("UI");
 
 		node login = nl::nx::nodes["UI"].resolve("Login.img");
 		node charsel = login.resolve("CharSelect");
@@ -56,7 +55,11 @@ namespace io
 			buttons[BT_PAGER].setstate("disabled");
 		}
 
-		size_t createcount = min(cslots, 8);
+		size_t createcount = cslots;
+		if (createcount > 8)
+		{
+			createcount = 8;
+		}
 
 		for (size_t i = charcount; i < createcount; i++)
 		{
@@ -71,7 +74,11 @@ namespace io
 		nttextures[true].push_back(texture(charsel["nameTag"]["1"]["1"]));
 		nttextures[true].push_back(texture(charsel["nameTag"]["1"]["2"]));
 
-		size_t charbtcount = min(charcount, 8);
+		size_t charbtcount = charcount;
+		if (charbtcount > 8)
+		{
+			charbtcount = 8;
+		}
 
 		selected = config.getdefchar();
 		page = selected % 8;
@@ -94,15 +101,16 @@ namespace io
 		rankmove['='] = texture(charsel["icon"]["same"]);
 		rankmove['-'] = texture(charsel["icon"]["down"]);
 
-		nl::nx::unview_file("UI");
-		nl::nx::view_file("Character");
-
-		size_t displaycount = min(charcount, 8);
+		size_t displaycount = charcount;
+		if (displaycount > 8)
+		{
+			displaycount = 8;
+		}
 
 		for (size_t i = 0; i < displaycount; i++)
 		{
 			maplelook* plook = chars->at(i).getlook();
-			app.getlookfactory()->loadcharlook(plook);
+			cache.getequips()->loadcharlook(plook);
 
 			maplelook look = chars->at(i).copylook();
 			look.setposition(vector2d(130 + (120 * (i % 4)), 250 + (200 * (i > 3))));
@@ -116,7 +124,6 @@ namespace io
 			rankinfo.push_back(make_pair(chars->at(i).getrank(), chars->at(i).getjobrank()));
 		}
 
-		nl::nx::unview_file("Character");
 		app.getimgcache()->unlock();
 
 		if (stats.size() > 0)
@@ -134,25 +141,25 @@ namespace io
 		buttoncd = 0;
 	}
 
-	void charselect::draw(ID2D1HwndRenderTarget* target)
+	void charselect::draw()
 	{
-		uielement::draw(target);
+		uielement::draw();
 
 		if (active)
 		{
 			for (vector<maplelook>::iterator itspr = looks.begin(); itspr != looks.end(); itspr++)
 			{
-				itspr->draw(target, position);
+				itspr->draw(position);
 			}
 			for (vector<nametag>::iterator itspr = nametags.begin(); itspr != nametags.end(); itspr++)
 			{
-				itspr->draw(target, position);
+				itspr->draw(position);
 			}
 
 			if (stats.size() > 0)
 			{
-				name.draw(target, vector2d(664, 270));
-				job.draw(target, vector2d(732, 305));
+				name.draw(vector2d(664, 270));
+				job.draw(vector2d(732, 305));
 
 				statset.draw(to_string(rankinfo[selected].first.first), cha_right, vector2d(732, 335));
 				statset.draw(to_string(rankinfo[selected].second.first), cha_right, vector2d(732, 355));

@@ -26,6 +26,7 @@ namespace io
 		textures["normal"] = texture(src["normal"]["0"]);
 		textures["disabled"] = texture(src["disabled"]["0"]);
 		position = vector2d();
+
 		state = "normal";
 		bttype = BTT_REGULAR;
 		active = true;
@@ -33,11 +34,12 @@ namespace io
 
 	button::button(node src, int x, int y)
 	{
-		textures["pressed"] = texture(src.resolve("pressed/0"));
-		textures["mouseOver"] = texture(src.resolve("mouseOver/0"));
-		textures["normal"] = texture(src.resolve("normal/0"));
-		textures["disabled"] = texture(src.resolve("disabled/0"));
+		textures["pressed"] = texture(src["pressed"]["0"]);
+		textures["mouseOver"] = texture(src["mouseOver"]["0"]);
+		textures["normal"] = texture(src["normal"]["0"]);
+		textures["disabled"] = texture(src["disabled"]["0"]);
 		position = vector2d(x, y);
+
 		state = "normal";
 		bttype = BTT_REGULAR;
 		active = true;
@@ -48,6 +50,7 @@ namespace io
 		textures["normal"] = s1;
 		textures["select"] = s2;
 		position = vector2d(x, y);
+
 		state = "normal";
 		bttype = BTT_ONESPRITE;
 		active = true;
@@ -57,44 +60,44 @@ namespace io
 	{
 		position = pos;
 		dimension = dim;
+
 		state = "normal";
 		bttype = BTT_AREA;
 		active = true;
 	}
 
-	pair<vector2d, vector2d> button::bounds()
+	rectangle2d button::bounds(vector2d parentpos)
 	{
 		if (bttype == BTT_AREA)
 		{
-			return pair<vector2d, vector2d>(position, dimension);
+			vector2d absp = parentpos + position;
+			return rectangle2d(absp, absp + dimension);
 		}
 		else
 		{
-			return pair<vector2d, vector2d>(position - textures["normal"].getorigin(), (textures["normal"].getdimension()));
+			vector2d absp = parentpos + position - textures["normal"].getorigin();
+			return rectangle2d(absp, absp + textures["normal"].getdimension());
 		}
 	}
 
-	void button::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	void button::draw(vector2d parentpos)
 	{
 		if (active)
 		{
 			vector2d absp = position + parentpos;
 
-			if (bttype == BTT_ONESPRITE)
+			switch (bttype)
 			{
-				if (state == "normal")
+			case BTT_REGULAR:
+				textures[state].draw(absp);
+				break;
+			case BTT_ONESPRITE:
+				textures["normal"].draw(absp);
+				if (state == "pressed" || state == "mouseOver")
 				{
-					textures["normal"].draw(absp);
-				}
-				else if (state == "pressed" || state == "mouseOver")
-				{
-					textures["normal"].draw(absp);
 					textures["select"].draw(absp);
 				}
-			}
-			else if (bttype == BTT_REGULAR)
-			{
-				textures[state].draw(absp);
+				break;
 			}
 		}
 	}

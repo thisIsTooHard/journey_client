@@ -31,7 +31,7 @@ namespace io
 	public:
 		charselect(account*);
 		~charselect() {}
-		void draw(ID2D1HwndRenderTarget*);
+		void draw();
 		void update();
 		void buttonpressed(short);
 	private:

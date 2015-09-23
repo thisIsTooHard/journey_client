@@ -85,9 +85,12 @@ namespace gameplay
 		posy = static_cast<float>(pos.y());
 	}
 
-	void camera::setbounds(vector2d hbd, vector2d vbd)
+	void camera::updateview()
 	{
-		hbounds = vector2d(-hbd.x(), -hbd.y());
-		vbounds = vector2d(-vbd.x(), -vbd.y() - 60);
+		vector2d mapwalls = cache.getmap()->getinfo()->getwalls();
+		vector2d mapborders = cache.getmap()->getinfo()->getborders();
+
+		hbounds = vector2d(-mapwalls.x(), -mapwalls.y());
+		vbounds = vector2d(-mapborders.x(), -mapborders.y() - 60);
 	}
 }

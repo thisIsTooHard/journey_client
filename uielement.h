@@ -21,7 +21,6 @@
 #include "button.h"
 #include "textfield.h"
 #include "dragicon.h"
-#include "collision.h"
 #include "sprite.h"
 
 using namespace std;
@@ -182,11 +181,11 @@ namespace io
 		uielement() {}
 		virtual ~uielement() {}
 		virtual void buttonpressed(short) {}
-		virtual void draw(ID2D1HwndRenderTarget*);
+		virtual void draw();
 		virtual void update();
 		virtual void sendicon(dragicon*, vector2d);
-		virtual void sendbool(bool b) {}
 		virtual void oniteminfo(dragicon* d) {}
+		virtual void sendbool(bool b) {}
 		mousestate sendmouse(vector2d, mousestate);
 		virtual rectangle2d bounds() { return rectangle2d(position, position + dimensions); }
 		virtual rectangle2d dragarea() { return rectangle2d(position, position); }

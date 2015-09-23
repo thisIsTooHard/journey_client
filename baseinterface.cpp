@@ -23,9 +23,6 @@ namespace io
 {
 	void baseinterface::init()
 	{
-		app.getimgcache()->setmode(ict_sys);
-		nx::view_file("UI");
-
 		node hpbar = nx::nodes["UI"]["UIWindow2.img"]["EnergyBar"];
 		mobhpbar["hpbarfront"] = texture(hpbar["w"]);
 		mobhpbar["hpbarmid"] = texture(hpbar["c"]);
@@ -33,15 +30,9 @@ namespace io
 		mobhpbar["hpbarfill0"] = texture(hpbar["Gage"]["1"]["0"]);
 		mobhpbar["hpbarfill1"] = texture(hpbar["Gage"]["1"]["1"]);
 
-		nx::unview_file("UI");
-		nx::view_file("Effect");
-
 		dmgset = charset(nx::nodes["Effect"]["BasicEff.img"]["NoRed0"]);
 		critset = charset(nx::nodes["Effect"]["BasicEff.img"]["NoCri0"]);
 		playerdmgset = charset(nx::nodes["Effect"]["BasicEff.img"]["NoViolet0"]);
-
-		nx::unview_file("Effect");
-		app.getimgcache()->unlock();
 
 		infotextw = textlabel(DWF_12R, TXC_WHITE, "");
 		infotexty = textlabel(DWF_12R, TXC_YELLOW, "");
@@ -77,7 +68,7 @@ namespace io
 		ReleaseSRWLockExclusive(&dmglock);
 	}
 
-	void baseinterface::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	void baseinterface::draw(vector2d viewpos)
 	{
 		if (active)
 		{
@@ -117,13 +108,13 @@ namespace io
 				{
 					infotextw.settext(sfit.text);
 					infotextw.setalpha(sfit.alpha);
-					infotextw.draw(target, infotop + vector2d(0, 16 * i));
+					infotextw.draw(infotop + vector2d(0, 16 * i));
 				}
 				else
 				{
 					infotexty.settext(sfit.text);
 					infotexty.setalpha(sfit.alpha);
-					infotexty.draw(target, infotop + vector2d(0, 16 * i));
+					infotexty.draw(infotop + vector2d(0, 16 * i));
 				}
 			}
 		}

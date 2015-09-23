@@ -47,7 +47,7 @@ namespace io
 		drag = true;
 	}
 
-	void dragicon::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	void dragicon::draw(vector2d parentpos)
 	{
 		if (!drag)
 		{
@@ -71,13 +71,7 @@ namespace io
 		}
 	}
 
-	rectangle2d dragicon::bounds(vector2d parentpos)
-	{
-		vector2d absp = pos + parentpos;
-		return rectangle2d(absp, absp + vector2d(32, 32));
-	}
-
-	void dragicon::dragdraw(ID2D1HwndRenderTarget* target, vector2d cursor)
+	void dragicon::dragdraw(vector2d cursor)
 	{
 		if (drag)
 		{
@@ -96,5 +90,11 @@ namespace io
 				break;
 			}
 		}
+	}
+
+	rectangle2d dragicon::bounds(vector2d parentpos)
+	{
+		vector2d absp = pos + parentpos;
+		return rectangle2d(absp, absp + vector2d(32, 32));
 	}
 }

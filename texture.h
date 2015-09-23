@@ -36,11 +36,16 @@ namespace graphics
 		~texture() {}
 		void draw();
 		void draw(vector2d);
+		void draw(vector2d, float, float);
 		void draw(vector2d, bool);
 		void draw(vector2d, float);
+		void draw(vector2d, float, bool);
 		void draw(vector2d, vector2d);
+		void draw(vector2d, vector2d, bool);
 		void draw(vector2d, vector2d, float, bool);
-		void shift(vector2d);
+		void draw(vector2d, vector2d, float, float, float);
+		void shift(vector2d s) { origin -= s; }
+		void setshift(vector2d s) { shf = s; }
 		void setorigin(vector2d v) { origin = v; }
 		bool isloaded() { return loaded; }
 		vector2d getdimension() { return dimension; }
@@ -50,6 +55,7 @@ namespace graphics
 		pair<imgcontext, size_t> source;
 		vector2d origin;
 		vector2d dimension;
+		vector2d shf;
 		bool loaded;
 	};
 }

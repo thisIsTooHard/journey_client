@@ -16,24 +16,23 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "stdfax.h"
-#include "animation.h"
+#include "graphicobject.h"
 #include "nametag.h"
 
-using namespace std;
 using namespace graphics;
 using namespace io;
 
 namespace maplemap
 {
-	class npc
+	class npc : public graphicobject
 	{
 	public:
 		npc() {}
 		~npc() {}
 		npc(int, int, bool, short, vector2d);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
-		void update();
+		void draw(vector2d);
+		void setstate(string);
+		void update() { graphicobject::update(&textures[state]); }
 		vector2d getdim() { return textures[state].getdimension(0); }
 	private:
 		map<string, animation> textures;
@@ -46,6 +45,7 @@ namespace maplemap
 		short oid;
 		int id;
 		bool front;
+		bool flip;
 		short fh;
 		vector2d position;
 	};

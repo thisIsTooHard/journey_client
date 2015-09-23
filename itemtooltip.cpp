@@ -21,10 +21,8 @@
 
 namespace io
 {
-	itemtooltip::itemtooltip(imagecache* imgcache)
+	void itemtooltip::init()
 	{
-		imgcache->setmode(ict_sys);
-
 		node itemtt = nx::nodes["UI"]["UIToolTip.img"]["Item"];
 
 		top = texture(itemtt["Frame"]["top"]);
@@ -35,13 +33,11 @@ namespace io
 		cover = texture(itemtt["ItemIcon"]["cover"]);
 		shade = texture(itemtt["ItemIcon"]["shade"]);
 
-		imgcache->unlock();
-
-		info = textlabel(DWF_12LL, TXC_WHITE, "");
-		active = true;
+		itemid = 0;
+		active = false;
 	}
 
-	void itemtooltip::setitem(iteminfo* it)
+	void itemtooltip::setitem(itemdata* it)
 	{
 		item = it;
 		itemid = item->getid();
@@ -49,12 +45,16 @@ namespace io
 		filllength = 200;
 
 		name = textlabel(DWF_20C, TXC_WHITE, item->getname());
+		active = true;
 	}
 
-	void itemtooltip::draw(ID2D1HwndRenderTarget* target, vector2d drawpos)
+	void itemtooltip::draw(vector2d drawpos)
 	{
 		if (active)
 		{
+			int bdelta = SCREENW - drawpos.x() - 277;
+			drawpos.shift(min(bdelta, 0), 16);
+
 			top.draw(drawpos);
 			mid.draw(drawpos + vector2d(0, 13), vector2d(0, filllength));
 			bot.draw(drawpos + vector2d(0, filllength + 13));
@@ -64,27 +64,14 @@ namespace io
 			base.draw(drawpos + vector2d(10, 58));
 			shade.draw(drawpos + vector2d(10, 58));
 
-			vector2d iconpos = drawpos + vector2d(20, 120);
+			vector2d iconpos = drawpos + vector2d(20, 131);
 
-			target->SetTransform(
-				D2D1::Matrix3x2F::Scale(
-				D2D1::Size(2.0f, 2.0f),
-				D2D1::Point2F(
-				static_cast<float>(iconpos.x()),
-				static_cast<float>(iconpos.y()))));
-
-			item->geticon(true).draw(iconpos);
-
-			target->SetTransform(
-				D2D1::Matrix3x2F::Scale(
-				D2D1::Size(1.0f, 1.0f),
-				D2D1::Point2F(
-				static_cast<float>(iconpos.x()),
-				static_cast<float>(iconpos.y()))));
+			texture* ico = &item->geticon(true);
+			ico->draw(iconpos, ico->getdimension() * 2);
 
 			cover.draw(drawpos + vector2d(10, 58));
 
-			name.draw(target, drawpos + vector2d(130, 5));
+			name.draw(drawpos + vector2d(130, 5));
 		}
 	}
 }

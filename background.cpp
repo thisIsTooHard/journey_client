@@ -24,11 +24,18 @@ namespace gameplay
 	{
 		ani = animation(back[src["bS"].get_string() + ".img"][(src["ani"].get_bool()) ? "ani" : "back"][to_string(src["no"].get_integer())]);
 		type = static_cast<bgtype>(src["type"].get_integer());
-		flipped = src["f"].get_bool();
-		pos = vector2d(static_cast<int>(src["x"]), static_cast<int>(src["y"]));
 		rpos = vector2d(static_cast<int>(src["rx"]), static_cast<int>(src["ry"]));
 		cpos = vector2d(static_cast<int>(src["cx"]), static_cast<int>(src["cy"]));
-		alpha = static_cast<float>(src["a"].get_integer() / 255);
+		alpha = static_cast<float>(src["a"].get_integer()) / 255;
+		fx = static_cast<float>(src["x"]);
+		fy = static_cast<float>(src["y"]);
+		flipped = src["f"].get_bool();
+
+		hspeed = 0;
+		vspeed = 0;
+
+		blending = false;
+		resetani();
 
 		mapwalls = walls;
 		mapborders = borders;
@@ -37,9 +44,6 @@ namespace gameplay
 			cpos = vector2d(ani.getdimension(0).x(), cpos.y());
 		if (cpos.y() == 0)
 			cpos = vector2d(cpos.x(), ani.getdimension(0).y());
-
-		fx = static_cast<float>(pos.x());
-		fy = static_cast<float>(pos.y());
 
 		switch (type)
 		{
@@ -51,92 +55,97 @@ namespace gameplay
 		case BGT_VMOVEB:
 			vspeed = 0.5f;
 			break;
+		case BGT_HTILED:
+			if (cpos.x() < 16)
+			{
+				type = BGT_HSTRETCH;
+			}
+			break;
+		case BGT_VTILED:
+			if (cpos.y() < 16)
+			{
+				type = BGT_VSTRETCH;
+			}
+			break;
+		case BGT_TILED:
+			if (cpos.x() < 16 || cpos.y() < 16)
+			{
+				type = BGT_STRETCH;
+			}
+			break;
 		default:
 			hspeed = 0;
 			vspeed = 0;
 		}
 	}
 
-	void background::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	void background::draw(vector2d parentpos)
 	{
-		pos = vector2d(static_cast<int>(fx), static_cast<int>(fy));
+		vector2d pos = getposition();
+
+		vector2d stretch = vector2d();
+		short htile = 1;
+		short vtile = 1;
 
 		vector2d absp = pos + parentpos;
 
 		//vector2d absp = pos + vector2d(static_cast<float>(rpos.x() * parentpos.x()) / 200, static_cast<float>(rpos.y() * parentpos.y()) / 150) + parentpos + vector2d(400, 300);
 
-		if (flipped)
-		{
-			target->SetTransform(
-				D2D1::Matrix3x2F::Scale(
-				D2D1::Size(-1.0f, 1.0f),
-				D2D1::Point2F(
-				(float)absp.x(),
-				(float)absp.y())));
-		}
-
 		switch (type)
 		{
 		case BGT_HMOVEA:
 		case BGT_HTILED:
-			for (short i = pos.x(); i > mapwalls.x() - cpos.x(); i = i - cpos.x())
-			{
-				pos = vector2d(i, pos.y());
-			}
-			for (short i = pos.x(); i < mapwalls.y() + cpos.x(); i = i + cpos.x())
-			{
-				ani.draw(target, vector2d(i + parentpos.x(), absp.y()), alpha);
-			}
+			htile = (mapwalls.y() + cpos.x() - mapwalls.x()) / cpos.x();
+			absp.setx(parentpos.x() - cpos.x());
 			break;
 		case BGT_VMOVEA:
 		case BGT_VTILED:
-			for (short i = pos.y(); i > mapborders.x() - cpos.y(); i = i - cpos.y())
-			{
-				pos = vector2d(pos.x(), i);
-			}
-			for (short i = pos.y(); i < mapborders.y() + cpos.y(); i = i + cpos.y())
-			{
-				ani.draw(target, vector2d(absp.x(), i + parentpos.y()), alpha);
-			}
+			vtile = (mapborders.y() + cpos.y() - mapborders.x()) / cpos.y();
+			absp.sety(parentpos.y() - cpos.y());
 			break;
 		case BGT_HMOVEB:
 		case BGT_VMOVEB:
 		case BGT_TILED:
-			for (short i = pos.x(); i > mapwalls.x() - cpos.x(); i = i - cpos.x())
-			{
-				pos = vector2d(i, pos.y());
-			}
-			for (short i = pos.y(); i > mapborders.x() - cpos.y(); i = i - cpos.y())
-			{
-				pos = vector2d(pos.x(), i);
-			}
-			for (short i = pos.x(); i < mapwalls.y() + cpos.x(); i = i + cpos.x())
-			{
-				for (short h = pos.y(); h < mapborders.y() + cpos.y(); h = h + cpos.y())
-				{
-					ani.draw(target, vector2d(i + parentpos.x(), h + parentpos.y()), alpha);
-				}
-			}
+			htile = (mapwalls.y() + cpos.x() - mapwalls.x()) / cpos.x();
+			vtile = (mapborders.y() + cpos.y() - mapborders.x()) / cpos.y();
+			absp = parentpos - cpos;
 			break;
-		default:
-			ani.draw(target, absp, alpha);
+		case BGT_HSTRETCH:
+			absp.setx(0);
+			stretch.setx(800);
+			break;
+		case BGT_VSTRETCH:
+			absp.sety(0);
+			stretch.sety(600);
+			break;
+		case BGT_STRETCH:
+			absp = vector2d();
+			stretch = vector2d(800, 600);
+			break;
 		}
-
-		if (flipped)
+		
+		texture* txt = ani.gettexture(frame);
+		if (txt)
 		{
-			target->SetTransform(
-				D2D1::Matrix3x2F::Scale(
-				D2D1::Size(1.0f, 1.0f),
-				D2D1::Point2F(
-				(float)absp.x(),
-				(float)absp.y())));
+			for (short h = 0; h < htile; h++)
+			{
+				for (short v = 0; v < vtile; v++)
+				{
+					txt->draw(absp, stretch, alpha, flipped);
+
+					absp.shifty(cpos.y());
+				}
+
+				absp.shiftx(cpos.x());
+			}
 		}
 	}
 
-	void background::update()
+	bool background::update()
 	{
-		ani.update();
-		fx += hspeed;
-		fy += vspeed;
+		graphicobject::update(&ani);
+		moveobject::update();
+
+		return false;
 	}
 }

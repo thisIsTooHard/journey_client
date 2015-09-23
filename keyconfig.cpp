@@ -89,7 +89,7 @@ namespace io
 			}
 			else if (type == KT_CASH || type == KT_ITEM)
 			{
-				iteminfo* item = app.getui()->getfield()->getitems()->getitem(action);
+				itemdata* item = cache.getitems()->getitem(action);
 				if (item)
 				{
 					dragicons.push_back(dragicon(DIT_ITEMKEY, itemicon(item->geticons(), true, invent->countitem(action)), txtkey, pos, key, action));
@@ -97,10 +97,10 @@ namespace io
 			}
 			else if (type == KT_SKILL)
 			{
-				skill* skl = app.getui()->getfield()->getattacks()->getskill(action);
-				if (skl)
+				skilldata* skill = cache.getskills()->getskill(action);
+				if (skill)
 				{
-					dragicons.push_back(dragicon(DIT_SKILLKEY, skl->geticon(0), txtkey, pos, key, action));
+					dragicons.push_back(dragicon(DIT_SKILLKEY, skill->geticon(0), txtkey, pos, key, action));
 				}
 			}
 		}

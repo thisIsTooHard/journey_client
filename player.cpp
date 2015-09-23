@@ -15,42 +15,46 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
+#pragma once
 #include "Journey.h"
 
 namespace gameplay
 {
 	player::player(maplechar* ch)
 	{
-		look = ch->copylook();
-		stats = ch->copystats();
+		look = ch->getlook();
+		stats = ch->getstats();
 
-		name = textlabel(DWF_14C, TXC_WHITE, stats.getname(), TXB_NAMETAG);
-	}
-
-	void player::init(int meso, skillbook skl, questlog qst, pair<vector<int>, vector<int>> trock, int cov, map<short, char> mb, map<short, string> area)
-	{
-		stats.setmeso(meso);
-		skills = skl;
-		quests = qst;
-		trockmaps = trock;
-		bookcover = cov;
-		bookcards = mb;
-		areainfo = area;
-
-		recalcstats(true);
-
+		elapsed = 0;
 		hspeed = 0;
 		vspeed = 0;
 		state = PST_STAND;
 		nofriction = false;
 		fleft = true;
-		look.setfleft(true);
+		look->setfleft(true);
 		candjump = true;
 
 		for (moveinput i = MIN_LEFT; i <= MIN_JUMP; i = static_cast<moveinput>(i + 1))
 		{
 			keydown[i] = false;
 		}
+
+		name = textlabel(DWF_14C, TXC_WHITE, stats->getname(), TXB_NAMETAG);
+	}
+
+	void player::init(int meso, skillbook skl, questlog qst, map<short, string> area)
+	{
+		stats->setmeso(meso);
+		skills = skl;
+		quests = qst;
+		areainfo = area;
+
+		recalcstats(true);
+	}
+
+	void player::updatefht()
+	{
+		footholds = cache.getmap()->getfht();
 	}
 
 	void player::setposition(vector2d pos)
@@ -67,18 +71,14 @@ namespace gameplay
 		{
 			state = PST_FALL;
 		}
-		else if (state == PST_CLIMB)
+		else if (state == PST_LADDER || state == PST_ROPE)
 		{
 			state = PST_STAND;
 		}
 	}
 
-	void player::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	void player::draw(vector2d parentpos)
 	{
-		fx += hspeed;
-		fy += vspeed;
-		position = getposition();
-
 		if (vspeed > 0)
 		{
 			if (fy + vspeed >= ground && ground >= fy)
@@ -88,21 +88,26 @@ namespace gameplay
 			}
 		}
 
+		fx += hspeed;
+		fy += vspeed;
+		position = getposition();
+
 		vector2d absp = parentpos + position;
 
-		look.draw(target, absp);
-		name.draw(target, absp);
-		effects.draw(target, absp);
+		look->draw(absp);
+
+		name.draw(absp);
+		effects.draw(absp);
 	}
 
-	movefragment player::update()
+	bool player::update()
 	{
-		bool anidone = look.update();
+		bool anidone = look->update();
 		effects.update();
 
 		float fspeed = WALKSPEED * static_cast<float>(speed) / 100;
 
-		if (state == PST_CLIMB)
+		if (state == PST_LADDER || state == PST_ROPE)
 		{
 			if (keydown[MIN_UP])
 			{
@@ -122,15 +127,21 @@ namespace gameplay
 			if (vspeed > 0)
 			{
 				vspeed -= cfriction;
-				vspeed = max(vspeed, 0);
+				if (vspeed < 0)
+				{
+					vspeed = 0;
+				}
 			}
 			else if (vspeed < 0)
 			{
 				vspeed += cfriction;
-				vspeed = min(vspeed, 0);
+				if (vspeed > 0)
+				{
+					vspeed = 0;
+				}
 			}
 
-			if (fy + vspeed > ladrrope.vertical.y() || fy + vspeed < ladrrope.vertical.x())
+			if (fy + vspeed * 2 > ladrrope->vertical.y() || fy + vspeed * 2 < ladrrope->vertical.x())
 			{
 				state = PST_FALL;
 			}
@@ -149,7 +160,10 @@ namespace gameplay
 				else if (hspeed < 0)
 				{
 					hspeed += 0.13f;
-					hspeed = min(hspeed, 0);
+					if (hspeed > 0)
+					{
+						hspeed = 0;
+					}
 				}
 
 				if (keydown[MIN_RIGHT])
@@ -160,7 +174,10 @@ namespace gameplay
 				else if (hspeed > 0)
 				{
 					hspeed -= 0.13f;
-					hspeed = max(hspeed, 0);
+					if (hspeed < 0)
+					{
+						hspeed = 0;
+					}
 				}
 			}
 
@@ -175,7 +192,7 @@ namespace gameplay
 					break;
 				case PST_PRONE:
 				case PST_STAND:
-				case PST_CLIMB:
+				case PST_LADDER:
 				case PST_WALK:
 					friction = 0.08f;
 					break;
@@ -187,12 +204,18 @@ namespace gameplay
 				if (hspeed > 0)
 				{
 					hspeed -= friction;
-					hspeed = max(hspeed, 0);
+					if (hspeed < 0)
+					{
+						hspeed = 0;
+					}
 				}
 				else if (hspeed < 0)
 				{
 					hspeed += friction;
-					hspeed = min(hspeed, 0);
+					if (hspeed > 0)
+					{
+						hspeed = 0;
+					}
 				}
 			}
 
@@ -269,69 +292,77 @@ namespace gameplay
 			}
 		}
 
-		look.setfleft(fleft);
+		look->setfleft(fleft);
 
 		switch (state)
 		{
 		case PST_STAND:
 			if (hspeed == 0)
 			{
-				look.setstate("stand");
+				look->setstate("stand");
 			}
 			else
 			{
-				look.setstate("walk");
+				look->setstate("walk");
 			}
 			break;
 		case PST_WALK:
-			look.setstate("walk", static_cast<float>(speed) / 100);
+			look->setstate("walk", static_cast<float>(speed) / 100);
 			break;
 		case PST_FALL:
-			look.setstate("jump");
+			look->setstate("jump");
 			break;
 		case PST_PRONE:
-			look.setstate("prone");
+			look->setstate("prone");
 			break;
-		case PST_CLIMB:
-			look.setstate((ladrrope.ladder) ? "ladder" : "rope", static_cast<float>(abs(vspeed)) / 2);
+		case PST_ROPE:
+			look->setstate("rope", static_cast<float>(abs(vspeed)) / 2);
+			break;
+		case PST_LADDER:
+			look->setstate("ladder", static_cast<float>(abs(vspeed)) / 2);
 			break;
 		}
 
 		movefragment ret;
 		ret.newstate = 0;
 
-		elapsed += DPF;
-		if (elapsed > 100)
+		if (elapsed == 0)
 		{
-			switch (state)
-			{
-			case PST_WALK:
-				ret.newstate = 2;
-				break;
-			case PST_STAND:
-				ret.newstate = 4;
-				break;
-			case PST_FALL:
-				ret.newstate = 6;
-				break;
-			}
+			movefragment firstmove;
+			firstmove.type = MVT_ABSOLUTE;
+			firstmove.command = 0;
+			firstmove.newstate = fleft ? state + 1 : state;
+			firstmove.xpps = 0;
+			firstmove.ypps = 0;
+			firstmove.xpos = static_cast<short>(fx);
+			firstmove.ypos = static_cast<short>(fy);
+			firstmove.unk = 34;
+			firstmove.duration = DPF * 10;
 
-			if (ret.newstate > 0)
-			{
-				ret.command = 0;
-				ret.newstate += fleft ? 1 : 0;
-				ret.xpps = static_cast<short>(hspeed * 6);
-				ret.ypps = static_cast<short>(vspeed * 6);
-				ret.xpos = static_cast<short>(fx + hspeed);
-				ret.ypos = static_cast<short>(fy + vspeed);
-				ret.duration = 100;
-				ret.unk = 0;
-			}
-
-			elapsed = 0;
+			moves.push_back(firstmove);
 		}
+		else if (elapsed == DPF * 2)
+		{
+			movefragment lastmove;
+			lastmove.type = MVT_ABSOLUTE;
+			lastmove.command = 0;
+			lastmove.newstate = fleft ? state + 1 : state;
+			lastmove.xpps = static_cast<short>(hspeed * 10);
+			lastmove.ypps = static_cast<short>(vspeed * 10);
+			lastmove.xpos = static_cast<short>(fx);
+			lastmove.ypos = static_cast<short>(fy);
+			lastmove.unk = 34;
+			lastmove.duration = DPF * 2;
 
-		return ret;
+			moves.push_back(lastmove);
+			packet_c.moveplayer(&moves);
+			moves.clear();
+
+			elapsed = -DPF;
+		}
+		elapsed += DPF;
+
+		return false;
 	}
 
 	void player::key_left(bool kst)
@@ -462,14 +493,15 @@ namespace gameplay
 					state = PST_FALL;
 				}
 				break;
-			case PST_CLIMB:
+			case PST_LADDER:
+			case PST_ROPE:
 				if (keydown[MIN_LEFT] || keydown[MIN_RIGHT])
 				{
 					fleft = keydown[MIN_LEFT];
 					fleft = !keydown[MIN_RIGHT];
 					vspeed = -JUMPSPEED * (static_cast<float>(jump) / 200);
 					state = PST_FALL;
-					ladrrope.vertical = vector2d();
+					ladrrope->vertical = vector2d();
 				}
 				break;
 			}
@@ -487,9 +519,21 @@ namespace gameplay
 			case PST_STAND:
 			case PST_WALK:
 				hspeed = 0;
-				state = PST_PRONE;
-				break;
-			case PST_CLIMB:
+
+				ladrrope = cache.getmap()->getlandr()->getlr(getposition(), false);
+
+				if (ladrrope)
+				{
+					fleft = true;
+					fx = static_cast<float>(ladrrope->x);
+					hspeed = 0;
+					vspeed = 0;
+					state = PST_LADDER;
+				}
+				else
+				{
+					state = PST_PRONE;
+				}
 				break;
 			}
 		}
@@ -518,40 +562,60 @@ namespace gameplay
 
 	void player::key_up(bool kst)
 	{
+		if (kst)
+		{
+			if (state != PST_LADDER && state != PST_ROPE)
+			{
+				ladrrope = cache.getmap()->getlandr()->getlr(getposition(), true);
+
+				if (ladrrope)
+				{
+					fleft = true;
+					fx = static_cast<float>(ladrrope->x);
+					hspeed = 0;
+					if (vspeed > 0)
+					{
+						vspeed = 0;
+					}
+					state = ladrrope->ladder ? PST_LADDER : PST_ROPE;
+				}
+			}
+		}
+
 		keydown[MIN_UP] = kst;
 	}
 
 	bool player::tryattack(attackinfo* info, int skillid, short hpcost, short mpcost)
 	{
-		bool stateok = state != PST_SKILL && state != PST_CLIMB;
+		bool stateok = state != PST_SKILL && state != PST_LADDER && state != PST_ROPE;
 		bool nocd = skills.getcd(skillid) == 0;
-		bool hpmpok = stats.getstat(MS_HP) >= hpcost && stats.getstat(MS_MP) >= mpcost;
+		bool hpmpok = stats->getstat(MS_HP) >= hpcost && stats->getstat(MS_MP) >= mpcost;
 
 		bool allow = stateok && nocd && hpmpok;
 
 		if (allow)
 		{
-			info->mastery = stats.getmastery();
-			info->maxdamage = stats.getmaxdamage();
-			info->mindamage = stats.getmindamage();
-			info->pllevel = stats.getstat(MS_LEVEL);
-			info->speed = look.getcloth(EQL_WEAPON)->getwspeed();
+			info->mastery = stats->getmastery();
+			info->maxdamage = stats->getmaxdamage();
+			info->mindamage = stats->getmindamage();
+			info->pllevel = stats->getstat(MS_LEVEL);
+			info->speed = look->getcloth(EQL_WEAPON)->getwspeed();
 			info->direction = fleft ? 1 : 0;
 			info->skill = skillid;
-			info->critical = stats.getcritical();
-			info->accuracy = stats.getaccuracy() + invent.getaccuracy();
+			info->critical = stats->getcritical();
+			info->accuracy = stats->getaccuracy() + invent.getaccuracy();
 
 			if (skillid == 0)
 			{
 				if (state == PST_PRONE)
 				{
 					state = PST_SKILL;
-					look.setstate("proneStab", getattspeed());
+					look->setstate("proneStab", getattspeed());
 				}
 				else
 				{
 					state = PST_SKILL;
-					look.setstate("attack", getattspeed());
+					look->setstate("attack", getattspeed());
 				}
 			}
 		}
@@ -562,12 +626,12 @@ namespace gameplay
 	void player::setaction(string act)
 	{
 		state = PST_SKILL;
-		look.setaction(act, getattspeed());
+		look->setaction(act, getattspeed());
 	}
 
 	float player::getattspeed()
 	{ 
-		return 1.7f - (static_cast<float>(look.getcloth(EQL_WEAPON)->getwspeed()) / 10); 
+		return 1.7f - (static_cast<float>(look->getcloth(EQL_WEAPON)->getwspeed()) / 10); 
 	}
 
 	void player::recalcstats(bool equipchange)
@@ -580,28 +644,19 @@ namespace gameplay
 		speed = 100 + invent.gettotal(ES_SPEED);
 		jump = 100 + invent.gettotal(ES_JUMP);
 
-		stats.settotal(MS_STR, stats.getstat(MS_STR) + invent.gettotal(ES_STR));
-		stats.settotal(MS_DEX, stats.getstat(MS_DEX) + invent.gettotal(ES_DEX));
-		stats.settotal(MS_INT, stats.getstat(MS_INT) + invent.gettotal(ES_INT));
-		stats.settotal(MS_LUK, stats.getstat(MS_LUK) + invent.gettotal(ES_LUK));
-		stats.settotal(MS_MAXHP, stats.getstat(MS_MAXHP) + invent.gettotal(ES_HP));
-		stats.settotal(MS_MAXMP, stats.getstat(MS_MAXMP) + invent.gettotal(ES_MP));
+		stats->settotal(MS_STR, stats->getstat(MS_STR) + invent.gettotal(ES_STR));
+		stats->settotal(MS_DEX, stats->getstat(MS_DEX) + invent.gettotal(ES_DEX));
+		stats->settotal(MS_INT, stats->getstat(MS_INT) + invent.gettotal(ES_INT));
+		stats->settotal(MS_LUK, stats->getstat(MS_LUK) + invent.gettotal(ES_LUK));
+		stats->settotal(MS_MAXHP, stats->getstat(MS_MAXHP) + invent.gettotal(ES_HP));
+		stats->settotal(MS_MAXMP, stats->getstat(MS_MAXMP) + invent.gettotal(ES_MP));
 
-		stats.setattack(invent.gettotal(ES_WATK));
+		stats->setattack(invent.gettotal(ES_WATK));
 
-		short primary = stats.getprim(look.getweptype());
-		short secondary = stats.getsec(look.getweptype());
-		short watk = stats.getattack();
-		float wmult = look.getcloth(EQL_WEAPON)->getwmultiplier();
-		stats.calcdamage(static_cast<short>(primary * wmult), secondary, watk);
-	}
-
-	void player::setlr(ladderrope lr)
-	{
-		ladrrope = lr;
-		hspeed = 0;
-		vspeed = min(vspeed, 0);
-		fx = static_cast<float>(lr.x);
-		state = PST_CLIMB;
+		short primary = stats->getprim(look->getweptype());
+		short secondary = stats->getsec(look->getweptype());
+		short watk = stats->getattack();
+		float wmult = look->getcloth(EQL_WEAPON)->getwmultiplier();
+		stats->calcdamage(static_cast<short>(primary * wmult), secondary, watk);
 	}
 }

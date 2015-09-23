@@ -36,7 +36,7 @@ namespace io
 		active = false;
 	}
 
-	void nametag::draw(ID2D1HwndRenderTarget* target, vector2d parentpos)
+	void nametag::draw(vector2d parentpos)
 	{
 		int length = static_cast<int>(content.getlength());
 
@@ -45,6 +45,6 @@ namespace io
 		tag[active][1].draw(bgpos + vector2d(8, 0), vector2d(length, 0));
 		tag[active][2].draw(bgpos + vector2d(8, 0) + vector2d(length, 0));
 
-		content.draw(target, position + parentpos);
+		content.draw(position + parentpos);
 	}
 }

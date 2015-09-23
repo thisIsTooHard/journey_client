@@ -21,12 +21,15 @@
 
 namespace maplemap
 {
-	mapportals::mapportals(node src, int mapid)
+	void mapportals::init()
 	{
 		node pnode = nx::nodes["Map"]["MapHelper.img"]["portal"]["game"];
 		animations[PT_REGULAR] = animation(pnode["pv"]);
 		animations[PT_HIDDEN] = animation(pnode["ph"]["default"]["portalContinue"]);
+	}
 
+	void mapportals::load(node src, int mapid)
+	{
 		for (node ptnode = src.begin(); ptnode != src.end(); ++ptnode)
 		{
 			char pid = static_cast<char>(stoi(ptnode.name()));
@@ -36,18 +39,18 @@ namespace maplemap
 			string targetname = ptnode["tn"];
 			vector2d pos = vector2d(ptnode["x"], ptnode["y"]);
 
-			animation anim;
+			animation* anim;
 			switch (type)
 			{
 			case PT_REGULAR:
 			case PT_HIDDEN:
-				anim = animations[type];
+				anim = &animations[type];
 				break;
 			case PT_SCRIPTED_HIDDEN:
-				anim = animations[PT_HIDDEN];
+				anim = &animations[PT_HIDDEN];
 				break;
 			default:
-				anim = animation();
+				anim = 0;
 			}
 
 			portals.add(pid, portal(type, name, targetid, mapid == targetid, targetname, anim, pos));
@@ -91,11 +94,11 @@ namespace maplemap
 		return warpinfo;
 	}
 
-	void mapportals::draw(ID2D1HwndRenderTarget* target, vector2d viewpos)
+	void mapportals::draw(vector2d viewpos)
 	{
 		for (smit<char, portal> ptit = portals.getit(); ptit.belowtop(); ptit++)
 		{
-			ptit->draw(target, viewpos);
+			ptit->draw(viewpos);
 		}
 	}
 

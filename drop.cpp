@@ -59,10 +59,10 @@ namespace maplemap
 
 		if (state == DST_PICKEDUP)
 		{
-			alpha -= 0.025f;
-			if (alpha < 0.025f)
+			dalpha -= 0.025f;
+			if (dalpha < 0.025f)
 			{
-				alpha = 0.0f;
+				dalpha = 0.0f;
 				state = DST_INACTIVE;
 				return true;
 			}

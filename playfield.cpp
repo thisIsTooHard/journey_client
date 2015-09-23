@@ -26,6 +26,12 @@ namespace gameplay
 		active = false;
 	}
 
+	void playfield::init()
+	{
+		drops.init();
+		portals.init();
+	}
+
 	bool playfield::moveup(bool keydown)
 	{
 		bool enable = true;
@@ -34,7 +40,7 @@ namespace gameplay
 		{
 			pair<int, string> warpinfo = portals.getportal(playerchar.bounds());
 
-			if (warpinfo.first == maplemap.getid())
+			if (warpinfo.first == cache.getmap()->getid())
 			{
 				vector2d spawnpos = portals.getspawnpoint(warpinfo.second);
 				playerchar.setposition(spawnpos);
@@ -46,18 +52,7 @@ namespace gameplay
 			}
 		}
 
-		if (playerchar.onladderrope())
-		{
-			playerchar.key_up(keydown);
-		}
-		else if (keydown)
-		{
-			ladderrope lr = landr.getlr(playerchar.getposition());
-			if (lr.vertical.contains(playerchar.getposition().y()))
-			{
-				playerchar.setlr(lr);
-			}
-		}
+		playerchar.key_up(keydown);
 
 		return enable;
 	}
@@ -69,7 +64,7 @@ namespace gameplay
 
 		if (skillid > 0)
 		{
-			skill* touse = attfactory.getskill(skillid);
+			skilldata* touse = cache.getskills()->getskill(skillid);
 			char skill_l = playerchar.getskills()->getlevel(skillid);
 			if (skill_l > 0)
 			{
@@ -120,9 +115,9 @@ namespace gameplay
 
 			if (allowed)
 			{
-				regularattack regtype = static_cast<regularattack>(playerchar.getlook()->getcloth(EQL_WEAPON)->getattack());
+				clothing* weapon = playerchar.getlook()->getcloth(EQL_WEAPON);
 
-				rectangle2d range = attfactory.getnormalrange(regtype);
+				rectangle2d range = weapon->getrange();
 				vector2d plpos = playerchar.getposition();
 				bool left = playerchar.getleft();
 				if (left)
@@ -145,19 +140,26 @@ namespace gameplay
 
 				mobs.sendattack(&attack, range);
 
-				switch (regtype)
+				switch (weapon->getweptype())
 				{
-				case RGA_1HWEP:
-				case RGA_2HWEP:
-				case RGA_SPEAR_PA:
-				case RGA_KNUCKLE:
+				case WEP_1H_SWORD:
+				case WEP_1H_AXE:
+				case WEP_1H_MACE:
+				case WEP_SPEAR:
+				case WEP_POLEARM:
+				case WEP_DAGGER:
+				case WEP_KNUCKLE:
 					type = ATT_CLOSE;
 					break;
-				case RGA_BOW:
-				case RGA_XBOW:
-				case RGA_CLAW:
-				case RGA_GUN:
+				case WEP_BOW:
+				case WEP_CROSSBOW:
+				case WEP_CLAW:
+				case WEP_GUN:
 					type = ATT_RANGED;
+					break;
+				case WEP_WAND:
+				case WEP_STAFF:
+					type = ATT_MAGIC;
 					break;
 				}
 			}
@@ -174,7 +176,7 @@ namespace gameplay
 	void playfield::useitem(int itemid)
 	{
 		inventorytype type = playerchar.getinventory()->gettypebyid(itemid);
-		short slot = playerchar.getinventory()->finditem(itemid);
+		short slot = playerchar.getinventory()->finditem(type, itemid);
 
 		if (slot >= 0)
 		{
@@ -185,29 +187,29 @@ namespace gameplay
 		}
 	}
 
-	void playfield::draw(ID2D1HwndRenderTarget* target)
+	void playfield::draw()
 	{
 		if (active)
 		{
 			cam.update(playerchar.getposition());
 
 			vector2d viewpos = cam.getposition();
-			backgrounds.drawbackgrounds(target, viewpos);
-			layers[0].draw(target, viewpos);
-			layers[1].draw(target, viewpos);
-			layers[2].draw(target, viewpos);
-			layers[3].draw(target, viewpos);
-			layers[4].draw(target, viewpos);
-			layers[5].draw(target, viewpos);
-			layers[6].draw(target, viewpos);
-			layers[7].draw(target, viewpos);
-			npcs.draw(target, viewpos);
-			mobs.draw(target, viewpos);
-			chars.draw(target, viewpos);
-			playerchar.draw(target, viewpos);
-			drops.draw(target, viewpos);
-			portals.draw(target, viewpos);
-			backgrounds.drawforegrounds(target, viewpos);
+			backgrounds.drawbackgrounds(viewpos);
+			layers[0].draw(viewpos);
+			layers[1].draw(viewpos);
+			layers[2].draw(viewpos);
+			layers[3].draw(viewpos);
+			layers[4].draw(viewpos);
+			layers[5].draw(viewpos);
+			layers[6].draw(viewpos);
+			layers[7].draw(viewpos);
+			npcs.draw(viewpos);
+			mobs.draw(viewpos);
+			chars.draw(viewpos);
+			playerchar.draw(viewpos);
+			drops.draw(viewpos);
+			portals.draw(viewpos);
+			backgrounds.drawforegrounds(viewpos);
 		}
 	}
 
@@ -220,13 +222,7 @@ namespace gameplay
 			mobs.update();
 			drops.update();
 			chars.update();
-
-			movefragment movement = playerchar.update();
-			if (movement.newstate > 0)
-			{
-				packet_c.moveplayer(movement);
-			}
-
+			playerchar.update();
 			portals.update(playerchar.bounds());
 
 			for (int i = 0; i < 8; i++)
@@ -251,23 +247,26 @@ namespace gameplay
 		portals.clear();
 		chars.clear();
 
+		cache.getmobs()->clear();
+
+		mapdata* mdata = cache.getmap();
+
+		mdata->load(mapid);
+
 		app.getimgcache()->setmode(ict_map);
 		nl::nx::view_file("Map");
 
 		string strid = to_string(mapid);
 		strid.insert(0, 9 - strid.length(), '0');
+		node src = nl::nx::nodes["Map"]["Map"]["Map" + to_string(mapid / 100000000)][strid + ".img"];
 
-		node mapdata = nl::nx::nodes["Map"]["Map"]["Map" + to_string(mapid / 100000000)][strid + ".img"];
+		backgrounds = mapbackgrounds(src["back"]);
 
-		footholds = footholdtree(mapdata["foothold"]);
-		maplemap = mapinfo(mapid, mapdata["info"], vector2d(footholds.getwalls()), vector2d(footholds.getborders()));
-		landr = laddersropes(mapdata["ladderRope"]);
-		portals = mapportals(mapdata["portal"], mapid);
-		backgrounds = mapbackgrounds(mapdata["back"], maplemap.getwalls(), maplemap.getborders());
+		portals.load(src["portal"], mapid);
 
 		for (int i = 0; i < 8; i++)
 		{
-			layers[i] = maplayer(mapdata[to_string(i)]);
+			layers[i] = maplayer(src[to_string(i)]);
 		}
 
 		nl::nx::unview_file("Map");
@@ -275,14 +274,11 @@ namespace gameplay
 
 		vector2d startpos = portals.getspawnpoint(pid);
 
-		playerchar.setfh(&footholds);
+		playerchar.updatefht();
 		playerchar.setposition(startpos);
 
 		cam.setposition(startpos);
-		cam.setbounds(maplemap.getwalls(), maplemap.getborders());
-
-		mobs.setfh(&footholds);
-		drops.setfh(&footholds);
+		cam.updateview();
 
 		active = true;
 	}

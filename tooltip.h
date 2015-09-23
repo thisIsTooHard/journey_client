@@ -36,7 +36,7 @@ namespace io
 		tooltip(string, tooltiptype, vector2d);
 		tooltip() {}
 		virtual ~tooltip() {}
-		virtual void draw(ID2D1HwndRenderTarget*, vector2d);
+		virtual void draw(vector2d);
 		virtual void update() {}
 		void setactive(bool a) { active = a; }
 		void setpos(vector2d p) { position = p; }

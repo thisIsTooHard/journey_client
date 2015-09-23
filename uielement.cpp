@@ -26,25 +26,25 @@ namespace io
 		icon->resetdrag();
 	}
 
-	void uielement::draw(ID2D1HwndRenderTarget* target)
+	void uielement::draw()
 	{
 		if (active)
 		{
 			for (vector<sprite>::iterator itspr = sprites.begin(); itspr != sprites.end(); ++itspr)
 			{
-				itspr->draw(target, position);
+				itspr->draw(position);
 			}
 			for (map<short, button>::iterator itbt = buttons.begin(); itbt != buttons.end(); ++itbt)
 			{
-				itbt->second.draw(target, position);
+				itbt->second.draw(position);
 			}
 			for (map<textid, textfield>::iterator ittxt = textfields.begin(); ittxt != textfields.end(); ++ittxt)
 			{
-				ittxt->second.draw(target, position);
+				ittxt->second.draw(position);
 			}
 			for (vector<dragicon>::iterator itdg = dragicons.begin(); itdg != dragicons.end(); ++itdg)
 			{
-				itdg->draw(target, position);
+				itdg->draw(position);
 			}
 		}
 	}
@@ -116,7 +116,7 @@ namespace io
 			for (map<short, button>::iterator itbt = buttons.begin(); itbt != buttons.end(); ++itbt)
 			{
 				string btst = itbt->second.getstate();
-				if (util::colliding(pos, itbt->second.bounds(), position) && itbt->second.isactive())
+				if (itbt->second.bounds(position).contains(pos) && itbt->second.isactive())
 				{
 					anycoll = true;
 					switch (state)
@@ -162,7 +162,7 @@ namespace io
 			{
 				if (txtit->second.isactive())
 				{
-					if (txtit->second.bounds().contains(pos))
+					if (txtit->second.bounds(position).contains(pos))
 					{
 						switch (state)
 						{

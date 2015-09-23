@@ -19,14 +19,14 @@
 #include "itemcache.h"
 #include "Journey.h"
 
-namespace gameplay
+namespace data
 {
-	iteminfo* itemcache::getitem(int itemid)
+	itemdata* itemcache::getitem(int itemid)
 	{
 		if (!items.count(itemid))
 		{
 			app.getimgcache()->setmode(ict_sys);
-			iteminfo toadd = iteminfo(itemid);
+			itemdata toadd = itemdata(itemid);
 			app.getimgcache()->unlock();
 
 			if (toadd.isloaded())

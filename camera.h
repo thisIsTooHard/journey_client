@@ -38,7 +38,7 @@ namespace gameplay
 		vector2d update(vector2d);
 		vector2d getposition();
 		void setposition(vector2d);
-		void setbounds(vector2d, vector2d);
+		void updateview();
 	};
 }
 

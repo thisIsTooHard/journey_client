@@ -25,17 +25,17 @@ namespace maplemap
 	class mapdrops
 	{
 	public:
-		mapdrops() { footholds = 0; }
-		~mapdrops();
+		mapdrops() {}
+		~mapdrops() { drops.clear(); }
+		void init();
 		void adddrop(short, int, bool, int, vector2d, vector2d, char, bool);
 		void removedrop(short, char);
-		void draw(ID2D1HwndRenderTarget*, vector2d);
+		void draw(vector2d);
 		void update();
 		void clear() { drops.clear(); }
-		void setfh(footholdtree* f) { footholds = f; }
 	private:
 		safeptrmap<short, drop*> drops;
-		footholdtree* footholds;
+		map<mesoamount, animation> mesos;
 	};
 }
 
