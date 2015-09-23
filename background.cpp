@@ -34,7 +34,6 @@ namespace gameplay
 		hspeed = 0;
 		vspeed = 0;
 
-		blending = false;
 		resetani();
 
 		mapwalls = walls;

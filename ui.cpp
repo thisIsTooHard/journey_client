@@ -419,4 +419,12 @@ namespace io
 			equipinfo.clear();
 		}
 	}
+
+	void ui::sendchat(int cid, bool gm, string txt)
+	{
+		if (elements.contains(UI_CHATBAR))
+		{
+			elements.get(UI_CHATBAR)->sendstring(txt);
+		}
+	}
 }

@@ -32,7 +32,6 @@ namespace graphics
 	protected:
 		short elapsed;
 		byte frame;
-		bool blending;
 		float alpha;
 		float alphastep;
 	};

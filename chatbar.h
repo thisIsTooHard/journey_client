@@ -37,6 +37,7 @@ namespace io
 		~chatbar() {}
 		void draw();
 		void update();
+		void sendchat(string);
 		void buttonpressed(short);
 		rectangle2d bounds();
 	private:
@@ -44,6 +45,8 @@ namespace io
 		map<chattarget, texture> chattargets;
 		texture chatenter;
 		texture chatcover;
+		textlabel closedtext;
+		vector<string> lines;
 		bool open;
 		chattarget chattarget;
 	};

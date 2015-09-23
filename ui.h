@@ -47,6 +47,7 @@ namespace io
 		void sendmouse(mousestate, vector2d);
 		void showiteminfo(int);
 		void showequipinfo(int, short);
+		void sendchat(int, bool, string);
 		void setactive(bool a) { active = a; }
 		void sendmouse(vector2d p) { sendmouse(mouse.getstate(), p); }
 		void enableactions() { actionsenabled = true; }

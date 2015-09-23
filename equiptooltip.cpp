@@ -252,8 +252,7 @@ namespace io
 
 			vector2d iconpos = pos + vector2d(20, 82);
 
-			texture* ico = &cloth->geticon(true);
-			ico->draw(iconpos, 2.0f, 2.0f);
+			cloth->geticon(true).draw(iconpos, 2.0f, 2.0f);
 
 			potential[rank].draw(pos + vector2d(10, 10));
 			cover.draw(pos + vector2d(10, 10));

@@ -23,7 +23,6 @@ namespace graphics
 	{
 		elapsed = 0;
 		frame = 0;
-		blending = false;
 		alpha = 1.0f;
 		alphastep = 0.0f;
 	}
@@ -55,7 +54,7 @@ namespace graphics
 			{
 				elapsed += amount;
 
-				if (blending)
+				if (ani->hasblending())
 				{
 					alpha += alphastep;
 					if (alpha < 0.f)
@@ -71,7 +70,7 @@ namespace graphics
 
 					frame = ani->nextframe(frame);
 
-					if (blending)
+					if (ani->hasblending())
 					{
 						float nexta = static_cast<float>(ani->getalpha(frame) - alpha);
 						alphastep = (nexta * amount) / delay;

@@ -113,16 +113,8 @@ namespace gameplay
 				hair->draw(CL_HAIRSHADE, state, frame, absp, !faceleft);
 
 				vector2d facepos = bodyinfo->facepos[state][frame];
-				if (faceleft)
-				{
-					face->draw(state_f, frame_f, absp, facepos, false);
-					clothes[EQL_FACEACC]->draw(CL_FACEACC, (state_f == "default") ? "blink" : state_f, 0, absp + facepos, false);
-				}
-				else
-				{
-					face->draw(state_f, frame_f, absp, facepos, true);
-					clothes[EQL_FACEACC]->draw(CL_FACEACC, (state_f == "default") ? "blink" : state_f, 0, absp, facepos);
-				}
+				face->draw(state_f, frame_f, absp, facepos, !faceleft);
+				clothes[EQL_FACEACC]->draw(CL_FACEACC, (state_f == "default") ? "blink" : state_f, 0, absp, facepos, !faceleft);
 				clothes[EQL_EYEACC]->draw(CL_EYEACC, state, frame, absp, !faceleft);
 				clothes[EQL_SHIELD]->draw(CL_SHIELD, state, frame, absp, !faceleft);
 

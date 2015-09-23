@@ -71,7 +71,7 @@ namespace character
 		charsprites() {}
 		virtual ~charsprites() {}
 		virtual void draw(charlayer, string, byte, vector2d, bool);
-		virtual void draw(charlayer, string, byte, vector2d, vector2d);
+		virtual void draw(charlayer, string, byte, vector2d, vector2d, bool);
 	protected:
 		map<charlayer, map<string, map<byte, texture>>> textures;
 	};

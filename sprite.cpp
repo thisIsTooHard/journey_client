@@ -26,8 +26,8 @@ namespace graphics
 		position = pos;
 		visible = true;
 		flipped = false;
+		speed = DPF;
 
-		blending = true;
 		resetani();
 	}
 
@@ -37,8 +37,8 @@ namespace graphics
 		position = pos;
 		visible = vis;
 		flipped = flp;
+		speed = DPF;
 
-		blending = true;
 		resetani();
 	}
 

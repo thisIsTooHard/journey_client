@@ -37,7 +37,6 @@ namespace gameplay
 		
 		elapsed = 0;
 		frame = 0;
-		blending = false;
 		alpha = (fadein) ? 0.0f : 1.0f;
 		alphastep = 0.0f;
 		fx = static_cast<float>(p.x());

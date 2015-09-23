@@ -186,6 +186,11 @@ namespace io
 		virtual void sendicon(dragicon*, vector2d);
 		virtual void oniteminfo(dragicon* d) {}
 		virtual void sendbool(bool b) {}
+		virtual void sendchar(char c) {}
+		virtual void sendshort(short s) {}
+		virtual void sendint(int i) {}
+		virtual void sendlong(int64_t l) {}
+		virtual void sendstring(string s) {}
 		mousestate sendmouse(vector2d, mousestate);
 		virtual rectangle2d bounds() { return rectangle2d(position, position + dimensions); }
 		virtual rectangle2d dragarea() { return rectangle2d(position, position); }

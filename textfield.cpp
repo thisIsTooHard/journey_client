@@ -35,7 +35,7 @@ namespace io
 	rectangle2d textfield::bounds(vector2d parentpos)
 	{
 		vector2d absp = position + parentpos;
-		return rectangle2d(absp, absp + vector2d(content.getlength(), 24));
+		return rectangle2d(absp, absp + vector2d(14 * maxlength, 24));
 	}
 
 	void textfield::draw(vector2d parentpos)

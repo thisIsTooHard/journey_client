@@ -48,8 +48,10 @@ namespace io
 		chattargets[CHT_PARTY] = texture(mainbar["chatTarget"]["party"]);
 		chattargets[CHT_SQUAD] = texture(mainbar["chatTarget"]["expedition"]);
 
-		textfields[TXT_CHAT] = textfield(TXT_CHAT, DWF_12L, TXC_BLACK, "defaulttext", vector2d(-415, -60), 32);
-		textfields[TXT_CHAT].setactive(true);
+		textfields[TXT_CHAT] = textfield(TXT_CHAT, DWF_12L, TXC_BLACK, "", vector2d(-430, -60), 32);
+		textfields[TXT_CHAT].setactive(false);
+
+		closedtext = textlabel(DWF_12L, TXC_WHITE, "");
 
 		app.getimgcache()->unlock();
 
@@ -97,9 +99,23 @@ namespace io
 
 		if (active)
 		{
+			if (open)
+			{
+
+			}
+			else if (lines.size() > 0)
+			{
+				closedtext.draw(lines.back(), position + vector2d(-430, -60));
+			}
+
 			chattargets[chattarget].draw(position + vector2d(0, 2));
 			chatcover.draw(position);
 		}
+	}
+
+	void chatbar::sendchat(string txt)
+	{
+		lines.push_back(txt);
 	}
 
 	void chatbar::update()

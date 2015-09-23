@@ -92,7 +92,7 @@ namespace graphics
 
 	void texture::draw(vector2d position, vector2d stretch, float alpha, bool flip)
 	{
-		draw(position, stretch, 1.0f, flip ? -1.0f : 1.0f, 1.0f);
+		draw(position, stretch, alpha, flip ? -1.0f : 1.0f, 1.0f);
 	}
 
 	void texture::draw(vector2d position, vector2d stretch, float alpha, float xscale, float yscale)

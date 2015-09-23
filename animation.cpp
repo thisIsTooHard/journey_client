@@ -24,7 +24,6 @@ namespace graphics
 		if (src.istype(bitmapnode))
 		{
 			textures[0] = texture(src);
-			alphablends[0] = pair<byte, byte>(255, 255);
 		}
 		else
 		{
@@ -53,54 +52,25 @@ namespace graphics
 					else
 						alphablends[frame] = pair<byte, byte>(a0, 255 - a0);
 				}
-				else
-				{
-					alphablends[frame] = pair<byte, byte>(255, 255);
-				}
 
 				frame++;
 				nodeit = src[to_string(frame)];
 			}
-			/*for (node nodeit = src.begin(); nodeit != src.end(); ++nodeit)
-			{
-				if (nodeit.istype(bitmapnode))
-				{
-					byte frame = static_cast<byte>(stoi(nodeit.name()));
-
-					node delay = nodeit["delay"];
-					if (delay.istype(integernode))
-						delays[frame] = static_cast<short>(delay.get_integer());
-					else if (delay.istype(stringnode))
-						delays[frame] = static_cast<short>(stoi(delay.get_string()));
-					else
-						delays[frame] = DEF_DELAY;
-
-					textures[frame] = texture(nodeit);
-
-					node a0_node = nodeit.resolve("a0");
-					if (a0_node.istype(integernode))
-					{
-						byte a0 = static_cast<byte>(a0_node.get_integer());
-
-						node a1_node = nodeit.resolve("a1");
-						if (a1_node.istype(integernode))
-							alphablends[frame] = pair<byte, byte>(a0, static_cast<byte>(a1_node.get_integer()));
-						else
-							alphablends[frame] = pair<byte, byte>(a0, 255 - a0);
-					}
-					else
-					{
-						alphablends[frame] = pair<byte, byte>(255, 255);
-					}
-				}
-			}*/
 		}
 
 		frame = 0;
 		last_f = static_cast<byte>(textures.size() - 1);
 		elapsed = 0;
-		alpha = static_cast<float>(alphablends[0].first);
-		alphastep = (alphablends[0].second - alpha) / (delays[0] / 16);
+		if (alphablends.size() > 0)
+		{
+			blending = true;
+			alpha = static_cast<float>(alphablends[0].first);
+			alphastep = (alphablends[0].second - alpha) / (delays[0] / 16);
+		}
+		else
+		{
+			blending = false;
+		}
 	}
 
 	void animation::draw(byte fr, vector2d pos)
@@ -129,7 +99,7 @@ namespace graphics
 		{
 			elapsed += frames;
 
-			if (alphastep != 0.f)
+			if (blending)
 			{
 				alpha += alphastep;
 				if (alpha < 0.f)
@@ -145,8 +115,11 @@ namespace graphics
 
 				frame = (frame == last_f) ? 0 : frame + 1;
 
-				float nexta = static_cast<float>(alphablends[frame].second - alpha);
-				alphastep = (nexta * DPF) / delay;
+				if (blending)
+				{
+					float nexta = static_cast<float>(alphablends[frame].second - alpha);
+					alphastep = (nexta * DPF) / delay;
+				}
 
 				return frame == 0;
 			}

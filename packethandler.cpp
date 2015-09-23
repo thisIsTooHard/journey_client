@@ -1214,7 +1214,14 @@ namespace net
 	{
 		void chat_received_h::handle(packet recv)
 		{
-			//TO DO
+			int cid = recv.readint();
+			bool gm = recv.readbool();
+			string text = recv.readascii();
+			char show = recv.readbyte();
+			if (show)
+			{
+				app.getui()->sendchat(cid, gm, text);
+			}
 		}
 	};
 
@@ -1344,7 +1351,7 @@ namespace net
 				int bonus5 = recv.readint();
 				if (inchat)
 				{
-
+					app.getui()->sendchat(-1, false, "You have gained experience (+" + to_string(gain) + ")");
 				}
 				else
 				{

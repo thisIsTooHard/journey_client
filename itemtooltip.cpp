@@ -66,8 +66,7 @@ namespace io
 
 			vector2d iconpos = drawpos + vector2d(20, 131);
 
-			texture* ico = &item->geticon(true);
-			ico->draw(iconpos, ico->getdimension() * 2);
+			item->geticon(true).draw(iconpos, 2.0f, 2.0f);
 
 			cover.draw(drawpos + vector2d(10, 58));
 

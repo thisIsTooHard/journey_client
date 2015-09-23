@@ -21,15 +21,14 @@
 
 namespace io
 {
-	const vector2d iconpositions[18] = { 
-		vector2d(), vector2d(43, 24), vector2d(43, 91), vector2d(109, 91), vector2d(109, 91), vector2d(43, 124), vector2d(43, 157), vector2d(76, 190), vector2d(10, 157), 
-		vector2d(142, 124), vector2d(10, 124), vector2d(109, 124), vector2d(76, 124), vector2d(76, 157), vector2d(10, 58), vector2d(), vector2d(), vector2d(76, 124)
+	const vector2d iconpositions[18] = {
+		vector2d(10, 24), vector2d(43, 24), vector2d(43, 91), vector2d(109, 91), vector2d(109, 91), vector2d(43, 124), vector2d(43, 157), vector2d(76, 190), vector2d(10, 157), 
+		vector2d(142, 124), vector2d(10, 124), vector2d(109, 124), vector2d(76, 124), vector2d(76, 157), vector2d(10, 58), vector2d(10, 24), vector2d(10, 24), vector2d(76, 124)
 	};
 
 	equipinventory::equipinventory(player* plc)
 	{
 		app.getimgcache()->setmode(ict_sys);
-		nl::nx::view_file("UI");
 
 		node source = nl::nx::nodes["UI"]["UIWindow2.img"]["Equip"]["character"];
 		node petsource = nl::nx::nodes["UI"]["UIWindow2.img"]["Equip"]["pet"];
@@ -63,7 +62,6 @@ namespace io
 			}
 		}
 
-		nl::nx::unview_file("UI");
 		app.getimgcache()->unlock();
 
 		position = config.geteqspos();

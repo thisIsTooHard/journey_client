@@ -28,14 +28,16 @@ namespace graphics
 		sprite(animation, vector2d, bool, bool);
 		~sprite() {}
 		void draw(vector2d);
-		bool update() { return graphicobject::update(&anim); }
+		bool update() { return graphicobject::update(&anim, speed); }
 		void setposition(vector2d pos) { position = pos; }
 		void togglehide() { visible = !visible; }
 		void flip() { flipped = !flipped; }
+		void setspeed(short s) { speed = s; }
 		animation* getani() { return &anim; }
 	private:
 		animation anim;
 		vector2d position;
+		short speed;
 		bool visible;
 		bool flipped;
 	};

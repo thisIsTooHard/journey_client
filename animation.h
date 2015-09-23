@@ -45,6 +45,7 @@ namespace graphics
 		bool update() { return update(DPF); }
 		bool isloaded() { return textures[0].isloaded(); }
 		bool isanimated() { return last_f > 0; }
+		bool hasblending() { return blending; }
 		texture* gettexture(byte f) { return textures.count(f) ? &textures[f] : 0; }
 	protected:
 		map<byte, texture> textures;
@@ -52,6 +53,7 @@ namespace graphics
 		map<byte, pair<byte, byte>> alphablends;
 		byte frame;
 		byte last_f;
+		bool blending;
 		short elapsed;
 		float alphastep;
 		float alpha;
