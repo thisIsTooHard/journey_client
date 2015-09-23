@@ -22,6 +22,7 @@
 #include "maplelook.h"
 #include "graphicobject.h"
 #include "gravityobject.h"
+#include "randomizer.h"
 
 using namespace graphics;
 using namespace action;
@@ -52,6 +53,7 @@ namespace gameplay
 	private:
 		void sendmoves(byte);
 		mobdata* mdata;
+		randomizer randomize;
 		int mid;
 		bool active;
 		int oid;

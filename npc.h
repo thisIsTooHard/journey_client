@@ -32,7 +32,7 @@ namespace maplemap
 		npc(int, int, bool, short, vector2d);
 		void draw(vector2d);
 		void setstate(string);
-		void update() { graphicobject::update(&textures[state]); }
+		void update();
 		vector2d getdim() { return textures[state].getdimension(0); }
 	private:
 		map<string, animation> textures;
@@ -44,8 +44,10 @@ namespace maplemap
 		string func;
 		short oid;
 		int id;
-		bool front;
 		bool flip;
+		bool hidename;
+		bool scripted;
+		bool mouseonly;
 		short fh;
 		vector2d position;
 	};

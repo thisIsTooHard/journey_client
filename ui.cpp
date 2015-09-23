@@ -185,6 +185,7 @@ namespace io
 							break;
 						case TXT_CHAT:
 							packet_c.general_chat(activetext->text(), true);
+							activetext->settext("");
 							break;
 						}
 						break;

@@ -16,30 +16,47 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "texture.h"
+#include <random>
 
-using namespace graphics;
+using namespace std;
 
-namespace gameplay
+namespace util
 {
-	class iteminfo
+	class randomizer
 	{
 	public:
-		iteminfo(int);
-		iteminfo() {}
-		~iteminfo() {}
-		bool isloaded() { return loaded; }
-		texture geticon(bool r) { return icon[r]; }
-		map<bool, texture> geticons() { return icon; }
-		int getid() { return itemid; }
-		string getname() { return name; }
-		string getdesc() { return desc; }
+		randomizer() {}
+		~randomizer() {}
+		bool nextbool();
+		bool below(float);
+
+		template <class T>
+		T nextreal(T high)
+		{
+			return nextreal<T>(0, high);
+		}
+
+		template <class T>
+		T nextreal(T low, T high)
+		{
+			uniform_real_distribution<T> range(low, high);
+			return range(chance());
+		}
+
+		template <class T>
+		T nextint(T high)
+		{
+			return nextint<T>(0, high);
+		}
+
+		template <class T>
+		T nextint(T low, T high)
+		{
+			uniform_int_distribution<T> range(low, high);
+			return range(chance());
+		}
 	private:
-		map<bool, texture> icon;
-		int itemid;
-		string name;
-		string desc;
-		bool loaded;
+		default_random_engine chance();
 	};
 }
 

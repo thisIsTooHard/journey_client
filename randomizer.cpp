@@ -15,25 +15,23 @@
 // You should have received a copy of the GNU Affero General Public License //
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
-#include "texture.h"
+#include "randomizer.h"
 
-namespace graphics
+namespace util
 {
-	class icon
+	default_random_engine randomizer::chance()
 	{
-	public:
-		icon() {}
-		~icon() {}
-		icon(int, bool);
-		icon(node, bool);
-		void toggle() { raw = !raw; }
-		void draw(vector2d, float);
-		void setposition(vector2d p) { pos = p; }
-	private:
-		map<bool, texture> textures;
-		vector2d pos;
-		bool raw;
-	};
-}
+		random_device rd;
+		return default_random_engine(rd());
+	}
 
+	bool randomizer::nextbool()
+	{
+		return nextint<int>(1) == 1;
+	}
+
+	bool randomizer::below(float percent)
+	{
+		return nextreal<float>(1.0f) <= percent;
+	}
+}

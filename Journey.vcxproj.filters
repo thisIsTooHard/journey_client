@@ -1,0 +1,805 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Quelldateien\Nx">
+      <UniqueIdentifier>{6cfe3a19-5e81-4ff2-a326-b2b9fa3c5625}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Nx">
+      <UniqueIdentifier>{ab0a547d-21a5-4b99-84ab-e8d3bb3ff134}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Gameplay">
+      <UniqueIdentifier>{8039770b-88d8-48d4-b533-a19409589c8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Gameplay">
+      <UniqueIdentifier>{891343e6-41be-4980-9b93-a3338beb4b48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\IO">
+      <UniqueIdentifier>{eaefc77a-fa0e-43f5-b977-c3f25d01bf2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\IO">
+      <UniqueIdentifier>{a94b8e07-a342-4dc1-a690-07a7165388f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Net">
+      <UniqueIdentifier>{5a0d5c7b-5ce1-4134-9232-97e4a5c6e20d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Net">
+      <UniqueIdentifier>{01a3bfb4-e3fe-43bf-8c50-8640f57d291c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Utilities">
+      <UniqueIdentifier>{5899eaec-3cbf-4b7d-bd60-770f1bddf1df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Utilities">
+      <UniqueIdentifier>{b151a9e0-b562-4123-93f6-a02562b7f7bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Program">
+      <UniqueIdentifier>{a5329a5a-8b89-484b-8b07-78215d4e6a82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Program">
+      <UniqueIdentifier>{f83ac0b0-066f-464e-8918-e062dd578d16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Gameplay\Character">
+      <UniqueIdentifier>{b4ba88a0-c546-4e7b-992e-369d84bb173e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Gameplay\Character">
+      <UniqueIdentifier>{eb3945f6-1e2a-4047-be54-e83f7ead37a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Gameplay\Inventory">
+      <UniqueIdentifier>{5aff3c75-eeca-4f74-88bc-c717dcb0264c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Gameplay\Inventory">
+      <UniqueIdentifier>{22896e50-733c-46f0-88ab-f9537ee4d0c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\IO\Components">
+      <UniqueIdentifier>{05584e6a-988a-4626-ab9e-bf7d47cd8c49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\IO\Components">
+      <UniqueIdentifier>{702f6b08-4780-48bc-88bc-fb0a1aa1d54d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Gameplay\Map">
+      <UniqueIdentifier>{c1f3b73d-2e2e-49d0-9d85-e88a4e49bb00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Gameplay\Map">
+      <UniqueIdentifier>{8b6ec0b2-5fab-4798-a462-fd36ba3b115a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\IO\Elements">
+      <UniqueIdentifier>{f2a1ca57-ad75-40ab-b256-f6ebf9e8c46c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\IO\Elements">
+      <UniqueIdentifier>{c0274a8d-2186-49f6-aef6-8154b09a23e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Graphics">
+      <UniqueIdentifier>{ff3eadaf-cc6b-47f9-a037-1973c74c6b6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Graphics">
+      <UniqueIdentifier>{eba5eabb-1b33-4f40-a4ac-85cd6ddfc8ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Gameplay\Action">
+      <UniqueIdentifier>{5f21409d-3485-4f42-ac04-0acab61cc109}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Gameplay\Action">
+      <UniqueIdentifier>{d3870267-4710-4bbf-bf6c-83ca38842407}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Data">
+      <UniqueIdentifier>{c6650618-d40b-451c-921e-aefb595e7554}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Data">
+      <UniqueIdentifier>{5d41a392-85e8-4fb2-ad8c-28a095d28002}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Journey.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="nxfile.h">
+      <Filter>Headerdateien\Nx</Filter>
+    </ClInclude>
+    <ClInclude Include="node.h">
+      <Filter>Headerdateien\Nx</Filter>
+    </ClInclude>
+    <ClInclude Include="node_impl.h">
+      <Filter>Headerdateien\Nx</Filter>
+    </ClInclude>
+    <ClInclude Include="file_impl.h">
+      <Filter>Headerdateien\Nx</Filter>
+    </ClInclude>
+    <ClInclude Include="file.h">
+      <Filter>Headerdateien\Nx</Filter>
+    </ClInclude>
+    <ClInclude Include="audio.h">
+      <Filter>Headerdateien\Nx</Filter>
+    </ClInclude>
+    <ClInclude Include="bitmap.h">
+      <Filter>Headerdateien\Nx</Filter>
+    </ClInclude>
+    <ClInclude Include="lz4.h">
+      <Filter>Headerdateien\Nx</Filter>
+    </ClInclude>
+    <ClInclude Include="stdfax.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="session.h">
+      <Filter>Headerdateien\Net</Filter>
+    </ClInclude>
+    <ClInclude Include="packet.h">
+      <Filter>Headerdateien\Net</Filter>
+    </ClInclude>
+    <ClInclude Include="packetcreator.h">
+      <Filter>Headerdateien\Net</Filter>
+    </ClInclude>
+    <ClInclude Include="cursor.h">
+      <Filter>Headerdateien\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="ui.h">
+      <Filter>Headerdateien\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="uielement.h">
+      <Filter>Headerdateien\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="vector2d.h">
+      <Filter>Headerdateien\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="packethandler.h">
+      <Filter>Headerdateien\Net</Filter>
+    </ClInclude>
+    <ClInclude Include="vhandler.h">
+      <Filter>Headerdateien\Net</Filter>
+    </ClInclude>
+    <ClInclude Include="account.h">
+      <Filter>Headerdateien\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="settings.h">
+      <Filter>Headerdateien\Program</Filter>
+    </ClInclude>
+    <ClInclude Include="keyboard.h">
+      <Filter>Headerdateien\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>Headerdateien\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="world.h">
+      <Filter>Headerdateien\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="maplelook.h">
+      <Filter>Headerdateien\Gameplay\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="maplestats.h">
+      <Filter>Headerdateien\Gameplay\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="maplechar.h">
+      <Filter>Headerdateien\Gameplay\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="inventory.h">
+      <Filter>Headerdateien\Gameplay\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="mapleitem.h">
+      <Filter>Headerdateien\Gameplay\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="mapleequip.h">
+      <Filter>Headerdateien\Gameplay\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>Headerdateien\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="charset.h">
+      <Filter>Headerdateien\IO\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="button.h">
+      <Filter>Headerdateien\IO\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="nametag.h">
+      <Filter>Headerdateien\IO\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="textfield.h">
+      <Filter>Headerdateien\IO\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="npc.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="portal.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="equipinventory.h">
+      <Filter>Headerdateien\IO\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="mob.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="animation.h">
+      <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="vgraphics.h">
+      <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="background.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="reactor.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="sprite.h">
+      <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="winapp.h">
+      <Filter>Headerdateien\Program</Filter>
+    </ClInclude>
+    <ClInclude Include="uibar.h">
+      <Filter>Headerdateien\IO\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="playfield.h">
+      <Filter>Headerdateien\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="login.h">
+      <Filter>Headerdateien\IO\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="worldselect.h">
+      <Filter>Headerdateien\IO\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="charselect.h">
+      <Filter>Headerdateien\IO\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="loginwait.h">
+      <Filter>Headerdateien\IO\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="statusbar.h">
+      <Filter>Headerdateien\IO\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="loginnotice.h">
+      <Filter>Headerdateien\IO\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="mapobjects.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="mapportals.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="attackinfo.h">
+      <Filter>Headerdateien\Gameplay\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="mapbackgrounds.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="maplayer.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="itemdrop.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="imagecache.h">
+      <Filter>Headerdateien\Program</Filter>
+    </ClInclude>
+    <ClInclude Include="fontcache.h">
+      <Filter>Headerdateien\Program</Filter>
+    </ClInclude>
+    <ClInclude Include="audiomanager.h">
+      <Filter>Headerdateien\Program</Filter>
+    </ClInclude>
+    <ClInclude Include="Mp3.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="baseinterface.h">
+      <Filter>Headerdateien\IO\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="textlabel.h">
+      <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="mapmobs.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="moveobject.h">
+      <Filter>Headerdateien\Gameplay\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="safemap.h">
+      <Filter>Headerdateien\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="statusmenu.h">
+      <Filter>Headerdateien\IO\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="playereffects.h">
+      <Filter>Headerdateien\Gameplay\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="skillbook.h">
+      <Filter>Headerdateien\Gameplay\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="keyconfig.h">
+      <Filter>Headerdateien\IO\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="dragicon.h">
+      <Filter>Headerdateien\IO\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="skillicon.h">
+      <Filter>Headerdateien\IO\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="statsinfo.h">
+      <Filter>Headerdateien\IO\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="safeptrmap.h">
+      <Filter>Headerdateien\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="facetype.h">
+      <Filter>Headerdateien\Gameplay\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="clothing.h">
+      <Filter>Headerdateien\Gameplay\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="bodytype.h">
+      <Filter>Headerdateien\Gameplay\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="charcreation.h">
+      <Filter>Headerdateien\IO\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="charsprites.h">
+      <Filter>Headerdateien\Gameplay\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="hairstyle.h">
+      <Filter>Headerdateien\Gameplay\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="itemicon.h">
+      <Filter>Headerdateien\IO\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="AES.h">
+      <Filter>Headerdateien\Net</Filter>
+    </ClInclude>
+    <ClInclude Include="rectangle2d.h">
+      <Filter>Headerdateien\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="questlog.h">
+      <Filter>Headerdateien\Gameplay\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="mapdrops.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="drop.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="mapchars.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="mesodrop.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="otherplayer.h">
+      <Filter>Headerdateien\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="gravityobject.h">
+      <Filter>Headerdateien\Gameplay\Action</Filter>
+    </ClInclude>
+    <ClInclude Include="chatbar.h">
+      <Filter>Headerdateien\IO\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="mapnpcs.h">
+      <Filter>Headerdateien\Gameplay\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="itemtooltip.h">
+      <Filter>Headerdateien\IO\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="tooltip.h">
+      <Filter>Headerdateien\IO\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="equiptooltip.h">
+      <Filter>Headerdateien\IO\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="cryptography.h">
+      <Filter>Headerdateien\Net</Filter>
+    </ClInclude>
+    <ClInclude Include="datacache.h">
+      <Filter>Headerdateien\Program</Filter>
+    </ClInclude>
+    <ClInclude Include="skilldata.h">
+      <Filter>Headerdateien\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="itemdata.h">
+      <Filter>Headerdateien\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="itemcache.h">
+      <Filter>Headerdateien\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="skillcache.h">
+      <Filter>Headerdateien\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="equipcache.h">
+      <Filter>Headerdateien\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="mapdata.h">
+      <Filter>Headerdateien\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="footholdtree.h">
+      <Filter>Headerdateien\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="laddersropes.h">
+      <Filter>Headerdateien\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="mapinfo.h">
+      <Filter>Headerdateien\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="graphicobject.h">
+      <Filter>Headerdateien\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="mobcache.h">
+      <Filter>Headerdateien\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="monsterbook.h">
+      <Filter>Headerdateien\Gameplay\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="telerock.h">
+      <Filter>Headerdateien\Gameplay\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="mobdata.h">
+      <Filter>Headerdateien\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="window.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="imagecachegl.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="randomizer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Journey.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="nxfile.cpp">
+      <Filter>Quelldateien\Nx</Filter>
+    </ClCompile>
+    <ClCompile Include="node.cpp">
+      <Filter>Quelldateien\Nx</Filter>
+    </ClCompile>
+    <ClCompile Include="file.cpp">
+      <Filter>Quelldateien\Nx</Filter>
+    </ClCompile>
+    <ClCompile Include="audio.cpp">
+      <Filter>Quelldateien\Nx</Filter>
+    </ClCompile>
+    <ClCompile Include="bitmap.cpp">
+      <Filter>Quelldateien\Nx</Filter>
+    </ClCompile>
+    <ClCompile Include="session.cpp">
+      <Filter>Quelldateien\Net</Filter>
+    </ClCompile>
+    <ClCompile Include="packet.cpp">
+      <Filter>Quelldateien\Net</Filter>
+    </ClCompile>
+    <ClCompile Include="packetcreator.cpp">
+      <Filter>Quelldateien\Net</Filter>
+    </ClCompile>
+    <ClCompile Include="cursor.cpp">
+      <Filter>Quelldateien\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="ui.cpp">
+      <Filter>Quelldateien\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="uielement.cpp">
+      <Filter>Quelldateien\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="vector2d.cpp">
+      <Filter>Quelldateien\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="packethandler.cpp">
+      <Filter>Quelldateien\Net</Filter>
+    </ClCompile>
+    <ClCompile Include="account.cpp">
+      <Filter>Quelldateien\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="settings.cpp">
+      <Filter>Quelldateien\Program</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>Quelldateien\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="keyboard.cpp">
+      <Filter>Quelldateien\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="world.cpp">
+      <Filter>Quelldateien\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="maplelook.cpp">
+      <Filter>Quelldateien\Gameplay\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="maplestats.cpp">
+      <Filter>Quelldateien\Gameplay\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="inventory.cpp">
+      <Filter>Quelldateien\Gameplay\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="maplechar.cpp">
+      <Filter>Quelldateien\Gameplay\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="mapleitem.cpp">
+      <Filter>Quelldateien\Gameplay\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="mapleequip.cpp">
+      <Filter>Quelldateien\Gameplay\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="charset.cpp">
+      <Filter>Quelldateien\IO\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="button.cpp">
+      <Filter>Quelldateien\IO\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="nametag.cpp">
+      <Filter>Quelldateien\IO\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="textfield.cpp">
+      <Filter>Quelldateien\IO\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="npc.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>Quelldateien\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="portal.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="equipinventory.cpp">
+      <Filter>Quelldateien\IO\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="mob.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="background.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="texture.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="animation.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="vgraphics.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="lz4.c">
+      <Filter>Quelldateien\Nx</Filter>
+    </ClCompile>
+    <ClCompile Include="reactor.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="sprite.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="winapp.cpp">
+      <Filter>Quelldateien\Program</Filter>
+    </ClCompile>
+    <ClCompile Include="uibar.cpp">
+      <Filter>Quelldateien\IO\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="playfield.cpp">
+      <Filter>Quelldateien\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="login.cpp">
+      <Filter>Quelldateien\IO\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="worldselect.cpp">
+      <Filter>Quelldateien\IO\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="charselect.cpp">
+      <Filter>Quelldateien\IO\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="loginwait.cpp">
+      <Filter>Quelldateien\IO\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="statusbar.cpp">
+      <Filter>Quelldateien\IO\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="loginnotice.cpp">
+      <Filter>Quelldateien\IO\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="mapportals.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="mapbackgrounds.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="maplayer.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="itemdrop.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="imagecache.cpp">
+      <Filter>Quelldateien\Program</Filter>
+    </ClCompile>
+    <ClCompile Include="fontcache.cpp">
+      <Filter>Quelldateien\Program</Filter>
+    </ClCompile>
+    <ClCompile Include="audiomanager.cpp">
+      <Filter>Quelldateien\Program</Filter>
+    </ClCompile>
+    <ClCompile Include="Mp3.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="MP3Player.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="baseinterface.cpp">
+      <Filter>Quelldateien\IO\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="textlabel.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="mapmobs.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="moveobject.cpp">
+      <Filter>Quelldateien\Gameplay\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="playereffects.cpp">
+      <Filter>Quelldateien\Gameplay\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="skillbook.cpp">
+      <Filter>Quelldateien\Gameplay\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="statusmenu.cpp">
+      <Filter>Quelldateien\IO\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="keyconfig.cpp">
+      <Filter>Quelldateien\IO\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="dragicon.cpp">
+      <Filter>Quelldateien\IO\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="skillicon.cpp">
+      <Filter>Quelldateien\IO\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="itemicon.cpp">
+      <Filter>Quelldateien\IO\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="statsinfo.cpp">
+      <Filter>Quelldateien\IO\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="charcreation.cpp">
+      <Filter>Quelldateien\IO\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="facetype.cpp">
+      <Filter>Quelldateien\Gameplay\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="charsprites.cpp">
+      <Filter>Quelldateien\Gameplay\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="clothing.cpp">
+      <Filter>Quelldateien\Gameplay\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="hairstyle.cpp">
+      <Filter>Quelldateien\Gameplay\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="bodytype.cpp">
+      <Filter>Quelldateien\Gameplay\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="AES.cpp">
+      <Filter>Quelldateien\Net</Filter>
+    </ClCompile>
+    <ClCompile Include="rectangle2d.cpp">
+      <Filter>Quelldateien\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="questlog.cpp">
+      <Filter>Quelldateien\Gameplay\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="mapdrops.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="drop.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="mesodrop.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="mapchars.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="otherplayer.cpp">
+      <Filter>Quelldateien\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="gravityobject.cpp">
+      <Filter>Quelldateien\Gameplay\Action</Filter>
+    </ClCompile>
+    <ClCompile Include="mapnpcs.cpp">
+      <Filter>Quelldateien\Gameplay\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="chatbar.cpp">
+      <Filter>Quelldateien\IO\Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="itemtooltip.cpp">
+      <Filter>Quelldateien\IO\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="tooltip.cpp">
+      <Filter>Quelldateien\IO\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="equiptooltip.cpp">
+      <Filter>Quelldateien\IO\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="cryptography.cpp">
+      <Filter>Quelldateien\Net</Filter>
+    </ClCompile>
+    <ClCompile Include="datacache.cpp">
+      <Filter>Quelldateien\Program</Filter>
+    </ClCompile>
+    <ClCompile Include="skilldata.cpp">
+      <Filter>Quelldateien\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="itemdata.cpp">
+      <Filter>Quelldateien\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="itemcache.cpp">
+      <Filter>Quelldateien\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="skillcache.cpp">
+      <Filter>Quelldateien\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="mobdata.cpp">
+      <Filter>Quelldateien\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="mobcache.cpp">
+      <Filter>Quelldateien\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="equipcache.cpp">
+      <Filter>Quelldateien\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="laddersropes.cpp">
+      <Filter>Quelldateien\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="footholdtree.cpp">
+      <Filter>Quelldateien\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="mapinfo.cpp">
+      <Filter>Quelldateien\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="mapdata.cpp">
+      <Filter>Quelldateien\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="graphicobject.cpp">
+      <Filter>Quelldateien\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="telerock.cpp">
+      <Filter>Quelldateien\Gameplay\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="monsterbook.cpp">
+      <Filter>Quelldateien\Gameplay\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="window.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="imagecachegl.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="randomizer.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Journey.rc">
+      <Filter>Ressourcendateien</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\JourneyNX\ico16.ico">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="..\..\..\journeynx\icon2.ico">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+    <Image Include="..\..\..\JourneyNX\ico32.ico">
+      <Filter>Ressourcendateien</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

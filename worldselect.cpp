@@ -34,6 +34,14 @@ namespace io
 
 		byte defworld = config.getdefworld();
 		byte defch = config.getdefch();
+		if (defworld > 0)
+		{
+			defworld = 0;
+		}
+		if (defch >= num)
+		{
+			defch = 0;
+		}
 
 		sprites.push_back(sprite(animation(back.resolve("11")), vector2d(370, 300)));
 		sprites.push_back(sprite(animation(worlds.resolve("layer:bg")), vector2d(650, 45)));
@@ -48,7 +56,6 @@ namespace io
 		{
 			sprites.push_back(sprite(animation(worlds["button:" + to_string(i)]["normal"]), vector2d(650, 47)));
 		}
-
 
 		sprites.push_back(sprite(animation(channels["layer:bg"]), vector2d(200, 170)));
 		sprites.push_back(sprite(animation(channels["release"]["layer:15"]), vector2d(200, 170)));

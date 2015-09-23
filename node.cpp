@@ -333,6 +333,12 @@ namespace nl {
 	bool node::istype(type t) const {
 		return data_type() == t;
 	}
+	bool node::tobl() const {
+		return istype(integernode) ? m_data->ireal == 1 : false;
+	}
+	bool node::tobl(bool def) const {
+		return istype(integernode) ? m_data->ireal == 1 : def;
+	}
 	int8_t node::toi8() const {
 		return istype(integernode) ? static_cast<int8_t>(m_data->ireal) : 0;
 	}
@@ -362,5 +368,11 @@ namespace nl {
 	}
 	vector2d node::tov2d(vector2d def) const {
 		return istype(vectornode) ? vector2d(m_data->vector[0], m_data->vector[1]) : def;
+	}
+	string node::tostr() const {
+		return istype(stringnode) ? to_string() : "";
+	}
+	string node::tostr(string def) const {
+		return istype(stringnode) ? to_string() : def;
 	}
 }

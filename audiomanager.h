@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 // This file is part of the Journey MMORPG client                           //
 // Copyright © 2015 SYJourney                                               //
 //                                                                          //
@@ -16,54 +16,51 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "iteminfo.h"
-#include "nxfile.h"
+#include <windows.h>
+#include <mmsystem.h>
+#include <dsound.h>
+#include <stdio.h>
 
-namespace gameplay
+#pragma comment(lib, "dsound.lib")
+#pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "winmm.lib")
+
+namespace program
 {
-	iteminfo::iteminfo(int id)
+	struct WaveHeaderType
 	{
-		string category;
-		switch (id / 1000000)
-		{
-		case 2:
-			category = "Consume";
-			break;
-		case 3:
-			category = "Install";
-			break;
-		case 4:
-			category = "Etc";
-			break;
-		case 5:
-			category = "Cash";
-			break;
-		default:
-			category = "";
-		}
+		char chunkId[4];
+		unsigned long chunkSize;
+		char format[4];
+		char subChunkId[4];
+		unsigned long subChunkSize;
+		unsigned short audioFormat;
+		unsigned short numChannels;
+		unsigned long sampleRate;
+		unsigned long bytesPerSecond;
+		unsigned short blockAlign;
+		unsigned short bitsPerSample;
+		char dataChunkId[4];
+		unsigned long dataSize;
+	};
 
-		if (category.size() > 0)
-		{
-			nx::view_file("Item");
+	class audiomanager
+	{
+	public:
+		audiomanager();
+		~audiomanager();
+		bool init(HWND, BYTE*); 
+		bool InitializeDirectSound(HWND);
+		void ShutdownDirectSound();
+		void Shutdown();
+		bool LoadWaveFile(BYTE*, IDirectSoundBuffer8**);
+		void ShutdownWaveFile(IDirectSoundBuffer8**);
 
-			node src = nx::nodes["Item"][category]["0" + to_string(id / 10000) + ".img"]["0" + to_string(id)]["info"];
-			icon[false] = texture(src["icon"]);
-			icon[true] = texture(src["iconRaw"]);
-
-			nx::unview_file("Item");
-
-			category = (category == "Install") ? "Ins" : category;
-
-			nx::view_file("String");
-
-			node strsrc = nx::nodes["String"][category + ".img"][to_string(id)];
-			name = strsrc["name"];
-			desc = strsrc["desc"];
-
-			nx::unview_file("String");
-		}
-
-		itemid = id;
-		loaded = name.size() > 0;
-	}
+		bool PlayWaveFile();
+	private:
+		IDirectSound8* m_DirectSound;
+		IDirectSoundBuffer* m_primaryBuffer;
+		IDirectSoundBuffer8* m_secondaryBuffer1;
+	};
 }
+

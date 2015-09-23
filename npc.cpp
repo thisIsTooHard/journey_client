@@ -21,65 +21,57 @@
 
 namespace maplemap
 {
-	npc::npc(int id, int o, bool fr, short f, vector2d pos)
+	npc::npc(int id, int o, bool fl, short f, vector2d pos)
 	{
-		string fullname;
 		string strid = to_string(id);
-		size_t extend = 7 - strid.length();
-		for (char i = 0; i < extend; i++)
+		strid.insert(0, 7 - strid.size(), '0');
+		strid.append(".img");
+
+		node src = nx::nodes["Npc"][strid];
+
+		string link = src["info"]["link"].tostr();
+		if (link.size() > 0)
 		{
-			fullname.append("0");
+			src = nx::nodes["Npc"][link];
 		}
-		fullname.append(strid);
-		node npcdata = nx::nodes["Npc"].resolve(fullname + ".img");
 
 		map<string, vector<string>> linenames;
-		for (node npcnode = npcdata.begin(); npcnode != npcdata.end(); npcnode++)
+		for (node npcnode = src.begin(); npcnode != src.end(); npcnode++)
 		{
 			string state = npcnode.name();
 			if (state == "info")
 			{
-				node speak = npcnode.resolve("speak");
-				if (speak.size() > 0)
-				{
-					for (node speaknode = speak.begin(); speaknode != speak.end(); speaknode++)
-					{
-						linenames[state].push_back(speaknode.get_string());
-					}
-				}
+				hidename = npcnode["hideName"].tobl();
+				mouseonly = npcnode["talkMouseOnly"].tobl();
+				scripted = npcnode["script"].size() > 0;
 			}
 			else
 			{
 				textures[state] = animation(npcnode);
-				node speak = npcnode.resolve("speak");
-				if (speak.size() > 0)
+			}
+
+			node speak = npcnode["speak"];
+			if (speak.size() > 0)
+			{
+				for (node speaknode = speak.begin(); speaknode != speak.end(); speaknode++)
 				{
-					for (node speaknode = speak.begin(); speaknode != speak.end(); speaknode++)
-					{
-						linenames[state].push_back(speaknode.get_string());
-					}
+					linenames[state].push_back(speaknode.get_string());
 				}
 			}
 		}
 
-		node stringdata = nx::nodes["String"].resolve("Npc.img/" + strid);
+		node strsrc = nx::nodes["String"]["Npc.img"][to_string(id)];
 
-		node namenode = stringdata.resolve("name");
-		if (namenode.data_type() == node::type::string)
-			name = namenode.get_string();
+		name = strsrc["name"].tostr();
+		func = strsrc["func"].tostr();
 
-		node funcnode = stringdata.resolve("func");
-		if (funcnode.data_type() == node::type::string)
-			func = funcnode.get_string();
-
-		for (map<string, vector<string>>::iterator stit = linenames.begin(); stit != linenames.end(); stit++)
+		for (map<string, vector<string>>::iterator stit = linenames.begin(); stit != linenames.end(); ++stit)
 		{
 			string state = stit->first;
 			vector<string> names = stit->second;
-			for (vector<string>::iterator nit = names.begin(); nit != names.end(); nit++)
+			for (vector<string>::iterator nit = names.begin(); nit != names.end(); ++nit)
 			{
-				string line = stringdata.resolve(*nit).get_string();
-				lines[state].push_back(line);
+				lines[state].push_back(strsrc[*nit].tostr());
 			}
 		}
 
@@ -87,7 +79,7 @@ namespace maplemap
 		ftag = textlabel(DWF_14BC, TXC_YELLOW, func, TXB_NAMETAG);
 
 		oid = o;
-		front = fr;
+		flip = fl;
 		fh = f;
 		position = pos;
 		state = "stand";
@@ -99,8 +91,11 @@ namespace maplemap
 
 		graphicobject::draw(&textures[state], absp, flip);
 
-		ntag.draw(absp);
-		ftag.draw(absp + vector2d(0, 18));
+		if (!hidename)
+		{
+			ntag.draw(absp);
+			ftag.draw(absp + vector2d(0, 18));
+		}
 	}
 
 	void npc::setstate(string st)
@@ -110,5 +105,12 @@ namespace maplemap
 			state = st;
 			resetani();
 		}
+	}
+
+	void npc::update()
+	{
+		graphicobject::update(&textures[state]);
+
+
 	}
 }

@@ -130,6 +130,8 @@ namespace nl {
 
 		//additions
 		bool istype(type) const;
+		bool tobl() const;
+		bool tobl(bool) const;
 		int8_t toi8() const;
 		int8_t toi8(int8_t) const;
 		int16_t toi16() const;
@@ -140,6 +142,8 @@ namespace nl {
 		int64_t toi64(int64_t) const;
 		vector2d tov2d() const;
 		vector2d tov2d(vector2d) const;
+		string tostr() const;
+		string tostr(string) const;
 	private:
 		node(data const *, _file_data const *);
 		node get_child(char const *, uint16_t) const;

@@ -81,6 +81,10 @@ namespace io
 		}
 
 		selected = config.getdefchar();
+		if (selected >= charcount)
+		{
+			selected = 0;
+		}
 		page = selected % 8;
 
 		for (size_t i = 0; i < charbtcount; i++)

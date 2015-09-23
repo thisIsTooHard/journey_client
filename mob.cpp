@@ -102,9 +102,10 @@ namespace gameplay
 		uniform_real_distribution<float> range(0.0f, 1.0f);
 		random_device random;
 
-		default_random_engine engine1(random());
-		bool hit = range(engine1) < hitchance;
-		if (hit)
+
+		/*default_random_engine engine1(random());
+		bool hit = range(engine1) < hitchance;*/
+		if (randomize.below(hitchance))
 		{
 			default_random_engine engine2(random());
 			int damage = dmgrange(engine2);
