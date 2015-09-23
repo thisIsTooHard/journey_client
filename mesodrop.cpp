@@ -57,7 +57,7 @@ namespace maplemap
 	{
 		if (state != DST_INACTIVE)
 		{
-			graphicobject::draw(anim, pos + viewpos, false);
+			graphicobject::draw(anim, getposition() + viewpos, false);
 		}
 	}
 

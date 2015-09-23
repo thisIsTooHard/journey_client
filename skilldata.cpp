@@ -114,11 +114,22 @@ namespace data
 		}
 	}
 
-	void skilldata::addeffects(playereffects* effects, bool flip)
+	void skilldata::addeffects(playereffects* effects, bool flip, float speed, bool twoh)
 	{
-		for (vector<animation>::iterator efit = skill_e.begin(); efit != skill_e.end(); ++efit)
+		if (skill_e.size() > 0)
 		{
-			effects->add(sprite(*efit, vector2d(), true, flip));
+			if (skill_e.size() > 1 && twoh)
+			{
+				sprite toadd = sprite(skill_e[1], vector2d(), true, flip);
+				toadd.setspeed(static_cast<short>(speed));
+				effects->add(toadd);
+			}
+			else
+			{
+				sprite toadd = sprite(skill_e[0], vector2d(), true, flip);
+				toadd.setspeed(static_cast<short>(speed));
+				effects->add(toadd);
+			}
 		}
 	}
 

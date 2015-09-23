@@ -74,9 +74,10 @@ namespace gameplay
 				if (allowed)
 				{
 					bool left = playerchar.getleft();
+					bool twoh = playerchar.getlook()->getcloth(EQL_WEAPON)->istwo_h();
 
-					touse->addeffects(playerchar.geteffects(), !left);
-					playerchar.setaction(touse->getaction(playerchar.getlook()->getcloth(EQL_WEAPON)->istwo_h()));
+					touse->addeffects(playerchar.geteffects(), !left, 16.0f / playerchar.getattspeed(), twoh);
+					playerchar.setaction(touse->getaction(twoh));
 
 					if (touse->isattack())
 					{

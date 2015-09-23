@@ -43,7 +43,7 @@ namespace data
 		skilldata() {}
 		~skilldata() {}
 		string getaction(bool);
-		void addeffects(playereffects*, bool);
+		void addeffects(playereffects*, bool, float, bool);
 		bool isattack() { return offensive; }
 		skillinfo getlevel(int l) { return levels[l]; }
 		texture geticon(char c) { return icon[c]; }
