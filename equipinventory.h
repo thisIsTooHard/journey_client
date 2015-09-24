@@ -33,6 +33,7 @@ namespace io
 		void oniteminfo(dragicon*);
 		rectangle2d dragarea();
 	private:
+		map<char, vector2d> iconpositions;
 		maplelook* look;
 		inventory* invent;
 		maplestats* stats;

@@ -32,6 +32,6 @@ namespace util
 
 	bool randomizer::below(float percent)
 	{
-		return nextreal<float>(1.0f) <= percent;
+		return nextreal<float>(1.0f) < percent;
 	}
 }

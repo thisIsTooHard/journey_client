@@ -61,15 +61,10 @@ namespace graphics
 		frame = 0;
 		last_f = static_cast<byte>(textures.size() - 1);
 		elapsed = 0;
-		if (alphablends.size() > 0)
+		if (alphablends.count(0))
 		{
-			blending = true;
 			alpha = static_cast<float>(alphablends[0].first);
 			alphastep = (alphablends[0].second - alpha) / (delays[0] / 16);
-		}
-		else
-		{
-			blending = false;
 		}
 	}
 

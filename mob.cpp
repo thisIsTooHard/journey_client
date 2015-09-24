@@ -70,11 +70,9 @@ namespace gameplay
 			int mindamage = static_cast<int>(attack->skillmult * attack->mindamage * (1 - 0.01f * ldelta) - mdata->getwdef() * 0.5f);
 			int maxdamage = static_cast<int>(attack->skillmult * attack->maxdamage * (1 - 0.01f * ldelta) - mdata->getwdef() * 0.6f);
 
-			uniform_int_distribution<int> dmgrange(mindamage, maxdamage);
-
 			for (char i = 0; i < attack->numdamage; i++)
 			{
-				pair<int, bool> damage = calcdamage(dmgrange, hitchance, attack->critical);
+				pair<int, bool> damage = calcdamage(mindamage, maxdamage, hitchance, attack->critical);
 
 				dmgnumbers.push_back(damage.first);
 				dmgeffects.push_back(damage);
@@ -97,21 +95,13 @@ namespace gameplay
 		}
 	}
 
-	pair<int, bool> mob::calcdamage(uniform_int_distribution<int> dmgrange, float hitchance, float critchance)
+	pair<int, bool> mob::calcdamage(int mindmg, int maxdmg, float hitchance, float critchance)
 	{
-		uniform_real_distribution<float> range(0.0f, 1.0f);
-		random_device random;
-
-
-		/*default_random_engine engine1(random());
-		bool hit = range(engine1) < hitchance;*/
-		if (randomize.below(hitchance))
+		if (random.below(hitchance))
 		{
-			default_random_engine engine2(random());
-			int damage = dmgrange(engine2);
+			int damage = random.nextint<int>(mindmg, maxdmg);
 
-			default_random_engine engine3(random());
-			bool crit = range(engine3) < critchance;
+			bool crit = random.below(critchance);
 			if (crit)
 			{
 				damage = static_cast<int>(damage * 1.5f);
@@ -227,11 +217,7 @@ namespace gameplay
 							moved = 0;
 							setstate("move");
 
-							random_device rd;
-							uniform_int_distribution<int> udist(0, 1);
-							default_random_engine e1(rd());
-
-							fleft = udist(e1) == 1;
+							fleft = random.nextbool();
 							hspeed = (fleft) ? -fspeed : fspeed;
 						}
 					}
@@ -245,19 +231,14 @@ namespace gameplay
 						{
 							moved = 0;
 
-							random_device rd;
-							uniform_int_distribution<int> udist(0, 2);
-							default_random_engine e1(rd());
-							int result = udist(e1);
-
-							if (result == 2)
+							if (random.nextbool())
 							{
 								hspeed = 0;
 								setstate("stand");
 							}
 							else
 							{
-								fleft = udist(e1) == 1;
+								fleft = random.nextbool();
 								hspeed = (fleft) ? -fspeed : fspeed;
 							}
 						}

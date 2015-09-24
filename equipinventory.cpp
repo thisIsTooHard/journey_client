@@ -21,13 +21,29 @@
 
 namespace io
 {
-	const vector2d iconpositions[18] = {
-		vector2d(10, 24), vector2d(43, 24), vector2d(43, 91), vector2d(109, 91), vector2d(109, 91), vector2d(43, 124), vector2d(43, 157), vector2d(76, 190), vector2d(10, 157), 
-		vector2d(142, 124), vector2d(10, 124), vector2d(109, 124), vector2d(76, 124), vector2d(76, 157), vector2d(10, 58), vector2d(10, 24), vector2d(10, 24), vector2d(76, 124)
-	};
-
 	equipinventory::equipinventory(player* plc)
 	{
+		iconpositions[1] = vector2d(43, 25);
+		iconpositions[2] = vector2d(43, 91);
+		iconpositions[3] = vector2d(43, 68);
+		iconpositions[4] = vector2d(109, 91);
+		iconpositions[5] = vector2d(43, 124);
+		iconpositions[6] = vector2d(43, 157);
+		iconpositions[7] = vector2d(76, 190);
+		iconpositions[8] = vector2d(10, 157);
+		iconpositions[9] = vector2d(142, 124);
+		iconpositions[10] = vector2d(142, 124);
+		iconpositions[11] = vector2d(109, 124);
+		iconpositions[12] = vector2d(109, 157);
+		iconpositions[13] = vector2d(142, 157);
+		iconpositions[15] = vector2d(109, 91);
+		iconpositions[16] = vector2d(142, 91);
+		iconpositions[17] = vector2d(76, 124);
+		iconpositions[18] = vector2d(142, 91); //tamed mob
+		iconpositions[19] = vector2d(76, 124); //saddle
+		iconpositions[49] = vector2d(10, 58);
+		iconpositions[50] = vector2d(76, 157);
+
 		app.getimgcache()->setmode(ict_sys);
 
 		node source = nl::nx::nodes["UI"]["UIWindow2.img"]["Equip"]["character"];

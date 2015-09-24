@@ -48,6 +48,7 @@ namespace maplemap
 			else
 			{
 				textures[state] = animation(npcnode);
+				states.push_back(state);
 			}
 
 			node speak = npcnode["speak"];
@@ -79,7 +80,7 @@ namespace maplemap
 		ftag = textlabel(DWF_14BC, TXC_YELLOW, func, TXB_NAMETAG);
 
 		oid = o;
-		flip = fl;
+		flip = !fl;
 		fh = f;
 		position = pos;
 		state = "stand";
@@ -109,8 +110,12 @@ namespace maplemap
 
 	void npc::update()
 	{
-		graphicobject::update(&textures[state]);
+		bool aniend = graphicobject::update(&textures[state]);
 
-
+		if (aniend)
+		{
+			int next_s = random.nextint<int>(states.size() - 1);
+			setstate(states[next_s]);
+		}
 	}
 }

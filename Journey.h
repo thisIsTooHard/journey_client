@@ -18,7 +18,6 @@
 #pragma once
 #include "packetcreator.h"
 #include "winapp.h"
-//#include "window.h"
 #include "datacache.h"
 #include "settings.h"
 
@@ -27,7 +26,6 @@ using namespace net;
 
 extern packetcreator packet_c;
 extern winapp app;
-//extern window app;
 extern session server;
 extern datacache cache;
 extern settings config;

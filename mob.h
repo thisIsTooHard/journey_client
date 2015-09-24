@@ -46,14 +46,14 @@ namespace gameplay
 		void kill(char);
 		rectangle2d bounds();
 		void setstate(string);
-		pair<int, bool> calcdamage(uniform_int_distribution<int>, float, float);
+		pair<int, bool> calcdamage(int, int, float, float);
 		void makeactive() { active = true; }
 		bool isalive() { return state != "die1"; }
 		bool isactive() { return active && isalive(); }
 	private:
 		void sendmoves(byte);
 		mobdata* mdata;
-		randomizer randomize;
+		randomizer random;
 		int mid;
 		bool active;
 		int oid;

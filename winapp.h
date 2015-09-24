@@ -19,7 +19,6 @@
 #include "ui.h"
 #include "imagecache.h"
 #include "fontcache.h"
-#include "audiomanager.h"
 #include <d2d1.h>
 #include <d2d1helper.h>
 #include <dwrite.h>
@@ -40,7 +39,6 @@ namespace program
 		ui* getui() { return &uinterface; }
 		fontcache* getfonts() { return &fonts; }
 		imagecache* getimgcache() { return &imgcache; }
-		audiomanager* getaudio() { return &audio; }
 	private:
 		long initfactories();
 		void draw();
@@ -48,7 +46,6 @@ namespace program
 		ui uinterface;
 		fontcache fonts;
 		imagecache imgcache;
-		audiomanager audio;
 		HWND window;
 		ID2D1Factory* d2d_factory;
 		IWICImagingFactory* image_factory;

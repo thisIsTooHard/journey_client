@@ -17,10 +17,10 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "graphicobject.h"
-#include "nametag.h"
+#include "textlabel.h"
+#include "randomizer.h"
 
 using namespace graphics;
-using namespace io;
 
 namespace maplemap
 {
@@ -36,6 +36,8 @@ namespace maplemap
 		vector2d getdim() { return textures[state].getdimension(0); }
 	private:
 		map<string, animation> textures;
+		vector<string> states;
+		randomizer random;
 		map<string, vector<string>> lines;
 		textlabel ntag;
 		textlabel ftag;
@@ -50,6 +52,7 @@ namespace maplemap
 		bool mouseonly;
 		short fh;
 		vector2d position;
+		short elapsed_s;
 	};
 }
 

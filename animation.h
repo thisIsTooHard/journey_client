@@ -38,14 +38,15 @@ namespace graphics
 		void setframe(byte);
 		short gettotaldelay();
 		short getdelay(byte f) { return delays[f]; }
-		byte getalpha(byte f) { return alphablends[f].second; }
+		float getalpha(byte f) { return static_cast<float>(alphablends[f].second) / 255; }
+		byte prevframe(byte f) { return (f > 0) ? f - 1 : last_f; }
 		byte nextframe(byte f) { return (f == last_f) ? 0 : f + 1; }
 		vector2d getdimension(byte);
 		bool update(short);
 		bool update() { return update(DPF); }
 		bool isloaded() { return textures[0].isloaded(); }
 		bool isanimated() { return last_f > 0; }
-		bool hasblending() { return blending; }
+		bool hasblending(byte f) { return alphablends.count(f); }
 		texture* gettexture(byte f) { return textures.count(f) ? &textures[f] : 0; }
 	protected:
 		map<byte, texture> textures;
