@@ -28,10 +28,11 @@ namespace maplemap
 		mapdrops() {}
 		~mapdrops() { drops.clear(); }
 		void init();
-		void adddrop(short, int, bool, int, vector2d, vector2d, char, bool);
-		void removedrop(short, char);
+		void adddrop(short, int, bool, int, vector2d, vector2d, char, char);
+		void removedrop(short, char, moveobject*);
 		void draw(vector2d);
 		void update();
+		drop* trypickup(rectangle2d);
 		void clear() { drops.clear(); }
 	private:
 		safeptrmap<short, drop*> drops;

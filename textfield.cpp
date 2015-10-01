@@ -20,16 +20,24 @@
 
 namespace io
 {
-	textfield::textfield(textid i, dwfonts fnt, textcolor col, string default, vector2d pos, int length)
+	textfield::textfield(textid i, dwfonts fnt, textcolor col, string def, vector2d pos, int max)
 	{
+		init();
+
+		getfont(fnt);
+		settext(def);
+
+		color = col;
 		id = i;
-		content = textlabel(fnt, col, default);
 		position = pos;
-		maxlength = length;
+		maxlength = max;
+
+		marker = textlabel(fnt, col, "|");
+		markpos = text.length();
+		crypt = 0;
 		active = true;
 		focused = false;
 		showmark = false;
-		markpos = default.length();
 	}
 
 	rectangle2d textfield::bounds(vector2d parentpos)
@@ -44,25 +52,30 @@ namespace io
 		{
 			vector2d absp = position + parentpos;
 
-			if (content.gettext() == "" && !focused)
+			if (text.size() > 0)
 			{
-				if (bg.isloaded())
+				if (crypt > 0)
 				{
-					bg.draw(absp + bgposition);
-				}
-			}
-			else
-			{
-				if (focused && showmark && markpos == content.gettext().length())
-				{
-					content.setmarker(true);
+					string crtext;
+					crtext.insert(0, text.size(), crypt);
+					textlabel::drawover(crtext, absp);
 				}
 				else
 				{
-					content.setmarker(false);
+					textlabel::draw(absp);
 				}
+			}
 
-				content.draw(absp);
+			if (focused)
+			{
+				if (showmark)
+				{
+					marker.draw(absp + vector2d(getadvance(markpos), 0));
+				}
+			}
+			else if (text.size() == 0)
+			{
+				bg.draw(absp + bgposition);
 			}
 		}
 	}
@@ -92,32 +105,36 @@ namespace io
 		elapsed = 0;
 		showmark = true;
 		focused = f;
-		markpos = content.gettext().length();
+		markpos = text.length();
 	}
 
 	void textfield::sendchar(char letter)
 	{
 		if (letter == 0 && markpos > 0)
 		{
-			markpos--; 
-			string text = content.gettext();
-			text.pop_back();
-			content.settext(text);
+			markpos--;
+			text.erase(markpos, 1);
+			textlabel::settext(text);
 		}
-		else if (letter > 2 && content.gettext().length() < maxlength)
+		else if (letter > 2 && text.length() < maxlength)
 		{
-			string text = content.gettext();
-			text.push_back(letter);
-			content.settext(text);
+			text.insert(markpos, 1, letter);
+			textlabel::settext(text);
 			markpos++;
 		}
 		else if (letter == 1 && markpos > 0)
 		{
-			//markpos -= 1;
+			markpos -= 1;
 		}
-		else if (letter == 2 && markpos < content.gettext().length())
+		else if (letter == 2 && markpos < text.length())
 		{
-			//markpos += 1;
+			markpos += 1;
 		}
+	}
+
+	void textfield::settext(string txt)
+	{
+		markpos = txt.length();
+		textlabel::settext(txt);
 	}
 }

@@ -95,7 +95,15 @@ namespace io
 		textfields[TXT_NAMECHAR].setfocus(true);
 		app.getui()->settextfield(&textfields[TXT_NAMECHAR]);
 
-		setlabel = textlabel(DWF_12C, TXC_BLACK, "");
+		facename = textlabel(DWF_12C, TXC_BLACK, "");
+		hairname = textlabel(DWF_12C, TXC_BLACK, "");
+		haircname = textlabel(DWF_12C, TXC_BLACK, "");
+		bodyname = textlabel(DWF_12C, TXC_BLACK, "");
+		topname = textlabel(DWF_12C, TXC_BLACK, "");
+		botname = textlabel(DWF_12C, TXC_BLACK, "");
+		shoename = textlabel(DWF_12C, TXC_BLACK, "");
+		wepname = textlabel(DWF_12C, TXC_BLACK, "");
+		gendername = textlabel(DWF_12C, TXC_BLACK, "");
 
 		app.getimgcache()->unlock();
 
@@ -217,7 +225,7 @@ namespace io
 			}
 			else
 			{
-				name = textfields[TXT_NAMECHAR].text();
+				name = textfields[TXT_NAMECHAR].gettext();
 				if (name.size() >= 4)
 				{
 					app.getui()->disableactions();
@@ -228,7 +236,7 @@ namespace io
 				else
 				{
 					app.getui()->add(UI_LOGINNOTICE, 10);
-					buttons[id].setstate("normal");
+					buttons[id].setstate(BTS_NORMAL);
 				}
 			}
 			break;
@@ -255,7 +263,7 @@ namespace io
 				buttons[BT_CHARC_WEPR].setactive(false);
 				buttons[BT_CHARC_GENDERL].setactive(false);
 				buttons[BT_CHARC_GEMDERR].setactive(false);
-				buttons[BT_CHARC_CANCEL].setstate("normal");
+				buttons[BT_CHARC_CANCEL].setstate(BTS_NORMAL);
 				textfields[TXT_NAMECHAR].setactive(true);
 				named = false;
 			}
@@ -372,7 +380,7 @@ namespace io
 				break;
 			}
 			app.getimgcache()->unlock();
-			buttons[id].setstate("mouseOver");
+			buttons[id].setstate(BTS_MOUSEOVER);
 		}
 	}
 
@@ -409,7 +417,7 @@ namespace io
 				buttons[BT_CHARC_GEMDERR].setactive(true);
 				textfields[TXT_NAMECHAR].setactive(false);
 			}
-			buttons[BT_CHARC_OK].setstate("normal");
+			buttons[BT_CHARC_OK].setstate(BTS_NORMAL);
 		}
 	}
 
@@ -450,15 +458,15 @@ namespace io
 
 			if (named)
 			{
-				setlabel.draw(newchar.getface()->getname(), vector2d(591, 214));
-				setlabel.draw(newchar.gethair()->getname(), vector2d(591, 233));
-				setlabel.draw(newchar.gethair()->getcolor(), vector2d(591, 252));
-				setlabel.draw(newchar.getbody()->getname(), vector2d(591, 271));
-				setlabel.draw(newchar.getcloth(EQL_COAT)->getname(), vector2d(591, 290));
-				setlabel.draw(newchar.getcloth(EQL_PANTS)->getname(), vector2d(591, 309));
-				setlabel.draw(newchar.getcloth(EQL_SHOES)->getname(), vector2d(591, 328));
-				setlabel.draw(newchar.getcloth(EQL_WEAPON)->getname(), vector2d(591, 347));
-				setlabel.draw(female? "Female" : "Male", vector2d(591, 366));
+				facename.draw(newchar.getface()->getname(), vector2d(591, 214));
+				hairname.draw(newchar.gethair()->getname(), vector2d(591, 233));
+				haircname.draw(newchar.gethair()->getcolor(), vector2d(591, 252));
+				bodyname.draw(newchar.getbody()->getname(), vector2d(591, 271));
+				topname.draw(newchar.getcloth(EQL_COAT)->getname(), vector2d(591, 290));
+				botname.draw(newchar.getcloth(EQL_PANTS)->getname(), vector2d(591, 309));
+				shoename.draw(newchar.getcloth(EQL_SHOES)->getname(), vector2d(591, 328));
+				wepname.draw(newchar.getcloth(EQL_WEAPON)->getname(), vector2d(591, 347));
+				gendername.draw(female? "Female" : "Male", vector2d(591, 366));
 			}
 		}
 	}

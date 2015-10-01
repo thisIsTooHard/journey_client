@@ -40,13 +40,17 @@ namespace maplemap
 		virtual ~drop() {}
 		virtual void draw(vector2d) {}
 		virtual bool update();
-		void makeactive() { state = DST_FLOATING; }
-		void expire(char);
+		void init(char);
+		void expire(char, moveobject*);
+		void makeactive() { if (state == DST_INACTIVE) state = DST_FLOATING; }
+		int getid() { return oid; }
+		rectangle2d bounds() { return rectangle2d(getposition(), getposition() + vector2d(32, 32)); }
 	protected:
 		short oid;
 		int owner;
 		vector2d pos;
 		vector2d dest;
+		moveobject* looter;
 		char pickuptype;
 		bool playerdrop;
 		dropstate state;

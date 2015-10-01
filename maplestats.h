@@ -82,13 +82,13 @@ namespace gameplay
 		short getsec(weapontype);
 		short getaccuracy();
 		void calcdamage(short, short, short);
-		const string getjobname();
+		string getjobname(short);
+		string getjobname() { return getjobname(stats[MS_JOB]); }
 		short getstat(maplestat s) { return stats.count(s) ? stats[s] : 0; }
 		short gettotal(maplestat s) { return totalstats.count(s) ? totalstats[s] : 0; }
 		void setstat(maplestat s, short v) { stats[s] = v; }
 		void settotal(maplestat t, short v) { totalstats[t] = v; }
 		void setexp(int v) { exp = v; }
-		void setmeso(int v) { meso = v; }
 		void setattack(short v) { attack = v; }
 		float getmastery() { return mastery; }
 		float getcritical() { return critical; }
@@ -104,7 +104,6 @@ namespace gameplay
 		short gethonor() { return honor; }
 		int getid() { return id; }
 		int getexp() { return exp; }
-		int getmeso() { return meso; }
 		int getexpneeded() { return exptable[stats[MS_LEVEL]]; }
 		string getname() { return name; }
 		pair<int, char> getspawninfo() { return spawninfo; }
@@ -125,7 +124,6 @@ namespace gameplay
 		float stance;
 		float resiststatus;
 		int exp;
-		int meso;
 		map<maplestat, short> stats;
 		map<maplestat, short> totalstats;
 		pair<int, char> spawninfo;

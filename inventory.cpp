@@ -22,6 +22,26 @@ namespace gameplay
 	inventory::inventory(vector<char> slt)
 	{
 		slots = slt;
+		meso = 0;
+	}
+
+	void inventory::modify(inventorytype type, short slot, char mode, short arg)
+	{
+		if (items[type].contains(slot))
+		{
+			switch (mode)
+			{
+			case 1:
+				items[type].get(slot)->setcount(arg);
+				break;
+			case 2:
+				items[type].changekey(slot, arg);
+				break;
+			case 3:
+				items[type].removekey(slot);
+				break;
+			}
+		}
 	}
 
 	void inventory::recalcstats()

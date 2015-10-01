@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "mobdata.h"
-#include "nxfile.h"
+#include "Journey.h"
 
 namespace data
 {
@@ -25,9 +25,8 @@ namespace data
 	{
 		string path = to_string(mid);
 		path.insert(0, 7 - path.size(), '0');
-		path.append(".img");
 
-		nl::node src = nl::nx::nodes["Mob"][path];
+		node src = nx::nodes["Mob"][path + ".img"];
 
 		for (node sub = src.begin(); sub != src.end(); ++sub)
 		{
@@ -54,8 +53,19 @@ namespace data
 			}
 		}
 
-		nl::node strsrc = nl::nx::nodes["String"]["Mob.img"][to_string(mid)]["name"];
+		node strsrc = nx::nodes["String"]["Mob.img"][to_string(mid)]["name"];
 		name = strsrc.istype(stringnode) ? strsrc.get_string() : "";
+
+		node sndsrc = nx::nodes["Sound"]["Mob.img"][path];
+		for (node sub = sndsrc.begin(); sub != sndsrc.end(); ++sub)
+		{
+			if (sub.data_type() == node::type::audio)
+			{
+				audio snd = sub.get_audio();
+				app.getaudio()->cachesound((void*)snd.data(), snd.length(), snd.id());
+				sounds[sub.name()] = snd.id();
+			}
+		}
 	}
 
 	void mobdata::draw(string state, byte frame, float alpha, bool flip, vector2d pos)
@@ -65,6 +75,11 @@ namespace data
 		{
 			txt->draw(pos, alpha, flip);
 		}
+	}
+
+	void mobdata::playsound(string state)
+	{
+		app.getaudio()->playsound(sounds[state]);
 	}
 
 	short mobdata::getldelta(short plvl)

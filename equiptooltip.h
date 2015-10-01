@@ -21,6 +21,7 @@
 #include "mapleequip.h"
 #include "maplestats.h"
 #include "charset.h"
+#include "mapletext.h"
 
 using namespace gameplay;
 using namespace character;

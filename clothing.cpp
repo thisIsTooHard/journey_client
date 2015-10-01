@@ -344,6 +344,12 @@ namespace character
 		desc = nx::nodes["String"]["Eqp.img"]["Eqp"][catname][to_string(equipid)]["desc"];
 		itemid = equipid;
 
+		txtargs descargs;
+		descargs.text = desc;
+		descargs.color = TXC_WHITE;
+		desctext = itemtext(descargs, DWF_12LL, vector2d(200, 0));
+		hasdesc = desc.size() > 0;
+
 		transparent = (itemid == 1002186);
 	}
 
@@ -354,6 +360,7 @@ namespace character
 		name = "";
 		desc = "";
 		type = "";
+		hasdesc = false;
 		transparent = true;
 	}
 
@@ -438,14 +445,9 @@ namespace character
 				return "SLOW (8)";
 			case 9:
 				return "SLOW (9)";
-			default:
-				return "";
 			}
 		}
-		else
-		{
-			return "";
-		}
+		return "";
 	}
 
 	string clothing::getdisplaystat(equipstat es)
@@ -478,6 +480,11 @@ namespace character
 			return "MAX MP";
 		case ES_HANDS:
 			return "HANDS";
+		case ES_SPEED:
+			return "SPEED";
+		case ES_JUMP:
+			return "JUMP";
 		}
+		return "";
 	}
 }

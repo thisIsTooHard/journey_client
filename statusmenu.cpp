@@ -24,7 +24,6 @@ namespace io
 	statusmenu::statusmenu()
 	{
 		app.getimgcache()->setmode(ict_sys);
-		nl::nx::view_file("UI");
 
 		node source = nl::nx::nodes["UI"]["StatusBar2.img"]["mainBar"]["System"];
 
@@ -39,8 +38,8 @@ namespace io
 		buttons[BT_GOPTIONS] = button(source["BtGameOption"], 8, 124);
 		buttons[BT_QUITGAME] = button(source["BtGameQuit"], 8, 150);
 
-		nl::nx::unview_file("UI");
 		app.getimgcache()->unlock();
+
 		position = vector2d(721, 366);
 		dimensions = vector2d(79, 176);
 		active = true;
@@ -70,6 +69,6 @@ namespace io
 			app.getui()->add(UI_KEYCONFIG);
 			break;
 		}
-		buttons[id].setstate("mouseOver");
+		buttons[id].setstate(BTS_MOUSEOVER);
 	}
 }

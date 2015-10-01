@@ -16,51 +16,38 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "skillicon.h"
-#include "itemicon.h"
-#include "keyboard.h"
+#include "moveobject.h"
+#include "maplelook.h"
+#include "playereffects.h"
 
-using namespace graphics;
+using namespace action;
 
-namespace io
+namespace gameplay
 {
-	enum dragicontype : char
+	enum playerstate : char
 	{
-		DIT_KEY,
-		DIT_SKILLKEY,
-		DIT_ITEMKEY,
-		DIT_SKILL,
-		DIT_ITEM
+		PST_WALK = 2,
+		PST_STAND = 4,
+		PST_FALL = 6,
+		PST_ALERT = 8,
+		PST_PRONE = 10,
+		PST_SWIM = 12,
+		PST_LADDER = 14,
+		PST_ROPE = 16,
+		PST_DIED = 18,
+		PST_SIT = 20,
+		PST_SKILL = 22
 	};
 
-	class dragicon
+	class vplayer : public moveobject
 	{
 	public:
-		dragicon(dragicontype, texture, texture, vector2d, char, int);
-		dragicon(dragicontype, itemicon, texture, vector2d, char, int);
-		dragicon() {}
-		~dragicon() {}
-		void draw(vector2d);
-		void dragdraw(vector2d);
-		void setdrag(vector2d, vector2d);
-		void resetdrag() { drag = false; }
-		void setposition(vector2d p) { pos = p; }
-		void setkeyicon(texture t) { keyicon.second = t; }
-		bool dragged() { return drag; }
-		char getkey() { return keybind; }
-		int getaction() { return action; }
-		dragicontype gettype() { return type; }
-		rectangle2d bounds(vector2d);
-	private:
-		itemicon item_ico;
-		skillicon skill_ico;
-		pair<texture, texture> keyicon;
-		dragicontype type;
-		int action;
-		char keybind;
-		bool drag;
-		vector2d pos;
-		vector2d rel;
+		virtual ~vplayer() {}
+		virtual int getid() = 0;
+		virtual maplelook* getlook() = 0;
+		virtual playereffects* geteffects() = 0;
+		virtual string getname() = 0;
+		virtual void draw(vector2d) = 0;
 	};
 }
 

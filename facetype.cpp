@@ -81,8 +81,7 @@ namespace character
 
 	void facetype::draw(string exp, byte frame, vector2d pos, vector2d shift, bool flip)
 	{
-		texture temp = textures[exp][frame];
-		temp.shift(shift);
-		temp.draw(pos, flip);
+		textures[exp][frame].setshift(shift);
+		textures[exp][frame].draw(pos, flip);
 	}
 }

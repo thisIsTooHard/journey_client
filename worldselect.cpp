@@ -24,16 +24,14 @@ namespace io
 	worldselect::worldselect(char num, vector<char> chl)
 	{
 		app.getimgcache()->setmode(ict_login);
-		nl::nx::view_file("UI");
-		nl::nx::view_file("Map");
 
 		node back = nx::nodes["Map"]["Back"]["login.img"]["back"];
 		node login = nx::nodes["UI"]["Login.img"];
 		node worlds = login["WorldSelect"]["BtWorld"]["release"];
 		node channels = login["WorldSelect"]["BtChannel"];
 
-		byte defworld = config.getdefworld();
-		byte defch = config.getdefch();
+		byte defworld = config.getconfig()->defaultworld;
+		byte defch = config.getconfig()->defaultchannel;
 		if (defworld > 0)
 		{
 			defworld = 0;
@@ -48,7 +46,7 @@ namespace io
 		sprites.push_back(sprite(animation(login.resolve("Common/frame")), vector2d(400, 290)));
 
 		buttons[BT_WORLDSEL0] = button(worlds["button:15"], 650, 20);
-		buttons[BT_WORLDSEL0].setstate("pressed");
+		buttons[BT_WORLDSEL0].setstate(BTS_PRESSED);
 
 		sprites.push_back(sprite(animation(worlds["button:16"]["normal"]), vector2d(650, 74)));
 
@@ -67,7 +65,7 @@ namespace io
 			buttons[buttonid] = button(texture(channels["button:" + to_string(i)]["normal"]["0"]), texture(channels["button:" + to_string(i)]["keyFocused"]["0"]), 200, 170);
 			if (i == defch)
 			{
-				buttons[buttonid].setstate("pressed");
+				buttons[buttonid].setstate(BTS_PRESSED);
 			}
 		}
 
@@ -79,7 +77,6 @@ namespace io
 		worldid = defworld;
 		channelid = defch;
 
-		nl::nx::unview_file("UI");
 		app.getimgcache()->unlock();
 		position = vector2d(0, 0);
 		dimensions = vector2d(800, 600);
@@ -117,33 +114,21 @@ namespace io
 	{
 		if (id >= BT_WORLDSEL0 && id <= BT_WORLDSEL19)
 		{
+			buttons[BT_WORLDSEL0 + worldid].setstate(BTS_NORMAL);
 			worldid = id - BT_WORLDSEL0;
-			for (map<short, button>::iterator itbt = buttons.begin(); itbt != buttons.end(); itbt++)
-			{
-				if (itbt->first != id && itbt->first >= BT_WORLDSEL0 && itbt->first <= BT_WORLDSEL19 && itbt->second.getstate() == "pressed")
-				{
-					itbt->second.setstate("normal");
-				}
-			}
 		}
 		else if (id >= BT_CHANNELSEL0 && id <= BT_CHANNELSEL16)
 		{
+			buttons[BT_CHANNELSEL0 + channelid].setstate(BTS_NORMAL);
 			channelid = id - BT_CHANNELSEL0;
-			for (map<short, button>::iterator itbt = buttons.begin(); itbt != buttons.end(); itbt++)
-			{
-				if (itbt->first != id && itbt->first >= BT_CHANNELSEL0 && itbt->first <= BT_CHANNELSEL16 && itbt->second.getstate() == "pressed")
-				{
-					itbt->second.setstate("normal");
-				}
-			}
 		}
 		else if (id == BT_GOWORLD)
 		{
 			app.getui()->disableactions();
 			app.getui()->getfield()->getlogin()->worldid = worldid;
 			app.getui()->getfield()->getlogin()->channelid = channelid;
-			config.setdefworld(worldid);
-			config.setdefchannel(channelid);
+			config.getconfig()->defaultworld = worldid;
+			config.getconfig()->defaultchannel = channelid;
 			packet_c.charlrequest(worldid, channelid);
 		}
 	}

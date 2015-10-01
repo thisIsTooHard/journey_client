@@ -21,6 +21,12 @@
 
 namespace data
 {
+	void itemcache::init()
+	{
+		node src = nx::nodes["UI"]["Basic.img"]["ItemNo"];
+		countset = charset(src);
+	}
+
 	itemdata* itemcache::getitem(int itemid)
 	{
 		if (!items.count(itemid))

@@ -21,47 +21,47 @@ namespace program
 {
 	void fontcache::init(IDWriteFactory* w_f)
 	{
-		fontfactory = unique_ptr<IDWriteFactory>(w_f);
+		dwrite_f = w_f;
 
-		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12L]);
+		dwrite_f->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12L]);
 		fonts[DWF_12L]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-		fonts[DWF_12L]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+		fonts[DWF_12L]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
-		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12LL]);
+		dwrite_f->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_LIGHT, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12LL]);
 		fonts[DWF_12LL]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-		fonts[DWF_12LL]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+		fonts[DWF_12LL]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
-		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12C]);
+		dwrite_f->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12C]);
 		fonts[DWF_12C]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-		fonts[DWF_12C]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+		fonts[DWF_12C]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
-		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12BC]);
+		dwrite_f->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12BC]);
 		fonts[DWF_12BC]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-		fonts[DWF_12BC]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+		fonts[DWF_12BC]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
-		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12R]);
+		dwrite_f->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 12.0f, L"en-us", &fonts[DWF_12R]);
 		fonts[DWF_12R]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
-		fonts[DWF_12R]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+		fonts[DWF_12R]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
-		fontfactory->CreateTextFormat(L"Times New Roman", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-us", &fonts[DWF_14L]);
+		dwrite_f->CreateTextFormat(L"Times New Roman", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-us", &fonts[DWF_14L]);
 		fonts[DWF_14L]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-		fonts[DWF_14L]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+		fonts[DWF_14L]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
-		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-us", &fonts[DWF_14C]);
+		dwrite_f->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-us", &fonts[DWF_14C]);
 		fonts[DWF_14C]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-		fonts[DWF_14C]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+		fonts[DWF_14C]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
-		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-us", &fonts[DWF_14BC]);
+		dwrite_f->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-us", &fonts[DWF_14BC]);
 		fonts[DWF_14BC]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-		fonts[DWF_14BC]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+		fonts[DWF_14BC]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
-		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-us", &fonts[DWF_14R]);
+		dwrite_f->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-us", &fonts[DWF_14R]);
 		fonts[DWF_14R]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
-		fonts[DWF_14R]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+		fonts[DWF_14R]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
-		fontfactory->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 20.0f, L"en-us", &fonts[DWF_20C]);
+		dwrite_f->CreateTextFormat(L"Calibri", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 20.0f, L"en-us", &fonts[DWF_20C]);
 		fonts[DWF_20C]->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-		fonts[DWF_20C]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+		fonts[DWF_20C]->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 	}
 
 	fontcache::~fontcache()

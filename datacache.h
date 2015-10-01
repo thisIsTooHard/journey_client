@@ -21,6 +21,8 @@
 #include "itemcache.h"
 #include "mobcache.h"
 #include "skillcache.h"
+#include "effectcache.h"
+#include "soundcache.h"
 
 using namespace data;
 
@@ -31,17 +33,22 @@ namespace program
 	public:
 		datacache() {}
 		~datacache() {}
+		void init();
 		mapdata* getmap() { return &mdata; }
 		equipcache* getequips() { return &equips; }
 		itemcache* getitems() { return &items; }
 		mobcache* getmobs() { return &mobs; }
 		skillcache* getskills() { return &skills; }
+		effectcache* geteffects() { return &effects; }
+		soundcache* getsounds() { return &sounds; }
 	private:
 		mapdata mdata;
 		equipcache equips;
 		itemcache items;
 		mobcache mobs;
 		skillcache skills;
+		effectcache effects;
+		soundcache sounds;
 	};
 }
 

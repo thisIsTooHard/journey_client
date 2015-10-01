@@ -16,7 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "winapp.h"
+#include "Journey.h"
 
 namespace program
 {
@@ -31,12 +31,14 @@ namespace program
 
 		result = initfactories();
 
-		nl::nx::load_all();
-
 		imgcache.init(image_factory);
 		fonts.init(dwrite_factory);
 
-		uinterface.init();
+		fullscreen = false;
+		screencd = 0;
+
+		scralpha = 1.0f;
+		trans = TRS_NONE;
 
 		if (result == 0)
 		{
@@ -73,16 +75,30 @@ namespace program
 
 			if (window)
 			{
-				SetPriorityClass(window, REALTIME_PRIORITY_CLASS);
-				SetFocus(window);
+				if (audio_pb.init(window))
+				{
+					uinterface.init();
 
-				ShowWindow(window, SW_SHOWNORMAL);
-				UpdateWindow(window);
-				return 0;
+					SetPriorityClass(window, REALTIME_PRIORITY_CLASS);
+					SetFocus(window);
+					ShowWindow(window, SW_SHOWNORMAL);
+					UpdateWindow(window);
+					return JRE_NONE;
+				}
+				else
+				{
+					return JRE_AUDIOERROR;
+				}
+			}
+			else
+			{
+				return JRE_WINAPP_FAILURE;
 			}
 		}
-
-		return result;
+		else
+		{
+			return JRE_WINAPP_FAILURE;
+		}
 	}
 
 	long winapp::initfactories()
@@ -102,7 +118,7 @@ namespace program
 
 			if (result == 0)
 			{
-				result = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &d2d_factory);
+				result = D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &d2d_factory);
 
 				if (result == 0)
 				{
@@ -160,7 +176,7 @@ namespace program
 					wasHandled = true;
 					break;
 				case WM_PAINT:
-					app->draw();
+					app->render();
 					result = 0;
 					wasHandled = true;
 					break;
@@ -222,7 +238,92 @@ namespace program
 		return result;
 	}
 
-	void winapp::draw()
+	void winapp::togglefullscreen()
+	{
+		if (screencd <= 0)
+		{
+			if (fullscreen)
+			{
+				SetWindowPos(
+					window, 
+					HWND_TOP, 0, 0, 
+					static_cast<int>(ceil(816.f * dpiX / 96.f)),
+					static_cast<int>(ceil(624.f * dpiX / 96.f)),
+					SWP_FRAMECHANGED);
+
+				fullscreen = false;
+			}
+			else
+			{
+				float factor = static_cast<float>(GetSystemMetrics(SM_CXSCREEN)) / 816.f;
+
+				SetWindowPos(
+					window,
+					HWND_TOPMOST, 0, 0,
+					static_cast<int>(ceil(816.f * factor * dpiX / 96.f)),
+					static_cast<int>(ceil(624.f * factor * dpiY / 96.f)),
+					SWP_FRAMECHANGED);
+
+				fullscreen = true;
+			}
+
+			screencd = 500;
+		}
+	}
+
+	void winapp::maptransition(int channel, int mapid, char portalid)
+	{
+		fadeout();
+		tinfo.channel = channel;
+		tinfo.mapid = mapid;
+		tinfo.portalid = portalid;
+		trans = TRS_MAP;
+	}
+
+	void wupdate(HWND hwnd)
+	{
+		winapp* app = reinterpret_cast<winapp*>(::GetWindowLongPtrW(hwnd, GWLP_USERDATA));
+		app->update();
+	}
+
+	void winapp::update()
+	{
+		uinterface.update();
+
+		bool trans_done = false;
+
+		if (alphastep.size() > 0)
+		{
+			scralpha += alphastep[0];
+
+			if (scralpha >= 1.0f)
+			{
+				scralpha = 1.0f;
+				trans_done = true;
+			}
+			else if (scralpha <= 0.0f)
+			{
+				scralpha = 0.0f;
+				trans_done = true;
+			}
+		}
+
+		if (trans_done)
+		{
+			alphastep.erase(alphastep.begin());
+
+			switch (trans)
+			{
+			case TRS_MAP:
+				uinterface.getfield()->setfield(tinfo.mapid, tinfo.portalid);
+				uinterface.enableactions();
+				trans = TRS_NONE;
+				break;
+			}
+		}
+	}
+
+	void winapp::render()
 	{
 		long result = 0;
 
@@ -242,23 +343,57 @@ namespace program
 				&d2d_rtarget
 				);
 
+			d2d_rtarget->CreateCompatibleRenderTarget(&back_rtarget);
+
 			d2d_rtarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
+			back_rtarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
 
-			result = d2d_rtarget->CreateLayer(NULL, &d2d_layer);
-
-			imgcache.settarget(d2d_rtarget);
+			imgcache.settarget(back_rtarget);
 		}
 
-		if (result == 0)
+		if (d2d_rtarget)
 		{
-			d2d_rtarget->BeginDraw();
-			d2d_rtarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
-			uinterface.draw();
-			d2d_rtarget->EndDraw();
+			RECT rc;
+			GetClientRect(window, &rc);
+			D2D1_RECT_F drc = D2D1::RectF(rc.left, rc.top, rc.right, rc.bottom);
+
+			app.update();
+
+			bool updatescr = alphastep.size() > 0 ? alphastep[0] > 0.0f : true;
+
+			if (updatescr)
+			{
+				if (scene)
+				{
+					scene->Release();
+					scene = 0;
+				}
+
+				back_rtarget->BeginDraw();
+				back_rtarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+				uinterface.draw();
+				back_rtarget->EndDraw();
+
+				back_rtarget->GetBitmap(&scene);
+			}
+			else if (!scene)
+			{
+				back_rtarget->GetBitmap(&scene);
+			}
+
+			if (scene)
+			{
+				d2d_rtarget->BeginDraw();
+				d2d_rtarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
+				d2d_rtarget->DrawBitmap(scene, drc, scralpha);
+				d2d_rtarget->EndDraw();
+			}
 		}
 		else
 		{
 			SafeRelease(&d2d_rtarget);
 		}
+
+		screencd -= DPF;
 	}
 }

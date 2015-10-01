@@ -34,7 +34,7 @@ namespace maplemap
 	class mesodrop : public drop, public graphicobject
 	{
 	public:
-		mesodrop(short, animation*, int, vector2d, vector2d, char, bool);
+		mesodrop(short, animation*, int, vector2d, vector2d, char, char);
 		mesodrop() {}
 		~mesodrop() {}
 		void draw(vector2d);

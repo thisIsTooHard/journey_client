@@ -33,8 +33,6 @@ namespace nl {
 		//Loads the pre-defined nodes from a standard setup of nx files for MapleStory
 		//Only call this function once
 		extern std::map<std::string, node> nodes;
-		void load_all();
-		void view_file(std::string);
-		void unview_file(std::string);
+		bool load_all();
 	}
 }

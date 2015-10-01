@@ -20,7 +20,7 @@
 
 namespace gameplay
 {
-	void account::init(int id, std::string name, char gm, bool fem, bool mute, short pn)
+	void account::init(int id, string name, char gm, bool fem, bool mute, short pn)
 	{
 		accid = id;
 		accname = name;
@@ -40,5 +40,12 @@ namespace gameplay
 				break;
 			selected++;
 		}
+	}
+
+	maplechar* account::addchar()
+	{
+		maplechar ch;
+		maplechars.push_back(ch);
+		return &maplechars[maplechars.size() - 1];
 	}
 }

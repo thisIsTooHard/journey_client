@@ -46,9 +46,11 @@ namespace net
 		MOVE_PLAYER = 41,
 		CLOSE_ATTACK = 44,
 		GENERAL_CHAT = 49,
+		MOVE_ITEM = 71,
 		USE_ITEM = 72,
 		SPEND_AP = 87,
-		MOVE_MONSTER = 188
+		MOVE_MONSTER = 188,
+		PICKUP_ITEM = 202
 	};
 
 	class packetcreator
@@ -58,9 +60,9 @@ namespace net
 		~packetcreator() {}
 		void init(session*, byte);
 		void c_login(string, string);
+		void accept_tos();
 		void pong();
 		void serverlrequest();
-		void banme();
 		void charlrequest(char, char);
 		void deletechar(string, int);
 		void registerpic(int, string);
@@ -69,17 +71,19 @@ namespace net
 		void playerlogin(int);
 		void checkcharname(string);
 		void createchar(string, int, int, int, int, int, int, int, int, int, bool);
-		void moveplayer(vector<movefragment>*);
+		void moveplayer(vector<movefragment>);
 		void changemap(bool, int, string, bool);
 		void close_attack(attackinfo);
 		void general_chat(string, bool);
+		void moveitem(inventorytype, short, char, short);
 		void useitem(short, int);
 		void spendap(maplestat);
-		void movemonster(int, short, byte, byte, byte, byte, byte, byte, vector2d, vector<movefragment>*);
+		void movemonster(int, short, byte, byte, byte, byte, byte, byte, vector2d, vector<movefragment>);
+		void pickupitem(int, vector2d);
 	private:
 		void send(packet*);
-		void writemoves(packet*, vector<movefragment>*);
-		unique_ptr<session> server;
+		void writemoves(packet*, vector<movefragment>);
+		session* server;
 		byte version;
 	};
 }

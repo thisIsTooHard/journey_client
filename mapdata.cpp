@@ -23,11 +23,13 @@ namespace data
 {
 	void mapdata::init()
 	{
-
+		//load something here
 	}
 
 	void mapdata::load(int mapid)
 	{
+		string oldbgm = (id > 0) ? info.getbgm() : "";
+
 		string strid = to_string(mapid);
 		strid.insert(0, 9 - strid.length(), '0');
 		strid.append(".img");
@@ -35,9 +37,10 @@ namespace data
 		node src = nx::nodes["Map"]["Map"]["Map" + to_string(mapid / 100000000)][strid];
 
 		fht = footholdtree(src["foothold"]);
-		info = mapinfo(mapid, src["info"], vector2d(fht.getwalls()), vector2d(fht.getborders()));
+		info = mapinfo(src, fht.getwalls(), fht.getborders());
 		landr = laddersropes(src["ladderRope"]);
 
+		newbgm = oldbgm != info.getbgm();
 		id = mapid;
 	}
 }

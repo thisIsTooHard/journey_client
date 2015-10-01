@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "equipcache.h"
-#include "nxfile.h"
+#include "Journey.h"
 
 namespace data
 {
@@ -146,7 +146,9 @@ namespace data
 	{
 		if (!bodytypes.count(sk))
 		{
+			app.getimgcache()->setmode(ict_sys);
 			bodytypes[sk] = bodytype(sk, &bodyinfo.posmap);
+			app.getimgcache()->unlock();
 		}
 		return &bodytypes[sk];
 	}
@@ -155,7 +157,9 @@ namespace data
 	{
 		if (!faces.count(fid))
 		{
+			app.getimgcache()->setmode(ict_sys);
 			faces[fid] = facetype(fid);
+			app.getimgcache()->unlock();
 		}
 		return &faces[fid];
 	}
@@ -164,7 +168,9 @@ namespace data
 	{
 		if (!hairstyles.count(hid))
 		{
+			app.getimgcache()->setmode(ict_sys);
 			hairstyles[hid] = hairstyle(hid, &bodyinfo.posmap);
+			app.getimgcache()->unlock();
 		}
 		return &hairstyles[hid];
 	}
@@ -173,7 +179,9 @@ namespace data
 	{
 		if (!clothes.count(iid))
 		{
+			app.getimgcache()->setmode(ict_sys);
 			clothes[iid] = clothing(iid, &bodyinfo.posmap);
+			app.getimgcache()->unlock();
 		}
 		return &clothes[iid];
 	}

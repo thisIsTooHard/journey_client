@@ -26,7 +26,6 @@ namespace io
 		keymap = keys;
 
 		app.getimgcache()->setmode(ict_sys);
-		nl::nx::view_file("UI");
 
 		nl::node src = nl::nx::nodes["UI"]["UIWindow2.img"]["KeyConfig"];
 
@@ -48,24 +47,27 @@ namespace io
 			keytxt[i] = texture(keys_n[to_string(i)]);
 		}
 
-		map<keyaction, keyaction> reserve;
+		short index = -1;
+		map<short, keyaction> reserve;
 		for (keyaction k = KA_EQUIPS; k <= KA_EQUIPENHANCE2; k = static_cast<keyaction>(k + 1))
 		{
-			reserve[k] = k;
+			reserve[index] = k;
 			actiontxt[k] = texture(icons_n[to_string(k)]);
+			index--;
 		}
 		for (keyaction k = KA_PICKUP; k <= KA_JUMP; k = static_cast<keyaction>(k + 1))
 		{
-			reserve[k] = k;
+			reserve[index] = k;
 			actiontxt[k] = texture(icons_n[to_string(k)]);
+			index--;
 		}
 		for (keyaction k = KA_FACE1; k <= KA_FACE7; k = static_cast<keyaction>(k + 1))
 		{
-			reserve[k] = k;
+			reserve[index] = k;
 			actiontxt[k] = texture(icons_n[to_string(k)]);
+			index--;
 		}
 
-		nl::nx::unview_file("UI");
 		app.getimgcache()->unlock();
 
 
@@ -80,11 +82,11 @@ namespace io
 			if (type == KT_ACTION || type == KT_MENU || type == KT_FACE)
 			{
 				keyaction ka = static_cast<keyaction>(action);
-				reserve.erase(ka);
 				texture txticon = actiontxt[ka];
+				reserve.erase(ka);
 				if (txticon.isloaded())
 				{
-					dragicons.push_back(dragicon(DIT_KEY, txticon, txtkey, pos, key, action));
+					icons.add(key, new keyicon(txticon, txtkey, key, ka, pos));
 				}
 			}
 			else if (type == KT_CASH || type == KT_ITEM)
@@ -92,7 +94,7 @@ namespace io
 				itemdata* item = cache.getitems()->getitem(action);
 				if (item)
 				{
-					dragicons.push_back(dragicon(DIT_ITEMKEY, itemicon(item->geticons(), true, invent->countitem(action)), txtkey, pos, key, action));
+					icons.add(key, new dragitemicon(IICT_KEY, item->geticons(), action, key, invent->countitem(action), pos));
 				}
 			}
 			else if (type == KT_SKILL)
@@ -100,14 +102,14 @@ namespace io
 				skilldata* skill = cache.getskills()->getskill(action);
 				if (skill)
 				{
-					dragicons.push_back(dragicon(DIT_SKILLKEY, skill->geticon(0), txtkey, pos, key, action));
+					//icons.add(key, new dragicon(ICN_SKILLKEY, skill->geticon(0), txtkey, pos, key, action));
 				}
 			}
 		}
 
-		for (map<keyaction, keyaction>::iterator rsit = reserve.begin(); rsit != reserve.end(); ++rsit)
+		for (map<short, keyaction>::iterator rsit = reserve.begin(); rsit != reserve.end(); ++rsit)
 		{
-			dragicons.push_back(dragicon(DIT_KEY, texture(icons_n[to_string(rsit->first)]), texture(), getreservepos(rsit->first), 0, rsit->first));
+			icons.add(rsit->first, new keyicon(texture(icons_n[to_string(rsit->second)]), texture(), 0, rsit->second, getreservepos(rsit->second)));
 		}
 
 		position = vector2d(89, 73);
@@ -123,66 +125,78 @@ namespace io
 		{
 		case BT_KEYS_CANCEL:
 			active = false;
-			buttons[BT_KEYS_CANCEL].setstate("normal");
+			buttons[BT_KEYS_CANCEL].setstate(BTS_NORMAL);
 			break;
 		case BT_KEYS_OK:
 
 			break;
 		case BT_KEYS_CLEAR:
-			if (dragicons.size() > 0)
+			if (icons.getend() > 0)
 			{
-				vector<dragicon> newicons;
-				for (vector<dragicon>::iterator drit = dragicons.begin(); drit != dragicons.end(); ++drit)
+				vector<int> toremove;
+				for (spmit<short, icon*> icit = icons.getit(); icit.belowtop(); ++icit)
 				{
-					switch (drit->gettype())
+					if (icit->gettype() == ICN_KEY)
 					{
-					case DIT_KEY:
-						drit->setposition(getreservepos(static_cast<keyaction>(drit->getaction())));
-						drit->setkeyicon(texture());
-						newicons.push_back(*drit);
-						break;
+						keyicon* dgit = reinterpret_cast<keyicon*>(icit.get());
+						dgit->setposition(getreservepos(static_cast<keyaction>(dgit->getaction())));
+						dgit->setkeytxt(texture());
+					}
+					else
+					{
+						toremove.push_back(icit.getindex());
 					}
 				}
-				dragicons = newicons;
+
+				for (vector<int>::iterator rmit = toremove.begin(); rmit != toremove.end(); ++rmit)
+				{
+					icons.remove(*rmit);
+				}
 			}
-			buttons[BT_KEYS_CLEAR].setstate("normal");
+			buttons[BT_KEYS_CLEAR].setstate(BTS_NORMAL);
 			break;
 		}
 	}
 
-	void keyconfig::sendicon(dragicon* icon, vector2d pos)
+	void keyconfig::sendicon(icon* icon, vector2d pos)
 	{
-		switch (icon->gettype())
+		if (icon->gettype() == ICN_KEY)
 		{
-		case DIT_KEY:
+			keyicon* kyit = reinterpret_cast<keyicon*>(icon);
+
 			if (pos.y() > position.y() + 265)
 			{
-				char keybind = icon->getkey();
+				char keybind = kyit->getkey();
 				if (keybind > -1)
 				{
 					keymap[keybind] = make_pair(KT_NONE, 0);
-					icon->setposition(getreservepos(static_cast<keyaction>(icon->getaction())));
-					icon->setkeyicon(texture());
+					icon->setposition(getreservepos(static_cast<keyaction>(kyit->getaction())));
+					kyit->setkeytxt(texture());
 				}
-				icon->resetdrag();
+				kyit->resetdrag();
 
 			}
 			else
 			{
-				char keybind = icon->getkey();
-				icon->resetdrag();
+				char keybind = kyit->getkey();
+				kyit->resetdrag();
 			}
-			break;
-		default:
-			uielement::sendicon(icon, pos);
+		}
+		else
+		{
+
 		}
 	}
 
-	void keyconfig::oniteminfo(dragicon* dgi)
+	void keyconfig::oninfo(icon* ico)
 	{
-		if (dgi)
+		if (ico)
 		{
-			app.getui()->showiteminfo(dgi->getaction());
+			if (ico->gettype() == ICN_ITEMKEY)
+			{
+				dragitemicon* dgi = reinterpret_cast<dragitemicon*>(ico);
+				app.getui()->showiteminfo(dgi->getid());
+			}
 		}
 		else
 		{

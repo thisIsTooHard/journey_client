@@ -120,15 +120,11 @@ namespace data
 		{
 			if (skill_e.size() > 1 && twoh)
 			{
-				sprite toadd = sprite(skill_e[1], vector2d(), true, flip);
-				toadd.setspeed(static_cast<short>(speed));
-				effects->add(toadd);
+				effects->add(effect(&skill_e[1], flip, static_cast<short>(speed)));
 			}
 			else
 			{
-				sprite toadd = sprite(skill_e[0], vector2d(), true, flip);
-				toadd.setspeed(static_cast<short>(speed));
-				effects->add(toadd);
+				effects->add(effect(&skill_e[0], flip, static_cast<short>(speed)));
 			}
 		}
 	}

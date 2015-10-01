@@ -18,7 +18,6 @@
 #pragma once
 #include "uielement.h"
 #include "charset.h"
-#include "maplechar.h"
 #include "nametag.h"
 #include "account.h"
 
@@ -35,13 +34,10 @@ namespace io
 		void update();
 		void buttonpressed(short);
 	private:
-		vector<maplestats> stats;
-		vector<maplelook> looks;
+		vector<maplechar*> chars;
 		vector<nametag> nametags;
-		vector<pair<pair<int, char>, pair<int, char>>> rankinfo;
 		textlabel name;
 		textlabel job;
-		map<char, texture> rankmove;
 		charset lvset;
 		charset statset;
 		char pic;

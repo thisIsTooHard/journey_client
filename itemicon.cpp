@@ -17,27 +17,38 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "itemicon.h"
-#include "nxfile.h"
+#include "Journey.h"
 
 namespace io
 {
-	itemicon::itemicon(map<bool, texture> txt, bool r, short q)
+	itemicon::itemicon(map<bool, texture> t, int i, bool r, short q)
 	{
-		textures = txt;
+		textures = t;
+		iid = i;
 		raw = r;
 		qty = q;
 
-		showcount = qty > 1;
-		pos = vector2d();
+		showcount = qty > 0;
+		alpha = 1.0f;
 	}
 
-	void itemicon::draw(vector2d parentpos, float alpha)
+	void itemicon::onmouseover()
 	{
-		textures[raw].draw(pos + parentpos, alpha);
+		app.getui()->showiteminfo(iid);
+	}
+
+	void itemicon::draw(vector2d pos)
+	{
+		textures[raw].draw(pos, alpha);
 
 		if (!raw && showcount && alpha == 1.0f)
 		{
-			countset.draw(to_string(qty), 8, cha_left, pos + parentpos + vector2d(-6, -12));
+			if (!countset)
+			{
+				countset = cache.getitems()->getcountset();
+			}
+
+			countset->draw(to_string(qty), cha_left, pos + vector2d(0, -12));
 		}
 	}
 }

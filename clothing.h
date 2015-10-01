@@ -19,8 +19,10 @@
 #include "charsprites.h"
 #include "mapleequip.h"
 #include "maplestats.h"
+#include "itemtext.h"
 
 using namespace gameplay;
+using namespace io;
 
 namespace character
 {
@@ -71,6 +73,7 @@ namespace character
 		byte getslots() { return slots; }
 		int getid() { return itemid; }
 		texture geticon(bool r) { return icon[r]; }
+		itemtext* getdtext() { return hasdesc ? &desctext : 0; }
 		map<bool, texture> geticons() { return icon; }
 	private:
 		map<bool, texture> icon;
@@ -79,6 +82,8 @@ namespace character
 		string type;
 		string name;
 		string desc;
+		bool hasdesc;
+		itemtext desctext;
 		bool cash;
 		bool tradeable;
 		bool transparent;

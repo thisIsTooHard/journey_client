@@ -70,8 +70,8 @@ namespace io
 		case cha_left:
 			for (char i = 0; i < length; i++)
 			{
-				shift += getw(numstr[i]);
 				draw(numstr[i], pos + vector2d(shift, 0), alpha);
+				shift += getw(numstr[i]);
 			}
 			break;
 		case cha_right:

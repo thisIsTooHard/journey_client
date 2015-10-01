@@ -19,43 +19,24 @@
 
 namespace maplemap
 {
-	itemdrop::itemdrop(short o, int id, texture ic, int own, vector2d pos, vector2d dst, char type, bool pld)
+	itemdrop::itemdrop(short o, int id, texture ic, int own, vector2d ps, vector2d dst, char type, char mod)
 	{
 		oid = o;
 		itemid = id;
 		ico = ic;
 		owner = own;
 		pickuptype = type;
-		playerdrop = pld;
+		dest = dst;
+		pos = ps;
 
-		fx = static_cast<float>(pos.x());
-		fy = static_cast<float>(pos.y());
-
-		updatefht();
-
-		dalpha = 1.0f;
-		moved = 0.0f;
-
-		if (pos == dst)
-		{
-			state = DST_FLOATING;
-			vspeed = 0;
-			hspeed = 0;
-			basey = fy;
-		}
-		else
-		{
-			state = DST_DROPPED;
-			vspeed = -6.0f;
-			hspeed = static_cast<float>(dst.x() - pos.x()) / 16;
-		}
+		init(mod);
 	}
 
 	void itemdrop::draw(vector2d viewpos)
 	{
 		if (state != DST_INACTIVE)
 		{
-			ico.draw(viewpos + getposition(), dalpha);
+			ico.draw(viewpos + getposition() - vector2d(16, 0), dalpha);
 		}
 	}
 }

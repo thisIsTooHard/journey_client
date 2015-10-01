@@ -36,7 +36,7 @@ namespace data
 		for (vector<ladderrope>::iterator lrit = landr.begin(); lrit != landr.end(); ++lrit)
 		{
 			ladderrope* lr = lrit._Ptr;
-			vector2d hor = vector2d(pos.x() - 50, pos.x() + 50);
+			vector2d hor = vector2d(pos.x() - 25, pos.x() + 25);
 			vector2d ver = up ? vector2d(lr->vertical.x(), lr->vertical.y() + 5) : vector2d(lr->vertical.x() - 5, lr->vertical.y());
 			if (hor.contains(lr->x) && ver.contains(pos.y()))
 			{

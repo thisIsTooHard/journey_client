@@ -19,56 +19,62 @@
 #include "Journey.h"
 
 HANDLE gTimerDoneEvent;
+HANDLE audio_closed;
 HANDLE hTimer = NULL;
 HANDLE hTimerQueue = NULL;
 
 packetcreator packet_c;
 winapp app;
-//window app;
 session server;
 datacache cache;
 settings config;
 
-int result = 0;
-byte mapleversion = 0;
+int result = JRE_NONE;
 
 void quit()
 {
-	result = 1;
+	result = JRE_EXIT;
 	PostQuitMessage(0);
 }
 
 void CALLBACK Update(PVOID lpParam, BOOLEAN TimerOrWaitFired) {
-	if (result == 0)
+	if (result == JRE_NONE)
 	{
-		app.getui()->update();
-		SetEvent(gTimerDoneEvent);
+		if (WaitForSingleObject(gTimerDoneEvent, DPF) == WAIT_OBJECT_0)
+		{
+			//ResetEvent(gTimerDoneEvent);
+			//app.update();
+		}
 	}
+	SetEvent(gTimerDoneEvent);
+}
+
+void CALLBACK CloseAudio()
+{
 }
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-	result = server.init();
+	result = nx::load_all() ? JRE_NONE : JRE_MISSING_FILES;
 
-	if (result > 0)
+	if (result == JRE_NONE)
 	{
-		mapleversion = result;
-		packet_c.init(&server, mapleversion);
-
-		HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
-
-		gTimerDoneEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-		hTimerQueue = CreateTimerQueue();
-
-		result = CoInitialize(NULL);
+		result = server.init();
 
 		if (result == 0)
 		{
+			packet_c.init(&server, 83);
+
+			HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
+			CoInitialize(NULL);
+
 			result = app.init();
 
 			if (result == 0)
 			{
-				CreateTimerQueueTimer(&hTimer, hTimerQueue, (WAITORTIMERCALLBACK)Update, NULL, 60, DPF, 0);
+				gTimerDoneEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+				hTimerQueue = CreateTimerQueue();
+				CreateTimerQueueTimer(&hTimer, hTimerQueue, (WAITORTIMERCALLBACK)Update, 0, 60, DPF, 0);
 
 				MSG winmsg;
 				while (result == 0)
@@ -76,9 +82,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 					if (WaitForSingleObject(gTimerDoneEvent, DPF) == WAIT_OBJECT_0)
 					{
 						server.receive();
-						//app.draw();
 
-						if (GetMessage(&winmsg, NULL, 0, 0))
+						if (GetMessage(&winmsg, 0, 0, 0))
 						{
 							TranslateMessage(&winmsg);
 							DispatchMessage(&winmsg);
@@ -88,26 +93,35 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 				WaitForSingleObject(gTimerDoneEvent, 1000);
 			}
-			else
-			{
-				MessageBox(NULL, (LPCSTR)"Failed to initialize windows app.", NULL, MB_OK);
-			}
 
 			CoUninitialize();
 		}
 
 		server.close();
 	}
-	else
+	
+	if (result != JRE_EXIT)
 	{
-		string error = "Connection failure:\n";
+		string error;
 		switch (result)
 		{
-		case -1:
-			error.append("The server seems to be offline.");
+		case JRE_SERVER_OFFLINE:
+			error = "Connection failure:\nThe server seems to be offline.";
 			break;
-		case -2:
-			error.append("Unsupported version.");
+		case JRE_WRONG_VERSION:
+			error = "Unsupported server version.";
+			break;
+		case JRE_MISSING_FILES:
+			error = "Could not find .nx files.";
+			break;
+		case JRE_WINAPP_FAILURE:
+			error = "Could not initialize winapi.";
+			break;
+		case JRE_AUDIOERROR:
+			error = "Could not initialize audio.";
+			break;
+		default:
+			error = "Unknown error.";
 			break;
 		}
 		MessageBox(NULL, error.c_str(), NULL, MB_OK);

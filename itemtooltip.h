@@ -18,6 +18,7 @@
 #pragma once
 #include "tooltip.h"
 #include "itemdata.h"
+#include "itemtext.h"
 
 using namespace data;
 

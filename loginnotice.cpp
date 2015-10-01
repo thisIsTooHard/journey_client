@@ -25,7 +25,7 @@ namespace io
 	{
 		app.getimgcache()->setmode(ict_login);
 
-		node notice = nl::nx::nodes["UI"].resolve("Login.img/Notice/");
+		node notice = nl::nx::nodes["UI"]["Login.img"]["Notice"];
 
 		string back;
 		switch (param)
@@ -68,7 +68,7 @@ namespace io
 			uielement* login = app.getui()->getelement(UI_LOGIN);
 			if (login)
 			{
-				login->setbutton(BT_LOGIN, "normal");
+				login->setbutton(BT_LOGIN, BTS_NORMAL);
 			}
 			active = false;
 			return;

@@ -43,6 +43,16 @@ namespace util
 			return range(chance());
 		}
 
+		size_t nextint(size_t high)
+		{
+			return nextint<size_t>(high);
+		}
+
+		size_t nextint(size_t low, size_t high)
+		{
+			return nextint<size_t>(low, high);
+		}
+
 		template <class T>
 		T nextint(T high)
 		{

@@ -22,7 +22,6 @@
 #include "cursor.h"
 #include "keyboard.h"
 #include "baseinterface.h"
-#include "dragicon.h"
 #include "itemtooltip.h"
 #include "equiptooltip.h"
 
@@ -46,18 +45,31 @@ namespace io
 		void sendkey(WPARAM, bool);
 		void sendmouse(mousestate, vector2d);
 		void showiteminfo(int);
-		void showequipinfo(int, short);
+		void showequipinfo(int, short, bool);
 		void sendchat(int, bool, string);
 		void setactive(bool a) { active = a; }
 		void sendmouse(vector2d p) { sendmouse(mouse.getstate(), p); }
 		void enableactions() { actionsenabled = true; }
 		void disableactions() { actionsenabled = false; }
 		void settextfield(textfield* t) { activetext = t; }
-		void seticon(dragicon* a) { activeicon = a; }
+		void seticon(icon* a) { activeicon = a; }
 		uielement* getelement(uielements t) { return elements.get(t); }
 		keyboard* getkeyboard() { return &keys; }
 		playfield* getfield() { return &field; }
 		baseinterface* getbase() { return &base; }
+
+		template <class E>
+		E* getelement(uielements t)
+		{
+			if (elements.contains(t))
+			{
+				return reinterpret_cast<E*>(elements.get(t));
+			}
+			else
+			{
+				return 0;
+			}
+		}
 	private:
 		safeptrmap<uielements, uielement*> elements;
 		playfield field;
@@ -66,8 +78,9 @@ namespace io
 		keyboard keys;
 		equiptooltip equipinfo;
 		itemtooltip iteminfo;
+		uielement* focused;
 		textfield* activetext;
-		dragicon* activeicon;
+		icon* activeicon;
 		tooltip* activeinfo;
 		bool shift;
 		bool active;

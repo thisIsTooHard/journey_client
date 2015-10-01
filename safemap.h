@@ -26,7 +26,7 @@ namespace util
 	class smit
 	{
 	public:
-		smit(map<K, V>* std, vector<K>* ky, SRWLOCK* lock, int t)
+		smit(map<K, V>* std, vector<K>* ky, SRWLOCK* lock, int32_t t)
 		{
 			stdmap = std;
 			keys = ky;
@@ -60,16 +60,21 @@ namespace util
 			return index < top;
 		}
 
-		int getindex()
+		int32_t getindex()
 		{
 			return index;
+		}
+
+		int32_t getkey()
+		{
+			return keys->at(index);
 		}
 	private:
 		map<K, V>* stdmap;
 		vector<K>* keys;
 		SRWLOCK* maplock;
-		int index;
-		int top;
+		int32_t index;
+		int32_t top;
 	};
 
 	template <typename K, typename V>
@@ -95,7 +100,7 @@ namespace util
 			return smit<K, V>(&stdmap, &keys, &maplock, top);
 		}
 
-		int getend() 
+		int32_t getend() 
 		{ 
 			return top; 
 		}
@@ -107,17 +112,18 @@ namespace util
 
 		void add(K key, V value)
 		{
-			if (!stdmap.count(key))
+			if (stdmap.count(key))
 			{
-				AcquireSRWLockExclusive(&maplock);
-				stdmap[key] = value;
-				keys.push_back(key);
-				top += 1;
-				ReleaseSRWLockExclusive(&maplock);
+				removekey(key);
 			}
+			AcquireSRWLockExclusive(&maplock);
+			stdmap[key] = value;
+			keys.push_back(key);
+			top += 1;
+			ReleaseSRWLockExclusive(&maplock);
 		}
 
-		void remove(int i)
+		void remove(int32_t i)
 		{
 			if (top > 0 && i < top)
 			{
@@ -137,8 +143,8 @@ namespace util
 			if (stdmap.count(key))
 			{
 				AcquireSRWLockShared(&maplock);
-				int index = -1;
-				for (int i = 0; i < top; i++)
+				int32_t index = -1;
+				for (int32_t i = 0; i < top; i++)
 				{
 					if (keys[i] == key)
 					{
@@ -155,6 +161,26 @@ namespace util
 			}
 		}
 
+		void removeall(vector<int32_t> toremove)
+		{
+			AcquireSRWLockExclusive(&maplock);
+			for (vector<int32_t>::iterator rmit = toremove.begin(); rmit != toremove.end(); ++rmit)
+			{
+				int32_t index = *rmit;
+
+				if (top > 0 && index < top)
+				{
+					if (stdmap.count(keys[index]))
+					{
+						top -= 1;
+						stdmap.erase(keys[index]);
+						keys.erase(keys.begin() + index);
+					}
+				}
+			}
+			ReleaseSRWLockExclusive(&maplock);
+		}
+
 		void clear()
 		{
 			AcquireSRWLockExclusive(&maplock);
@@ -166,7 +192,7 @@ namespace util
 	private:
 		vector<K> keys;
 		map<K, V> stdmap;
-		int top;
+		int32_t top;
 		SRWLOCK maplock;
 	};
 }

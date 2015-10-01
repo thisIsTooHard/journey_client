@@ -19,12 +19,15 @@
 
 namespace gameplay
 {
-	otherplayer::otherplayer(maplelook lk, byte lv, short jb, string nm, vector2d pos)
+	otherplayer::otherplayer(maplelook lk, int i, byte lv, short jb, string nm, vector2d pos)
 	{
 		look = lk;
-		name = textlabel(DWF_14C, TXC_WHITE, nm, TXB_NAMETAG);
+		id = i;
 		level = lv;
 		job = jb;
+
+		name = textlabel(DWF_14C, TXC_WHITE, nm);
+		name.setback(TXB_NAMETAG);
 
 		fx = static_cast<float>(pos.x());
 		fy = static_cast<float>(pos.y());
@@ -32,18 +35,17 @@ namespace gameplay
 		vspeed = 0.0f;
 
 		elapsed = 0;
+		state = PST_STAND;
 	}
 
 	void otherplayer::addmoves(vector<movefragment> moves)
 	{
-		for (vector<movefragment>::iterator mvit = moves.begin(); mvit != moves.end(); ++mvit)
-		{
-			movements.push_back(*mvit);
-		}
+		movements = moves;
 	}
 
 	void otherplayer::draw(vector2d viewpos)
 	{
+		updatemoves();
 		vector2d absp = viewpos + getposition();
 
 		look.draw(absp);
@@ -53,68 +55,83 @@ namespace gameplay
 
 	bool otherplayer::update()
 	{
-		bool aniend = look.update();
+		look.update();
+		return false;
+	}
 
+	void otherplayer::updatemoves()
+	{
 		if (movements.size() > 0)
 		{
-			movefragment move = *movements.begin();
+			movefragment move = movements[0];
+			fx = static_cast<float>(move.xpos);
+			fy = static_cast<float>(move.ypos);
+			resolvestate(static_cast<playerstate>(move.newstate));
 
-			switch (move.type)
+			/*if (movements.size() > 1)
 			{
-			case MVT_ABSOLUTE:
-				if (elapsed == 0)
-				{
-					fx = static_cast<float>(move.xpos);
-					fy = static_cast<float>(move.ypos);
-				}
-				hspeed = static_cast<float>(move.xpps) / static_cast<float>(move.duration / 4);
-				vspeed = static_cast<float>(move.ypps) / static_cast<float>(move.duration / 4);
-				break;
+				moveobject::update();
+				movefragment next = movements[1];
+				hspeed = (static_cast<float>(next.xpos) - fx);
+				vspeed = (static_cast<float>(next.ypos) - fy);
 			}
+			else
+			{
+				hspeed = static_cast<float>(move.xpps) / 20;
+				vspeed = static_cast<float>(move.ypps) / 20;
+				moveobject::update();
+			}*/
 
-			switch (move.newstate)
-			{
-			case 2:
-				look.setstate("walk");
-				look.setfleft(false);
-				break;
-			case 3:
-				look.setstate("walk");
-				look.setfleft(true);
-				break;
-			case 4:
-				look.setstate("stand");
-				look.setfleft(false);
-				break;
-			case 5:
-				look.setstate("stand");
-				look.setfleft(true);
-				break;
-			case 6:
-				look.setstate("jump");
-				look.setfleft(false);
-				break;
-			case 7:
-				look.setstate("jump");
-				look.setfleft(true);
-				break;
-			default:
-			{
-					   int newmove = move.newstate;
-					   int newstate = newmove;
-			}
-			}
+			movements.erase(movements.begin());
+		}
+	}
 
-			bool moveend = moveobject::update();
-
-			elapsed += DPF;
-			if (elapsed >= move.duration)
-			{
-				movements.erase(movements.begin());
-				elapsed = 0;
-			}
+	void otherplayer::resolvestate(playerstate pst)
+	{
+		if (pst % 2 == 0)
+		{
+			look.setfleft(false);
+		}
+		else
+		{
+			pst = static_cast<playerstate>(pst - 1);
+			look.setfleft(true);
 		}
 
-		return false;
+		switch (pst)
+		{
+		case PST_STAND:
+			look.setstate("stand");
+			break;
+		case PST_WALK:
+			look.setstate("walk");
+			break;
+		case PST_PRONE:
+			look.setstate("prone");
+			break;
+		case PST_FALL:
+			look.setstate("jump");
+			break;
+		case PST_LADDER:
+			look.setstate("ladder");
+			break;
+		case PST_ROPE:
+			look.setstate("rope");
+			break;
+		case PST_SIT:
+			look.setstate("sit");
+			break;
+		case PST_SWIM:
+			look.setstate("fly");
+			break;
+		case PST_ALERT:
+			look.setstate("alert");
+			break;
+		case PST_DIED:
+			look.setstate("dead");
+			break;
+		//default:
+			//throw new runtime_error("Unhandled State!");
+		}
 	}
 }

@@ -17,6 +17,9 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "itemdata.h"
+#include "charset.h"
+
+using namespace io;
 
 namespace data
 {
@@ -25,9 +28,12 @@ namespace data
 	public:
 		itemcache() {}
 		~itemcache() {}
+		void init();
 		itemdata* getitem(int);
+		charset* getcountset() { return &countset; }
 	private:
 		map<int, itemdata> items;
+		charset countset;
 	};
 }
 

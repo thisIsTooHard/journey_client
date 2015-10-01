@@ -16,7 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "sprite.h"
+#include "effect.h"
 #include "safemap.h"
 
 using namespace graphics;
@@ -30,9 +30,9 @@ namespace gameplay
 		~playereffects() {}
 		void draw(vector2d);
 		void update();
-		void add(sprite);
+		void add(effect);
 	private:
-		safemap<int, sprite> effects;
+		safemap<int, effect> effects;
 		int top;
 	};
 }

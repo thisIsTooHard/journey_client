@@ -48,11 +48,11 @@ namespace gameplay
 		{
 		case BGT_HMOVEA:
 		case BGT_HMOVEB:
-			hspeed = 0.5f;
+			hspeed = -0.5f;
 			break;
 		case BGT_VMOVEA:
 		case BGT_VMOVEB:
-			vspeed = 0.5f;
+			vspeed = -0.5f;
 			break;
 		case BGT_HTILED:
 			if (cpos.x() < 16)
@@ -86,35 +86,54 @@ namespace gameplay
 		short htile = 1;
 		short vtile = 1;
 
-		vector2d absp = pos + parentpos;
+		//no1: viewxmin = camera
 
-		//vector2d absp = pos + vector2d(static_cast<float>(rpos.x() * parentpos.x()) / 200, static_cast<float>(rpos.y() * parentpos.y()) / 150) + parentpos + vector2d(400, 300);
+		//int viewwidth = mapwalls.y() - mapwalls.x();
+		//int viewheight = mapborders.y() - mapborders.x();
+
+		int viewwidth = 800;
+		int viewheight = 530;
+
+		auto shiftx = 0.5 * rpos.x() * (-parentpos.x() - mapwalls.x() + viewwidth / 2) / 100 + viewwidth / 2;
+		auto shifty = 0.5 * rpos.y() * (-parentpos.y() + mapborders.y() - 300) / 100 + viewheight / 2 + (viewheight - 600) / 2;
+
+		vector2d absp = pos + vector2d(shiftx, shifty);
 
 		switch (type)
 		{
 		case BGT_HMOVEA:
+			absp.setx(cshiftx() + parentpos.x());
+			htile = 2 + (mapwalls.y() - mapwalls.x()) / cpos.x();
+			break;
 		case BGT_HTILED:
-			htile = (mapwalls.y() + cpos.x() - mapwalls.x()) / cpos.x();
-			absp.setx(parentpos.x() - cpos.x());
+			//absp.setx(cshifty() + parentpos.y());
+			htile = 2 + (mapwalls.y() - mapwalls.x()) / cpos.x();
 			break;
 		case BGT_VMOVEA:
+			absp.setx(cshifty() + parentpos.y());
+			vtile = 2 + (mapborders.y() + cpos.y() - mapborders.x()) / cpos.y();
+			break;
 		case BGT_VTILED:
-			vtile = (mapborders.y() + cpos.y() - mapborders.x()) / cpos.y();
-			absp.sety(parentpos.y() - cpos.y());
+			//absp.setx(pos.x() + parentpos.x());
+			vtile = 2 + (mapborders.y() + cpos.y() - mapborders.x()) / cpos.y();
 			break;
 		case BGT_HMOVEB:
+			absp.setx(cshiftx() + parentpos.x());
+			htile = 2 + (mapwalls.y() + cpos.x() - mapwalls.x()) / cpos.x();
+			vtile = 2 + (mapborders.y() + cpos.y() - mapborders.x()) / cpos.y();
+			break;
 		case BGT_VMOVEB:
+			absp.setx(cshifty() + parentpos.y());
 		case BGT_TILED:
-			htile = (mapwalls.y() + cpos.x() - mapwalls.x()) / cpos.x();
-			vtile = (mapborders.y() + cpos.y() - mapborders.x()) / cpos.y();
-			absp = parentpos - cpos;
+			htile = 2 + (mapwalls.y() + cpos.x() - mapwalls.x()) / cpos.x();
+			vtile = 2 + (mapborders.y() + cpos.y() - mapborders.x()) / cpos.y();
 			break;
 		case BGT_HSTRETCH:
-			absp.setx(0);
+			absp = vector2d();
 			stretch.setx(800);
 			break;
 		case BGT_VSTRETCH:
-			absp.sety(0);
+			absp = vector2d();
 			stretch.sety(600);
 			break;
 		case BGT_STRETCH:
@@ -122,6 +141,8 @@ namespace gameplay
 			stretch = vector2d(800, 600);
 			break;
 		}
+
+		int starty = absp.y();
 		
 		texture* txt = ani.gettexture(frame);
 		if (txt)
@@ -131,13 +152,32 @@ namespace gameplay
 				for (short v = 0; v < vtile; v++)
 				{
 					txt->draw(absp, stretch, alpha, flipped);
-
 					absp.shifty(cpos.y());
 				}
-
+				absp.sety(starty);
 				absp.shiftx(cpos.x());
 			}
 		}
+	}
+
+	int background::cshiftx()
+	{
+		int x = static_cast<int>(fx);
+		if (fx < mapwalls.x())
+		{
+			fx += cpos.x();
+		}
+		return (x % cpos.x()) - cpos.x();
+	}
+
+	int background::cshifty()
+	{
+		int y = static_cast<int>(fy);
+		if (y < mapborders.x())
+		{
+			fy += cpos.x();
+		}
+		return (y % cpos.y()) - cpos.y();
 	}
 
 	bool background::update()

@@ -25,11 +25,12 @@ namespace data
 	class mapdata
 	{
 	public:
-		mapdata() {}
+		mapdata() { id = 0; }
 		~mapdata() {}
 		void init();
 		void load(int);
 		int getid() { return id; }
+		bool hasnewbgm() { return newbgm; }
 		mapinfo* getinfo() { return &info; }
 		laddersropes* getlandr() { return &landr; }
 		footholdtree* getfht() { return &fht; }
@@ -37,6 +38,7 @@ namespace data
 		mapinfo info;
 		laddersropes landr;
 		footholdtree fht;
+		bool newbgm;
 		int id;
 	};
 }

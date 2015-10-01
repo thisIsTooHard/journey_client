@@ -26,7 +26,7 @@ namespace maplemap
 	class itemdrop : public drop
 	{
 	public:
-		itemdrop(short, int, texture, int, vector2d, vector2d, char, bool);
+		itemdrop(short, int, texture, int, vector2d, vector2d, char, char);
 		itemdrop() {}
 		~itemdrop() {}
 		void draw(vector2d);

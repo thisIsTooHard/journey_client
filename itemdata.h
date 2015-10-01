@@ -17,8 +17,10 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "texture.h"
+#include "itemtext.h"
 
 using namespace graphics;
+using namespace io;
 
 namespace data
 {
@@ -34,11 +36,13 @@ namespace data
 		int getid() { return itemid; }
 		string getname() { return name; }
 		string getdesc() { return desc; }
+		itemtext* getdtext() { return &desctext; }
 	private:
 		map<bool, texture> icon;
 		int itemid;
 		string name;
 		string desc;
+		itemtext desctext;
 		bool loaded;
 	};
 }

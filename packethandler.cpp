@@ -17,6 +17,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "packethandler.h"
+#include "iteminventory.h"
+#include "equipinventory.h"
 #include "Journey.h"
 
 namespace net
@@ -27,48 +29,45 @@ namespace net
 		{
 			app.getui()->remove(UI_LOGINWAIT);
 			int reason = recv.readint();
-			if (reason > 0)
+			if (reason != 0)
 			{
 				switch (reason)
 				{
 				case 2:
 					app.getui()->add(UI_LOGINNOTICE, 16);
-					app.getui()->enableactions();
 					return;
 				case 7:
 					app.getui()->add(UI_LOGINNOTICE, 17);
-					app.getui()->enableactions();
+					return;
+				case 23:
+					packet_c.accept_tos();
 					return;
 				default:
-					app.getui()->add(UI_LOGINNOTICE, reason - 1);
-					app.getui()->enableactions();
-					return;
+					if (reason > 0)
+					{
+						app.getui()->add(UI_LOGINNOTICE, reason - 1);
+					}
 				}
+				app.getui()->enableactions();
+				return;
 			}
 			recv.readshort();
 			int accid = recv.readint();
 			bool female = recv.readbool();
 			bool admin = recv.readbool();
 			char gmlevel = recv.readbyte();
-			if (mapleversion != 62)
-			{
-				recv.readbyte();
-			}
+			recv.readbyte();
 			string accname = recv.readascii();
 			recv.readbyte();
 			bool muted = recv.readbool();
 			int64_t mutedtill = recv.readlong();
 			int64_t created = recv.readlong();
 			recv.readint();
-			short pin = 0;
-			if (mapleversion != 62)
-			{
-				pin = recv.readshort();
-			}
+			short pin = recv.readshort();
 			app.getui()->getfield()->getlogin()->getacc()->init(accid, accname, gmlevel, female, muted, pin);
-			if (config.getsaveid())
+			if (config.getconfig()->saveid)
 			{
-				config.setdefacc(accname);
+				config.getconfig()->defaultacc = accname;
 			}
 			packet_c.serverlrequest();
 		}
@@ -186,11 +185,11 @@ namespace net
 
 	void addcharentry(packet* recv)
 	{
-		maplestats mstats = getmstats(recv);
-		maplelook mlook = getmlook(recv);
-		maplechar mchar = maplechar(mstats, mlook);
+		maplechar* newchar = app.getui()->getfield()->getlogin()->getacc()->addchar();
+		newchar->stats = getmstats(recv);
+		newchar->look = getmlook(recv);
 
-		bool rankinfo = (mapleversion == 62) ? true : recv->readbool();
+		bool rankinfo = recv->readbool();
 		bool notgm = recv->readbool();
 		if (notgm)
 		{
@@ -200,9 +199,9 @@ namespace net
 			int jobrankmv = recv->readint();
 			char rankmc = (rankmv > 0) ? '+' : (rankmv < 0) ? '-' : '=';
 			char jobrankmc = (jobrankmv > 0) ? '+' : (jobrankmv < 0) ? '-' : '=';
-			mchar.setrankinfo(rank, rankmc, jobrank, jobrankmc);
+			newchar->rank = make_pair(rank, rankmc);
+			newchar->jobrank = make_pair(jobrank, jobrankmc);
 		}
-		app.getui()->getfield()->getlogin()->getacc()->addchar(mchar);
 	}
 
 	class charlist_h : public vhandler
@@ -215,8 +214,11 @@ namespace net
 			{
 				addcharentry(&recv);
 			}
-			char pic = (mapleversion == 62) ? 2 : recv.readbyte();
+			char pic = recv.readbyte();
 			char slots = static_cast<char>(recv.readint());
+
+			cache.getsounds()->play(MSN_CHARSEL);
+
 			app.getui()->getfield()->getlogin()->getacc()->setpicslots(pic, slots);
 			app.getui()->remove(UI_WORLDSELECT);
 			app.getui()->add(UI_CHARSEL);
@@ -313,6 +315,98 @@ namespace net
 		}
 	};
 
+	void additem(packet* recv, short pos, inventorytype invtype)
+	{
+		char type = recv->readbyte();
+		int id = recv->readint();
+		bool cash = recv->readbool();
+		bool pet = (id >= 5000000 && id <= 5000102);
+		int64_t uniqueid = -1;
+		if (cash)
+		{
+			uniqueid = recv->readlong();
+		}
+		int64_t expire = recv->readlong();
+
+		mapleitem* item;
+		if (pet)
+		{
+			string petname = recv->readpadascii(13);
+			char petlevel = recv->readbyte();
+			short closeness = recv->readshort();
+			char fullness = recv->readbyte();
+			recv->readlong();
+			recv->readint();
+			recv->readshort();
+			recv->readint();
+			item = new mapleitem(id, pos, type, cash, uniqueid, expire, petname, petlevel, closeness, fullness);
+		}
+		else
+		{
+			short count = recv->readshort();
+			string owner = recv->readascii();
+			short flag = recv->readshort();
+			item = new mapleitem(id, count, pos, type, cash, uniqueid, expire, owner, flag);
+			if (item->canrecharge())
+			{
+				recv->readint();
+				recv->readint();
+			}
+		}
+
+		app.getui()->getfield()->getplayer()->getinventory()->additem(item, invtype);
+	}
+
+	void addequip(packet* recv, short pos, bool cashinv, bool equipped)
+	{
+		char type = recv->readbyte();
+		int id = recv->readint();
+		bool cash = recv->readbool();
+		int64_t uniqueid = -1;
+		if (cash)
+		{
+			uniqueid = recv->readlong();
+		}
+		int64_t expire = recv->readlong();
+
+		char slots = recv->readbyte();
+		char level = recv->readbyte();
+		map<equipstat, short> stats;
+		for (equipstat e = ES_STR; e <= ES_JUMP; e = (equipstat)(e + 1))
+		{
+			stats[e] = recv->readshort();
+		}
+		string owner = recv->readascii();
+		short flag = recv->readshort();
+
+		char itemlevel = 0;
+		short itemexp = 0;
+		int vicious = 0;
+		if (cash)
+		{
+			recv->readlong();
+			recv->readshort();
+		}
+		else
+		{
+			recv->readbyte();
+			itemlevel = recv->readbyte();
+			recv->readshort();
+			itemexp = recv->readshort();
+			vicious = recv->readint();
+			recv->readlong();
+		}
+		recv->readlong();
+		recv->readint();
+
+		if (cashinv)
+		{
+			pos = -pos;
+		}
+
+		app.getui()->getfield()->getplayer()->getinventory()->additem(new mapleequip(pos, type, id, cash, uniqueid, expire, slots, level, stats, owner, flag, itemlevel, itemexp, vicious), equipped ? IVT_EQUIPPED : IVT_EQUIP);
+	}
+
 	class set_field_h : public vhandler
 	{
 		void set_field_h::handle(packet recv)
@@ -330,14 +424,15 @@ namespace net
 				int64_t timestamp = recv.readlong();
 				if (channel == app.getui()->getfield()->getlogin()->channelid)
 				{
+					cache.getsounds()->play(MSN_PORTAL);
+					app.getui()->getfield()->clear();
 					app.getimgcache()->clearcache(ict_map);
-					app.getui()->getfield()->setfield(mapid, portalid);
+					app.maptransition(channel, mapid, portalid);
 				}
 				else
 				{
-					app.getui()->getfield()->changechannel(channel);
+					//app.getui()->getfield()->changechannel(channel);
 				}
-				app.getui()->enableactions();
 				return;
 			}
 
@@ -504,9 +599,13 @@ namespace net
 			plc->init(meso, skills, quests, areainfo);
 
 			app.getui()->remove(UI_CHARSEL);
+			app.getui()->remove(UI_SOFTKEYBOARD);
 			app.getimgcache()->clearcache(ict_login);
 			app.getui()->add(UI_STATUSBAR);
 			app.getui()->add(UI_CHATBAR);
+			app.getui()->add(UI_INVENTORY);
+
+			cache.getsounds()->play(MSN_GAMEIN);
 
 			pair<int, char> spawninfo = app.getui()->getfield()->getplayer()->getstats()->getspawninfo();
 			app.getui()->getfield()->setfield(spawninfo.first, spawninfo.second);
@@ -524,72 +623,12 @@ namespace net
 
 			plc->setinventory(inventory(slots));
 
-			inventory* ivt = plc->getinventory();
-
 			for (char i = 0; i < 3; i++)
 			{
 				short pos = recv->readshort();
 				while (pos != 0)
 				{
-					char type = recv->readbyte();
-					int id = recv->readint();
-					bool cash = recv->readbool();
-					int64_t uniqueid = -1;
-					if (cash)
-					{
-						uniqueid = recv->readlong();
-					}
-					int64_t expire = recv->readlong();
-
-					char slots = recv->readbyte();
-					char level = recv->readbyte();
-					map<equipstat, short> stats;
-					for (equipstat e = ES_STR; e <= ES_JUMP; e = (equipstat)(e + 1))
-					{
-						stats[e] = recv->readshort();
-					}
-					string owner = recv->readascii();
-					short flag = recv->readshort();
-
-					char itemlevel = 0;
-					short itemexp = 0;
-					int vicious = 0;
-					if (cash)
-					{
-						recv->readlong();
-						recv->readshort();
-					}
-					else 
-					{
-						recv->readbyte();
-						itemlevel = recv->readbyte();
-						recv->readshort();
-						itemexp = recv->readshort();
-						vicious = recv->readint();
-						recv->readlong();
-					}
-					recv->readlong();
-					recv->readint();
-
-					if (i == 1)
-					{
-						pos = -pos;
-					}
-
-					mapleequip* equip = new mapleequip(pos, type, id, cash, uniqueid, expire, slots, level, stats, owner, flag, itemlevel, itemexp, vicious);
-					switch (i)
-					{
-					case 0:
-						ivt->additem(equip, IVT_EQUIPPED);
-						break;
-					case 1:
-						ivt->additem(equip, IVT_EQUIPPED);
-						break;
-					case 2:
-						ivt->additem(equip, IVT_EQUIP);
-						break;
-					}
-
+					addequip(recv, pos, i == 1, i == 0);
 					pos = recv->readshort();
 				}
 			}
@@ -597,62 +636,30 @@ namespace net
 
 			for (char i = 0; i < 4; i++)
 			{
+				inventorytype invtype;
+
+				switch (i)
+				{
+				case 0:
+					invtype = IVT_USE;
+					break;
+				case 1:
+					invtype = IVT_SETUP;
+					break;
+				case 2:
+					invtype = IVT_ETC;
+					break;
+				case 3:
+					invtype = IVT_CASH;
+					break;
+				default:
+					invtype = IVT_NONE;
+				}
+
 				char pos = recv->readbyte();
 				while (pos != 0)
 				{
-					char type = recv->readbyte();
-					int id = recv->readint();
-					bool cash = recv->readbool();
-					bool pet = (id >= 5000000 && id <= 5000102);
-					int64_t uniqueid = -1;
-					if (cash)
-					{
-						uniqueid = recv->readlong();
-					}
-					int64_t expire = recv->readlong();
-
-					mapleitem* item;
-					if (pet)
-					{
-						string petname = recv->readpadascii(13);
-						char petlevel = recv->readbyte();
-						short closeness = recv->readshort();
-						char fullness = recv->readbyte();
-						recv->readlong();
-						recv->readint();
-						recv->readshort();
-						recv->readint();
-						item = new mapleitem(id, pos, type, cash, uniqueid, expire, petname, petlevel, closeness, fullness);
-					}
-					else
-					{
-						short count = recv->readshort();
-						string owner = recv->readascii();
-						short flag = recv->readshort();
-						item = new mapleitem(id, count, pos, type, cash, uniqueid, expire, owner, flag);
-						if (item->canrecharge())
-						{
-							recv->readint();
-							recv->readint();
-						}
-					}
-
-					switch (i)
-					{
-					case 0:
-						ivt->additem(item, IVT_USE);
-						break;
-					case 1:
-						ivt->additem(item, IVT_SETUP);
-						break;
-					case 2:
-						ivt->additem(item, IVT_ETC);
-						break;
-					case 3:
-						ivt->additem(item, IVT_CASH);
-						break;
-					}
-
+					additem(recv, pos, invtype);
 					pos = recv->readbyte();
 				}
 			}
@@ -786,7 +793,7 @@ namespace net
 			int skillid = recv.readint();
 			int level = recv.readint();
 			int masterlevel = recv.readint();
-			int64_t expire = (mapleversion == 62) ? -1 : recv.readlong();
+			int64_t expire = recv.readlong();
 			app.getui()->getfield()->getplayer()->getskills()->updateskill(skillid, level, masterlevel, expire);
 		}
 	};
@@ -808,35 +815,43 @@ namespace net
 			for (char i = 0; i < size; i++)
 			{
 				char mode = recv.readbyte();
-				char invtype = recv.readbyte();
-				short pos = recv.readshort(); //if move: oldposition, else position
-				short arg;
-				char addmove;
-				
-				if (mode == 1 || mode == 2)
+				inventorytype invtype = static_cast<inventorytype>(recv.readbyte());
+				short pos = recv.readshort();
+
+				short arg = (mode == 1 || mode == 2) ? recv.readshort() : 0;
+				char addmove = ((mode == 2 && (pos < 0 || arg < 0)) || mode == 3 && pos < 0) ? recv.readbyte() : 0;
+
+				if (mode == 0)
 				{
-					arg = recv.readshort();
+					if (invtype == IVT_EQUIP || invtype == IVT_EQUIPPED)
+					{
+						addequip(&recv, pos, false, invtype == IVT_EQUIPPED);
+					}
+					else
+					{
+						additem(&recv, pos, invtype);
+					}
+				}
+				else
+				{
+					app.getui()->getfield()->getplayer()->getinventory()->modify(invtype, pos, mode, arg);
 				}
 
-				if ((mode == 2 && (pos < 0 || arg < 0)) || mode == 3 && pos < 0)
+				if (invtype == IVT_EQUIPPED)
 				{
-					addmove = recv.readbyte();
+					equipinventory* invent = app.getui()->getelement<equipinventory>(UI_EQUIPS);
+					if (invent)
+					{
+						invent->modify(pos, mode, arg);
+					}
 				}
-
-				switch (mode)
+				else
 				{
-				case 0:
-					//additem
-					break;
-				case 1:
-					//quantity
-					break;
-				case 2:
-					//move
-					break;
-				case 3:
-					app.getui()->getfield()->getplayer()->getinventory()->removeitem(static_cast<inventorytype>(invtype), pos);
-					break;
+					iteminventory* invent = app.getui()->getelement<iteminventory>(UI_INVENTORY);
+					if (invent)
+					{
+						invent->modify(invtype, pos, mode, arg);
+					}
 				}
 			}
 		}
@@ -929,6 +944,7 @@ namespace net
 			{
 				for (char i = 0; i < 20; i++)
 				{
+					player* player = app.getui()->getfield()->getplayer();
 					maplestat stat = app.getui()->getfield()->getplayer()->getstats()->statvalue(i);
 
 					if ((updatemask & stat) != 0)
@@ -936,33 +952,34 @@ namespace net
 						switch (stat)
 						{
 						case MS_SKIN:
-							app.getui()->getfield()->getplayer()->getlook()->setbody(cache.getequips()->getbody(recv.readshort()));
+							player->getlook()->setbody(cache.getequips()->getbody(recv.readshort()));
 							break;
 						case MS_FACE:
-							app.getui()->getfield()->getplayer()->getlook()->setface(cache.getequips()->getface(recv.readint()));
+							player->getlook()->setface(cache.getequips()->getface(recv.readint()));
 							break;
 						case MS_HAIR:
-							app.getui()->getfield()->getplayer()->getlook()->sethair(cache.getequips()->gethair(recv.readint()));
+							player->getlook()->sethair(cache.getequips()->gethair(recv.readint()));
 							break;
 						case MS_LEVEL:
-							app.getui()->getfield()->getplayer()->getstats()->setstat(MS_LEVEL, static_cast<byte>(recv.readbyte()));
+							player->getstats()->setstat(MS_LEVEL, static_cast<byte>(recv.readbyte()));
+							app.getui()->getfield()->showchareffect(0);
 							break;
 						case MS_EXP:
-							app.getui()->getfield()->getplayer()->getstats()->setexp(recv.readint());
+							player->getstats()->setexp(recv.readint());
 							break;
 						case MS_MESO:
-							app.getui()->getfield()->getplayer()->getstats()->setmeso(recv.readint());
+							player->getinventory()->setmeso(recv.readint());
 							break;
 						case MS_AP:
-							app.getui()->getfield()->getplayer()->getstats()->setstat(MS_AP, recv.readshort());
+							player->getstats()->setstat(MS_AP, recv.readshort());
 							if (app.getui()->getelement(UI_STATSINFO))
 							{
-								app.getui()->getelement(UI_STATSINFO)->sendbool(app.getui()->getfield()->getplayer()->getstats()->getstat(MS_AP) > 0);
+								app.getui()->getelement(UI_STATSINFO)->sendbool(player->getstats()->getstat(MS_AP) > 0);
 							}
 							break;
 						default:
-							app.getui()->getfield()->getplayer()->getstats()->setstat(stat, recv.readshort());
-							app.getui()->getfield()->getplayer()->recalcstats(false);
+							player->getstats()->setstat(stat, recv.readshort());
+							player->recalcstats(false);
 							break;
 						}
 					}
@@ -991,6 +1008,16 @@ namespace net
 				int time = recv.readint();
 			}
 			//TO DO
+		}
+	};
+
+	class show_foreign_effect_h : public vhandler
+	{
+		void show_foreign_effect_h::handle(packet recv)
+		{
+			int cid = recv.readint();
+			char effect = recv.readbyte();
+			app.getui()->getfield()->showchareffect(cid, effect);
 		}
 	};
 
@@ -1107,10 +1134,7 @@ namespace net
 			recv.skip(3);
 			char team = recv.readbyte();
 
-			app.getimgcache()->setmode(ict_sys);
 			cache.getequips()->loadcharlook(&mlook);
-			app.getimgcache()->unlock();
-
 			app.getui()->getfield()->getchars()->addchar(chrid, mlook, level, job, name, pos);
 		}
 	};
@@ -1261,7 +1285,7 @@ namespace net
 	{
 		void drop_item_from_mapobject_h::handle(packet recv)
 		{
-			char mod = recv.readbyte();
+			char mod = recv.readbyte(); //0 - from player, 1 - normal drop, 2 - spawn, 3 - dissapearing
 			int oid = recv.readint();
 			bool meso = recv.readbool();
 			int itemid = recv.readint();
@@ -1274,6 +1298,7 @@ namespace net
 			{
 				dropfrom = recv.readpoint();
 				recv.readshort();
+				cache.getsounds()->play(MSN_DROP);
 			}
 			else
 			{
@@ -1285,7 +1310,7 @@ namespace net
 				int64_t expire = recv.readlong();
 			}
 			bool playerdrop = recv.readbool();
-			app.getui()->getfield()->getdrops()->adddrop(oid, itemid, meso, owner, dropfrom, dropto, pickuptype, playerdrop);
+			app.getui()->getfield()->getdrops()->adddrop(oid, itemid, meso, owner, dropfrom, dropto, pickuptype, mod);
 		}
 	};
 
@@ -1295,11 +1320,22 @@ namespace net
 		{
 			char anim = recv.readbyte();
 			int oid = recv.readint();
+			moveobject* looter = 0;
 			if (anim > 1)
 			{
 				int cid = recv.readint();
+				if (recv.length() > 0)
+				{
+					char pet = recv.readbyte();
+				}
+
+				if (cid == app.getui()->getfield()->getplayer()->getid())
+				{
+					cache.getsounds()->play(MSN_PICKUP);
+				}
+				looter = app.getui()->getfield()->getchar(cid);
 			}
-			app.getui()->getfield()->getdrops()->removedrop(oid, anim);
+			app.getui()->getfield()->getdrops()->removedrop(oid, anim, looter);
 		}
 	};
 
@@ -1443,7 +1479,7 @@ namespace net
 		handlers[PLAYER_MOVED] = unique_ptr<vhandler>(new player_moved_h());
 		handlers[SHOW_ITEM_EFFECT] = unique_ptr<vhandler>(new unhandled()); //TO DO
 		handlers[SHOW_CHAIR] = unique_ptr<vhandler>(new unhandled()); //TO DO
-		handlers[SHOW_FOREIGN_EFFECT] = unique_ptr<vhandler>(new unhandled()); //TO DO
+		handlers[SHOW_FOREIGN_EFFECT] = unique_ptr<vhandler>(new show_foreign_effect_h()); //TO DO
 		handlers[LOCK_UI] = unique_ptr<vhandler>(new unhandled()); //not sure what this does
 		handlers[TOGGLE_UI] = unique_ptr<vhandler>(new toggle_ui_h());
 		handlers[SPAWN_MOB] = unique_ptr<vhandler>(new spawn_mob_h());
@@ -1471,14 +1507,13 @@ namespace net
 
 	void packethandler::process(packet recv)
 	{
-		short opcode = recv.readshort();
-		if (handlers.count(opcode))
+		if (recv.length() > 1)
 		{
-			handlers[opcode]->handle(recv);
-		}
-		else
-		{
-			throw new runtime_error("packet error: unhandled packet.");
+			short opcode = recv.readshort();
+			if (handlers.count(opcode))
+			{
+				handlers[opcode]->handle(recv);
+			}
 		}
 	}
 }

@@ -30,6 +30,7 @@ namespace data
 		~mobdata() {}
 		void draw(string, byte, float, bool, vector2d);
 		short getldelta(short);
+		void playsound(string);
 		string getname() { return name; }
 		short getlvl() { return level; }
 		short getspeed() { return speed; }
@@ -45,6 +46,7 @@ namespace data
 	private:
 		map<string, animation> textures;
 		map<string, rectangle2d> rect;
+		map<string, size_t> sounds;
 		string name;
 		short level;
 		short speed;

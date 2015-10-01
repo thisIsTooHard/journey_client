@@ -25,27 +25,52 @@
 #include <wincodecsdk.h>
 #include <windowsx.h>
 #include <math.h>
+#include "audioplayerbass.h"
 
 using namespace io;
 
 namespace program
 {
+	enum transition
+	{
+		TRS_NONE,
+		TRS_LOGIN,
+		TRS_MAP,
+		TRS_CHANNEL
+	};
+
+	struct transinfo
+	{
+		int channel;
+		int mapid;
+		char portalid;
+	};
+
 	class winapp
 	{
 	public:
 		winapp() {}
 		~winapp();
 		long init();
+		void update();
+		void togglefullscreen();
+		void maptransition(int, int, char);
+		void fadeout() { alphastep.push_back(-0.05f); }
+		void fadein() { alphastep.push_back(0.05f); }
+		float getdpix() { return dpiX; }
+		float getdpiy() { return dpiY; }
 		ui* getui() { return &uinterface; }
 		fontcache* getfonts() { return &fonts; }
 		imagecache* getimgcache() { return &imgcache; }
+		audioplayerbass* getaudio() { return &audio_pb; }
 	private:
+		void render();
 		long initfactories();
-		void draw();
 		static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 		ui uinterface;
 		fontcache fonts;
 		imagecache imgcache;
+		audioplayerbass audio_pb;
 		HWND window;
 		ID2D1Factory* d2d_factory;
 		IWICImagingFactory* image_factory;
@@ -53,10 +78,18 @@ namespace program
 		ID2D1SolidColorBrush* white_brush;
 		ID2D1SolidColorBrush* black_brush;
 		ID2D1HwndRenderTarget* d2d_rtarget;
+		ID2D1BitmapRenderTarget* back_rtarget;
+		ID2D1DeviceContext* d2d_device;
+		ID2D1Bitmap* scene;
 		ID2D1Layer* d2d_layer;
+		transition trans;
+		transinfo tinfo;
 		float dpiX;
 		float dpiY;
-		SRWLOCK drawlock;
+		float scralpha;
+		vector<float> alphastep;
+		short screencd;
+		bool fullscreen;
 	};
 }
 

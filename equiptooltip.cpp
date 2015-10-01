@@ -179,6 +179,12 @@ namespace io
 			namestr.append(")");
 		}
 		name = textlabel(DWF_14C, namecolor, namestr);
+
+		itemtext* desc = cloth->getdtext();
+		if (desc)
+		{
+			filllength += 9 + desc->getheight();
+		}
 		
 		category = textlabel(DWF_12LL, TXC_WHITE, "CATEGORY: " + cloth->gettype());
 		wepspeed = textlabel(DWF_12LL, TXC_WHITE, "ATTACK SPEED: " + cloth->getdisplayspeed());
@@ -319,6 +325,13 @@ namespace io
 				pos = pos + vector2d(0, 18); 
 				hammers.draw(pos + vector2d(10, 0));
 				pos = pos + vector2d(0, 18);
+			}
+
+			itemtext* desc = cloth->getdtext();
+			if (desc)
+			{
+				line.draw(pos + vector2d(0, 5));
+				desc->draw(pos + vector2d(10, 6));
 			}
 		}
 	}

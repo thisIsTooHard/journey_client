@@ -54,7 +54,7 @@ namespace net
 
 		int result = WSAStartup(MAKEWORD(2, 2), &wsa_info);
 		if (result != 0) {
-			return -1;
+			return 1;
 		}
 
 		ZeroMemory(&hints, sizeof(hints));
@@ -66,7 +66,7 @@ namespace net
 
 		if (result != 0) {
 			WSACleanup();
-			return -1;
+			return 2;
 		}
 
 		for (ptr = addr_info; ptr != NULL; ptr = ptr->ai_next) {
@@ -75,7 +75,7 @@ namespace net
 				ptr->ai_protocol);
 			if (sock == INVALID_SOCKET) {
 				WSACleanup();
-				return -1;
+				return 2;
 			}
 
 			result = connect(sock, ptr->ai_addr, (int)ptr->ai_addrlen);
@@ -91,7 +91,7 @@ namespace net
 
 		if (sock == INVALID_SOCKET) {
 			WSACleanup();
-			return -1;
+			return 2;
 		}
 
 		char recvbuf[32];
@@ -139,13 +139,13 @@ namespace net
 				break;
 			default:
 				WSACleanup();
-				return -2;
+				return 3;
 			}
 		}
 		else
 		{
 			WSACleanup();
-			return -1;
+			return 2;
 		}
 
 		encrypter.init(recviv, sendiv, version, localisation);
@@ -155,7 +155,7 @@ namespace net
 
 		active = true;
 
-		return version;
+		return 0;
 	}
 
 	int session::dispatch(packet* tosend)

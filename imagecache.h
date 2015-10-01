@@ -36,20 +36,20 @@ namespace program
 	class imagecache
 	{
 	public:
-		imagecache() {}
-		~imagecache() {}
+		imagecache() { target = 0; }
+		~imagecache();
 		void init(IWICImagingFactory*);
 		void setmode(imgcontext);
-		void settarget(ID2D1HwndRenderTarget* trg) { target = trg; }
+		void settarget(ID2D1RenderTarget* trg) { target = trg; }
 		void unlock();
 		void clearcache(imgcontext);
 		void draw(imgcontext, size_t, D2D1_RECT_F, float, float, float, vector2d);
 		void draw(imgcontext, size_t, D2D1_RECT_F, float);
 		pair<imgcontext, size_t> createimage(bitmap bmp);
-		ID2D1HwndRenderTarget* gettarget() { return target; }
+		ID2D1RenderTarget* gettarget() { return target; }
 	private:
-		unique_ptr<IWICImagingFactory> imgfactory;
-		ID2D1HwndRenderTarget* target;
+		IWICImagingFactory* imgfactory;
+		ID2D1RenderTarget* target;
 		map<imgcontext, map<size_t, IWICBitmap*>> temp;
 		map<imgcontext, map<size_t, ID2D1Bitmap*>> cache;
 		imgcontext imgcon;

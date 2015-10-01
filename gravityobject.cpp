@@ -65,7 +65,7 @@ namespace action
 
 			float ground = fh.resolvex(static_cast<int>(fx));
 
-			if (ground - fy <= fh.getslope() * abs(hspeed))
+			if (ground - fy <= fh.getslope() * hspeed)
 			{
 				fy = ground;
 				groundhit = true;

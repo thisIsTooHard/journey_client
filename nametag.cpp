@@ -38,12 +38,12 @@ namespace io
 
 	void nametag::draw(vector2d parentpos)
 	{
-		int length = static_cast<int>(content.getlength());
+		int width = content.getwidth() - 4;
 
-		vector2d bgpos = position + parentpos - vector2d(7 + length / 2, -2);
+		vector2d bgpos = position + parentpos - vector2d(8 + width / 2, -3);
 		tag[active][0].draw(bgpos);
-		tag[active][1].draw(bgpos + vector2d(8, 0), vector2d(length, 0));
-		tag[active][2].draw(bgpos + vector2d(8, 0) + vector2d(length, 0));
+		tag[active][1].draw(bgpos + vector2d(8, 0), vector2d(width + 1, 0));
+		tag[active][2].draw(bgpos + vector2d(8, 0) + vector2d(width + 1, 0));
 
 		content.draw(position + parentpos);
 	}

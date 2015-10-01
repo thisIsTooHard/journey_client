@@ -42,9 +42,6 @@ namespace io
 		abilities["legendary"] = texture(detail["abilityTitle"]["legendary"]["0"]);
 		abilities["none"] = texture(detail["abilityTitle"]["normal"]["0"]);
 
-		statlabel = textlabel(DWF_12L, TXC_BLACK, "");
-
-		//buttons[BT_STATS_AUTO] = button(src["BtAuto"]);
 		buttons[BT_STATS_HP] = button(src["BtHpUp"]);
 		buttons[BT_STATS_MP] = button(src["BtMpUp"]);
 		buttons[BT_STATS_STR] = button(src["BtStrUp"]);
@@ -54,20 +51,22 @@ namespace io
 
 		if (st->getstat(MS_AP) == 0)
 		{
-			buttons[BT_STATS_HP].setstate("disabled");
-			buttons[BT_STATS_MP].setstate("disabled");
-			buttons[BT_STATS_STR].setstate("disabled");
-			buttons[BT_STATS_DEX].setstate("disabled");
-			buttons[BT_STATS_LUK].setstate("disabled");
-			buttons[BT_STATS_INT].setstate("disabled");
+			buttons[BT_STATS_HP].setstate(BTS_DISABLED);
+			buttons[BT_STATS_MP].setstate(BTS_DISABLED);
+			buttons[BT_STATS_STR].setstate(BTS_DISABLED);
+			buttons[BT_STATS_DEX].setstate(BTS_DISABLED);
+			buttons[BT_STATS_LUK].setstate(BTS_DISABLED);
+			buttons[BT_STATS_INT].setstate(BTS_DISABLED);
 		}
 
 		buttons[BT_STATS_DETAILOPEN] = button(src["BtDetailOpen"]);
 		buttons[BT_STATS_DETAILCLOSE] = button(src["BtDetailClose"]);
 		buttons[BT_STATS_DETAILCLOSE].setactive(false);
 
+		statlabel = textlabel(DWF_12L, TXC_BLACK, "");
+
 		app.getimgcache()->unlock();
-		position = config.getstatspos();
+		position = config.getconfig()->statsinfopos;
 		dimensions = vector2d(212, 318);
 		active = true;
 		dragged = false;
@@ -83,18 +82,18 @@ namespace io
 
 		if (active)
 		{
-			statlabel.draw(stats->getname(), position + vector2d(73, 25));
-			statlabel.draw(stats->getjobname(), position + vector2d(73, 43));
-			statlabel.draw("", position + vector2d(73, 61)); //guild
-			statlabel.draw(to_string(stats->getstat(MS_FAME)), position + vector2d(73, 79));
-			statlabel.draw(to_string(stats->getmindamage()) + " ~ " + to_string(stats->getmaxdamage()), position + vector2d(73, 97));
-			statlabel.draw(to_string(stats->getstat(MS_HP)) + " / " + to_string(stats->gettotal(MS_MAXHP)), position + vector2d(73, 115));
-			statlabel.draw(to_string(stats->getstat(MS_MP)) + " / " + to_string(stats->gettotal(MS_MAXMP)), position + vector2d(73, 133));
-			statlabel.draw(to_string(stats->getstat(MS_AP)), position + vector2d(79, 175));
-			statlabel.draw(to_string(stats->getstat(MS_STR) + invent->gettotal(ES_STR)) + " (" + to_string(stats->getstat(MS_STR)) + " + " + to_string(invent->gettotal(ES_STR)) + ")", position + vector2d(73, 202));
-			statlabel.draw(to_string(stats->getstat(MS_DEX) + invent->gettotal(ES_DEX)) + " (" + to_string(stats->getstat(MS_DEX)) + " + " + to_string(invent->gettotal(ES_DEX)) + ")", position + vector2d(73, 220));
-			statlabel.draw(to_string(stats->getstat(MS_INT) + invent->gettotal(ES_INT)) + " (" + to_string(stats->getstat(MS_INT)) + " + " + to_string(invent->gettotal(ES_INT)) + ")", position + vector2d(73, 238));
-			statlabel.draw(to_string(stats->getstat(MS_LUK) + invent->gettotal(ES_LUK)) + " (" + to_string(stats->getstat(MS_LUK)) + " + " + to_string(invent->gettotal(ES_LUK)) + ")", position + vector2d(73, 256));
+			statlabel.drawline(stats->getname(), position + vector2d(73, 25));
+			statlabel.drawline(stats->getjobname(), position + vector2d(73, 43));
+			statlabel.drawline("", position + vector2d(73, 61)); //guild
+			statlabel.drawline(to_string(stats->getstat(MS_FAME)), position + vector2d(73, 79));
+			statlabel.drawline(to_string(stats->getmindamage()) + " ~ " + to_string(stats->getmaxdamage()), position + vector2d(73, 97));
+			statlabel.drawline(to_string(stats->getstat(MS_HP)) + " / " + to_string(stats->gettotal(MS_MAXHP)), position + vector2d(73, 115));
+			statlabel.drawline(to_string(stats->getstat(MS_MP)) + " / " + to_string(stats->gettotal(MS_MAXMP)), position + vector2d(73, 133));
+			statlabel.drawline(to_string(stats->getstat(MS_AP)), position + vector2d(79, 175));
+			statlabel.drawline(to_string(stats->getstat(MS_STR) + invent->gettotal(ES_STR)) + " (" + to_string(stats->getstat(MS_STR)) + " + " + to_string(invent->gettotal(ES_STR)) + ")", position + vector2d(73, 202));
+			statlabel.drawline(to_string(stats->getstat(MS_DEX) + invent->gettotal(ES_DEX)) + " (" + to_string(stats->getstat(MS_DEX)) + " + " + to_string(invent->gettotal(ES_DEX)) + ")", position + vector2d(73, 220));
+			statlabel.drawline(to_string(stats->getstat(MS_INT) + invent->gettotal(ES_INT)) + " (" + to_string(stats->getstat(MS_INT)) + " + " + to_string(invent->gettotal(ES_INT)) + ")", position + vector2d(73, 238));
+			statlabel.drawline(to_string(stats->getstat(MS_LUK) + invent->gettotal(ES_LUK)) + " (" + to_string(stats->getstat(MS_LUK)) + " + " + to_string(invent->gettotal(ES_LUK)) + ")", position + vector2d(73, 256));
 
 			if (showdetail)
 			{
@@ -115,23 +114,23 @@ namespace io
 				string resistr = to_string(static_cast<int>(stats->getresist() * 100));
 				string stancestr = to_string(static_cast<int>(stats->getstance() * 100));
 
-				statlabel.draw(to_string(stats->getattack()), detailpos + vector2d(73, 35));
-				statlabel.draw(critstr + "%", detailpos + vector2d(73, 53));
-				statlabel.draw(mincritstr + "%", detailpos + vector2d(73, 71));
-				statlabel.draw(maxcritstr + "%", detailpos + vector2d(168, 71));
-				statlabel.draw(bdmstr + "%", detailpos + vector2d(73, 89));
-				statlabel.draw(idefstr + "%", detailpos + vector2d(168, 89));
-				statlabel.draw(resistr + "%", detailpos + vector2d(73, 107));
-				statlabel.draw(stancestr + "%", detailpos + vector2d(168, 107));
-				statlabel.draw(to_string(invent->gettotal(ES_WDEF)), detailpos + vector2d(73, 125));
-				statlabel.draw(to_string(invent->gettotal(ES_MDEF)), detailpos + vector2d(73, 143));
-				statlabel.draw(to_string(stats->getaccuracy() + invent->getaccuracy()), detailpos + vector2d(73, 161));
-				statlabel.draw("0", detailpos + vector2d(73, 179));
-				statlabel.draw(to_string(invent->gettotal(ES_AVOID)), detailpos + vector2d(73, 197));
-				statlabel.draw("0", detailpos + vector2d(73, 215));
-				statlabel.draw(to_string(invent->gettotal(ES_SPEED) + 100) + "%", detailpos + vector2d(73, 233));
-				statlabel.draw(to_string(invent->gettotal(ES_JUMP) + 100) + "%", detailpos + vector2d(168, 233));
-				statlabel.draw(to_string(stats->gethonor()), detailpos + vector2d(73, 351));
+				statlabel.drawline(to_string(stats->getattack()), detailpos + vector2d(73, 35));
+				statlabel.drawline(critstr + "%", detailpos + vector2d(73, 53));
+				statlabel.drawline(mincritstr + "%", detailpos + vector2d(73, 71));
+				statlabel.drawline(maxcritstr + "%", detailpos + vector2d(168, 71));
+				statlabel.drawline(bdmstr + "%", detailpos + vector2d(73, 89));
+				statlabel.drawline(idefstr + "%", detailpos + vector2d(168, 89));
+				statlabel.drawline(resistr + "%", detailpos + vector2d(73, 107));
+				statlabel.drawline(stancestr + "%", detailpos + vector2d(168, 107));
+				statlabel.drawline(to_string(invent->gettotal(ES_WDEF)), detailpos + vector2d(73, 125));
+				statlabel.drawline(to_string(invent->gettotal(ES_MDEF)), detailpos + vector2d(73, 143));
+				statlabel.drawline(to_string(stats->getaccuracy() + invent->getaccuracy()), detailpos + vector2d(73, 161));
+				statlabel.drawline("0", detailpos + vector2d(73, 179));
+				statlabel.drawline(to_string(invent->gettotal(ES_AVOID)), detailpos + vector2d(73, 197));
+				statlabel.drawline("0", detailpos + vector2d(73, 215));
+				statlabel.drawline(to_string(invent->gettotal(ES_SPEED) + 100) + "%", detailpos + vector2d(73, 233));
+				statlabel.drawline(to_string(invent->gettotal(ES_JUMP) + 100) + "%", detailpos + vector2d(168, 233));
+				statlabel.drawline(to_string(stats->gethonor()), detailpos + vector2d(73, 351));
 			}
 		}
 	}
@@ -140,21 +139,21 @@ namespace io
 	{
 		if (hasap)
 		{
-			buttons[BT_STATS_HP].setstate("normal");
-			buttons[BT_STATS_MP].setstate("normal");
-			buttons[BT_STATS_STR].setstate("normal");
-			buttons[BT_STATS_DEX].setstate("normal");
-			buttons[BT_STATS_LUK].setstate("normal");
-			buttons[BT_STATS_INT].setstate("normal");
+			buttons[BT_STATS_HP].setstate(BTS_NORMAL);
+			buttons[BT_STATS_MP].setstate(BTS_NORMAL);
+			buttons[BT_STATS_STR].setstate(BTS_NORMAL);
+			buttons[BT_STATS_DEX].setstate(BTS_NORMAL);
+			buttons[BT_STATS_LUK].setstate(BTS_NORMAL);
+			buttons[BT_STATS_INT].setstate(BTS_NORMAL);
 		}
 		else
 		{
-			buttons[BT_STATS_HP].setstate("disabled");
-			buttons[BT_STATS_MP].setstate("disabled");
-			buttons[BT_STATS_STR].setstate("disabled");
-			buttons[BT_STATS_DEX].setstate("disabled");
-			buttons[BT_STATS_LUK].setstate("disabled");
-			buttons[BT_STATS_INT].setstate("disabled");
+			buttons[BT_STATS_HP].setstate(BTS_DISABLED);
+			buttons[BT_STATS_MP].setstate(BTS_DISABLED);
+			buttons[BT_STATS_STR].setstate(BTS_DISABLED);
+			buttons[BT_STATS_DEX].setstate(BTS_DISABLED);
+			buttons[BT_STATS_LUK].setstate(BTS_DISABLED);
+			buttons[BT_STATS_INT].setstate(BTS_DISABLED);
 		}
 	}
 
@@ -198,7 +197,7 @@ namespace io
 			break;
 		}
 
-		buttons[id].setstate("normal");
+		buttons[id].setstate(BTS_NORMAL);
 	}
 
 	rectangle2d statsinfo::dragarea()

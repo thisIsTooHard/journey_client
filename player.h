@@ -16,8 +16,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "maplechar.h"
-#include "playereffects.h"
+#include "vplayer.h"
+#include "account.h"
 #include "inventory.h"
 #include "footholdtree.h"
 #include "laddersropes.h"
@@ -32,9 +32,9 @@ using namespace data;
 
 namespace gameplay
 {
-	const float FALLSPEED = 7.7f;
+	const float FALLSPEED = 7.5f;
 	const float GRAVITYACC = 0.5f;
-	const float JUMPSPEED = 8.5f;
+	const float JUMPSPEED = 8.8f;
 	const float WALKSPEED = 1.8f;
 
 	enum moveinput : char
@@ -46,46 +46,38 @@ namespace gameplay
 		MIN_JUMP
 	};
 
-	enum playerstate : char
-	{
-		PST_WALK = 2,
-		PST_STAND = 4,
-		PST_FALL = 6,
-		PST_ALERT = 8,
-		PST_PRONE = 10,
-		PST_SWIM = 12,
-		PST_LADDER = 14,
-		PST_ROPE = 16,
-		PST_SKILL = 18
-	};
-
-	class player
+	class player : public vplayer
 	{
 	public:
 		player() {}
 		~player() {}
 		player(maplechar*);
+		void init(int, skillbook, questlog, map<short, string>);
+		void setinventory(inventory ivt) { invent = ivt; }
 		void setposition(vector2d);
 		void updatefht();
-		void setlr(ladderrope);
+		void setstate(playerstate);
+		bool tryclimb(bool);
+		void trysit();
 		void sit(bool);
 		void key_jump(bool);
 		void key_left(bool);
 		void key_right(bool);
 		void key_down(bool);
 		void key_up(bool);
-		bool tryattack(attackinfo*, int, short, short);
 		void draw(vector2d);
+		bool update();
 		void setaction(string);
 		void recalcstats(bool);
-		bool update();
+		void sendmoves(bool);
 		float getattspeed();
-		void init(int, skillbook, questlog, map<short, string>);
-		void setinventory(inventory ivt) { invent = ivt; }
+		bool limitstate();
+		bool tryattack(attackinfo*, int, short, short);
 		void setexpression(char c) { look->setexpression(c); }
 		bool getleft() { return fleft; }
-		vector2d getposition() { return vector2d(static_cast<int>(floor(fx)), static_cast<int>(floor(fy))); }
-		rectangle2d bounds() { return rectangle2d(position, position + vector2d(50, 80)); }
+		int getid() { return stats->getid(); }
+		string getname() { return stats->getname(); }
+		rectangle2d bounds() { return rectangle2d(position - vector2d(30, 70), position + vector2d(30, 10)); }
 		maplestats* getstats() { return stats; }
 		maplelook* getlook() { return look; }
 		playereffects* geteffects() { return &effects; }
@@ -96,6 +88,7 @@ namespace gameplay
 	private:
 		maplestats* stats;
 		maplelook* look;
+		textlabel name;
 		playereffects effects;
 		inventory invent;
 		skillbook skills;
@@ -103,7 +96,6 @@ namespace gameplay
 		telerock trock;
 		monsterbook book;
 		map<short, string> areainfo;
-		textlabel name;
 		vector<movefragment> moves;
 		footholdtree* footholds;
 		ladderrope* ladrrope;
@@ -112,11 +104,8 @@ namespace gameplay
 		short elapsed;
 		short speed;
 		short jump;
-		float hspeed;
-		float vspeed;
 		vector2d position;
-		float fx;
-		float fy;
+		vector2d c_debug;
 		float ground;
 		bool nofriction;
 		bool candjump;

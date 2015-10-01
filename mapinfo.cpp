@@ -19,10 +19,9 @@
 
 namespace data
 {
-	mapinfo::mapinfo(int id, node info, vector2d walls, vector2d borders)
+	mapinfo::mapinfo(node src, vector2d walls, vector2d borders)
 	{
-		mapid = id;
-
+		node info = src["info"];
 		if (info["VRLeft"].istype(integernode))
 		{
 			mapwalls = vector2d(info["VRLeft"], info["VRRight"]);
@@ -35,13 +34,34 @@ namespace data
 		}
 
 		string bgmpath = info["bgm"];
-		bgm = "Sound\\" + bgmpath.substr(0, bgmpath.find('/')) + ".img\\" + bgmpath.substr(0, bgmpath.find('/')) + ".img\\" + bgmpath.substr(bgmpath.find('/') + 1, bgmpath.size()) + ".mp3";
-		
+		size_t split = bgmpath.find('/');
+		bgm = bgmpath.substr(0, split) + ".img/" + bgmpath.substr(split + 1);
+
 		cloud = info["cloud"].get_bool();
-		fieldlimit = static_cast<int>(info["fieldLimit"].get_integer());
+		fieldlimit = info["fieldLimit"];
 		hideminimap = info["hideMinimap"].get_bool();
-		mapmark = info["mapMark"].get_string();
+		mapmark = info["mapMark"];
 		swim = info["swim"].get_bool();
 		town = info["town"].get_bool();
+
+		node stsrc = src["seat"];
+		for (node sub = stsrc.begin(); sub != stsrc.end(); ++sub)
+		{
+			seats.push_back(sub.tov2d());
+		}
+	}
+
+	vector2d* mapinfo::getseat(vector2d pos)
+	{
+		vector2d hor = vector2d(pos.x() - 10, pos.x() + 10);
+		vector2d ver = vector2d(pos.y() - 10, pos.y() + 10);
+		for (vector<vector2d>::iterator stit = seats.begin(); stit != seats.end(); ++stit)
+		{
+			if (hor.contains(stit->x()) && ver.contains(stit->y()))
+			{
+				return stit._Ptr;
+			}
+		}
+		return 0;
 	}
 }

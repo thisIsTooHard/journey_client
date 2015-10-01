@@ -24,6 +24,7 @@ namespace gameplay
 	{
 		look = ch->getlook();
 		stats = ch->getstats();
+		look->setposition(vector2d());
 
 		elapsed = 0;
 		hspeed = 0;
@@ -33,22 +34,24 @@ namespace gameplay
 		fleft = true;
 		look->setfleft(true);
 		candjump = true;
+		c_debug = vector2d();
 
 		for (moveinput i = MIN_LEFT; i <= MIN_JUMP; i = static_cast<moveinput>(i + 1))
 		{
 			keydown[i] = false;
 		}
 
-		name = textlabel(DWF_14C, TXC_WHITE, stats->getname(), TXB_NAMETAG);
+		name = textlabel(DWF_14C, TXC_WHITE, stats->getname());
+		name.setback(TXB_NAMETAG);
 	}
 
 	void player::init(int meso, skillbook skl, questlog qst, map<short, string> area)
 	{
-		stats->setmeso(meso);
 		skills = skl;
 		quests = qst;
 		areainfo = area;
 
+		invent.setmeso(meso);
 		recalcstats(true);
 	}
 
@@ -79,23 +82,11 @@ namespace gameplay
 
 	void player::draw(vector2d parentpos)
 	{
-		if (vspeed > 0)
-		{
-			if (fy + vspeed >= ground && ground >= fy)
-			{
-				vspeed = 0;
-				fy = ground;
-			}
-		}
-
-		fx += hspeed;
-		fy += vspeed;
 		position = getposition();
 
 		vector2d absp = parentpos + position;
 
 		look->draw(absp);
-
 		name.draw(absp);
 		effects.draw(absp);
 	}
@@ -105,17 +96,16 @@ namespace gameplay
 		bool anidone = look->update();
 		effects.update();
 
-		float fspeed = WALKSPEED * static_cast<float>(speed) / 100;
-
 		if (state == PST_LADDER || state == PST_ROPE)
 		{
+			float cspeed = WALKSPEED * static_cast<float>(speed) / 125;
 			if (keydown[MIN_UP])
 			{
-				vspeed = -fspeed;
+				vspeed = -cspeed;
 			}
 			else if (keydown[MIN_DOWN])
 			{
-				vspeed = fspeed;
+				vspeed = cspeed;
 			}
 			else
 			{
@@ -123,7 +113,6 @@ namespace gameplay
 			}
 
 			float cfriction = 0.01f;
-
 			if (vspeed > 0)
 			{
 				vspeed -= cfriction;
@@ -141,7 +130,13 @@ namespace gameplay
 				}
 			}
 
-			if (fy + vspeed * 2 > ladrrope->vertical.y() || fy + vspeed * 2 < ladrrope->vertical.x())
+			float cfy = (vspeed > 0) ? fy : fy - 35;
+
+			if (cfy > ladrrope->vertical.y())
+			{
+				state = PST_FALL;
+			}
+			else if (fy + 5 + vspeed * 2 < ladrrope->vertical.x())
 			{
 				state = PST_FALL;
 			}
@@ -150,12 +145,16 @@ namespace gameplay
 		{
 			if (state != PST_SKILL && state != PST_PRONE)
 			{
+				float fspeed = WALKSPEED * static_cast<float>(speed) / 100;
 				float maxhspeed = (candjump) ? fspeed * 1.5f : fspeed * 4.0f;
 
 				if (keydown[MIN_LEFT])
 				{
 					hspeed = hspeed - (fspeed / 10);
-					hspeed = max(hspeed, -maxhspeed);
+					if (hspeed < -maxhspeed)
+					{
+						hspeed = -maxhspeed;
+					}
 				}
 				else if (hspeed < 0)
 				{
@@ -169,7 +168,10 @@ namespace gameplay
 				if (keydown[MIN_RIGHT])
 				{
 					hspeed = hspeed + (fspeed / 10);
-					hspeed = min(hspeed, maxhspeed);
+					if (hspeed > maxhspeed)
+					{
+						hspeed = maxhspeed;
+					}
 				}
 				else if (hspeed > 0)
 				{
@@ -184,20 +186,13 @@ namespace gameplay
 			if (hspeed != 0 && !nofriction)
 			{
 				float friction;
-
 				switch (state)
 				{
 				case PST_SKILL:
-					friction = 0.2f;
+					friction = 0.17f;
 					break;
-				case PST_PRONE:
-				case PST_STAND:
-				case PST_LADDER:
-				case PST_WALK:
-					friction = 0.08f;
-					break;
-				case PST_FALL:
-					friction = 0.01f;
+				default:
+					friction = 0.1f;
 					break;
 				}
 
@@ -235,12 +230,20 @@ namespace gameplay
 			if (ground != fy)
 			{
 				vspeed = vspeed + GRAVITYACC;
-				vspeed = min(vspeed, FALLSPEED);
+				if (vspeed > FALLSPEED)
+				{
+					vspeed = FALLSPEED;
+				}
 
 				if (state != PST_SKILL)
 				{
 					state = PST_FALL;
 				}
+			}
+
+			if (state == PST_WALK && hspeed == 0)
+			{
+				state = PST_STAND;
 			}
 		}
 
@@ -282,29 +285,35 @@ namespace gameplay
 				if (keydown[MIN_LEFT])
 				{
 					fleft = true;
+					state = PST_WALK;
 				}
 
 				if (keydown[MIN_RIGHT])
 				{
 					fleft = false;
+					state = PST_WALK;
 				}
 				break;
 			}
 		}
+
+		if (vspeed > 0 && state != PST_LADDER && state != PST_ROPE)
+		{
+			if (fy + vspeed >= ground && ground >= fy)
+			{
+				vspeed = 0;
+				fy = ground;
+			}
+		}
+
+		moveobject::update();
 
 		look->setfleft(fleft);
 
 		switch (state)
 		{
 		case PST_STAND:
-			if (hspeed == 0)
-			{
-				look->setstate("stand");
-			}
-			else
-			{
-				look->setstate("walk");
-			}
+			look->setstate("stand");
 			break;
 		case PST_WALK:
 			look->setstate("walk", static_cast<float>(speed) / 100);
@@ -321,12 +330,26 @@ namespace gameplay
 		case PST_LADDER:
 			look->setstate("ladder", static_cast<float>(abs(vspeed)) / 2);
 			break;
+		case PST_SIT:
+			look->setstate("sit");
+			break;
 		}
 
-		movefragment ret;
-		ret.newstate = 0;
+		if (elapsed > 0 || hspeed != 0 || vspeed != 0)
+		{
+			if (elapsed % (DPF * 2) == 0)
+			{
+				sendmoves(elapsed >= DPF * 2);
+			}
+			elapsed += DPF;
+		}
 
-		if (elapsed == 0)
+		return false;
+	}
+
+	void player::sendmoves(bool close)
+	{
+		if (!close)
 		{
 			movefragment firstmove;
 			firstmove.type = MVT_ABSOLUTE;
@@ -337,32 +360,74 @@ namespace gameplay
 			firstmove.xpos = static_cast<short>(fx);
 			firstmove.ypos = static_cast<short>(fy);
 			firstmove.unk = 34;
-			firstmove.duration = DPF * 10;
+			firstmove.duration = DPF * 2;
 
 			moves.push_back(firstmove);
 		}
-		else if (elapsed == DPF * 2)
+		else
 		{
 			movefragment lastmove;
 			lastmove.type = MVT_ABSOLUTE;
 			lastmove.command = 0;
 			lastmove.newstate = fleft ? state + 1 : state;
-			lastmove.xpps = static_cast<short>(hspeed * 10);
-			lastmove.ypps = static_cast<short>(vspeed * 10);
+			lastmove.xpps = static_cast<short>(hspeed * 20);
+			lastmove.ypps = static_cast<short>(vspeed * 20);
 			lastmove.xpos = static_cast<short>(fx);
 			lastmove.ypos = static_cast<short>(fy);
 			lastmove.unk = 34;
-			lastmove.duration = DPF * 2;
+			lastmove.duration = DPF;
 
 			moves.push_back(lastmove);
-			packet_c.moveplayer(&moves);
+			packet_c.moveplayer(moves);
 			moves.clear();
 
 			elapsed = -DPF;
 		}
-		elapsed += DPF;
+	}
 
-		return false;
+	void player::setstate(playerstate st)
+	{
+		if (state != st)
+		{
+			sendmoves(false);
+			state = st;
+			sendmoves(true);
+		}
+	}
+
+	bool player::tryclimb(bool up)
+	{
+		vector2d absp = up ? getposition() + vector2d(0, -50) : getposition();
+		ladrrope = cache.getmap()->getlandr()->getlr(absp, false);
+		if (ladrrope)
+		{
+			fleft = true;
+			fx = static_cast<float>(ladrrope->x);
+			hspeed = 0.0f;
+			if (vspeed > 0.0f)
+			{
+				vspeed = 0.0f;
+			}
+			setstate((ladrrope->ladder) ? PST_LADDER : PST_ROPE);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	void player::trysit()
+	{
+		vector2d* seat = cache.getmap()->getinfo()->getseat(getposition());
+		if (seat)
+		{
+			hspeed = 0.0f;
+			vspeed = 0.0f;
+			fx = static_cast<float>(seat->x());
+			fy = static_cast<float>(seat->y());
+			setstate(PST_SIT);
+		}
 	}
 
 	void player::key_left(bool kst)
@@ -374,8 +439,9 @@ namespace gameplay
 			switch (state)
 			{
 			case PST_STAND:
+			case PST_SIT:
 				fleft = true;
-				state = PST_WALK;
+				setstate(PST_WALK);
 				break;
 			case PST_WALK:
 				if (!fleft)
@@ -383,21 +449,10 @@ namespace gameplay
 					fleft = true;
 					hspeed = 0;
 				}
-				else if (hspeed < 0 && !keydown[MIN_LEFT])
-				{
-					//hspeed = hspeed - 5;
-				}
 				break;
 			case PST_FALL:
 				fleft = true;
 				break;
-			}
-		}
-		else
-		{
-			if (!keydown[MIN_RIGHT] && state == PST_WALK)
-			{
-				state = PST_STAND;
 			}
 		}
 
@@ -413,8 +468,9 @@ namespace gameplay
 			switch (state)
 			{
 			case PST_STAND:
+			case PST_SIT:
 				fleft = false;
-				state = PST_WALK;
+				setstate(PST_WALK);
 				break;
 			case PST_WALK:
 				if (fleft)
@@ -422,21 +478,10 @@ namespace gameplay
 					fleft = false;
 					hspeed = 0;
 				}
-				else if (hspeed > 0 && !keydown[MIN_LEFT])
-				{
-					//hspeed = hspeed + 5;
-				}
 				break;
 			case PST_FALL:
 				fleft = false;
 				break;
-			}
-		}
-		else
-		{
-			if (!keydown[MIN_LEFT] && state == PST_WALK)
-			{
-				state = PST_STAND;
 			}
 		}
 
@@ -447,6 +492,7 @@ namespace gameplay
 	{
 		if (!keydown[MIN_JUMP] && kst)
 		{
+			playerstate oldstate = state;
 			switch (state)
 			{
 			case PST_STAND:
@@ -467,7 +513,7 @@ namespace gameplay
 				{
 					vspeed = -JUMPSPEED * (static_cast<float>(jump) / 100);
 				}
-				state = PST_FALL;
+				setstate(PST_FALL);
 				break;
 			case PST_FALL:
 				if (candjump && vspeed < 0)
@@ -490,7 +536,7 @@ namespace gameplay
 					{
 						vspeed = -JUMPSPEED * (static_cast<float>(jump) / 100);
 					}
-					state = PST_FALL;
+					setstate(PST_FALL);
 				}
 				break;
 			case PST_LADDER:
@@ -499,11 +545,17 @@ namespace gameplay
 				{
 					fleft = keydown[MIN_LEFT];
 					fleft = !keydown[MIN_RIGHT];
-					vspeed = -JUMPSPEED * (static_cast<float>(jump) / 200);
-					state = PST_FALL;
-					ladrrope->vertical = vector2d();
+					vspeed = -JUMPSPEED * (static_cast<float>(jump) / 150);
+					hspeed = fleft ? -WALKSPEED : WALKSPEED;
+					setstate(PST_FALL);
+					ladrrope = 0;
 				}
 				break;
+			}
+
+			if (oldstate != PST_FALL && state == PST_FALL)
+			{
+				cache.getsounds()->play(MSN_JUMP);
 			}
 		}
 
@@ -519,20 +571,9 @@ namespace gameplay
 			case PST_STAND:
 			case PST_WALK:
 				hspeed = 0;
-
-				ladrrope = cache.getmap()->getlandr()->getlr(getposition(), false);
-
-				if (ladrrope)
+				if (!tryclimb(false))
 				{
-					fleft = true;
-					fx = static_cast<float>(ladrrope->x);
-					hspeed = 0;
-					vspeed = 0;
-					state = PST_LADDER;
-				}
-				else
-				{
-					state = PST_PRONE;
+					setstate(PST_PRONE);
 				}
 				break;
 			}
@@ -542,16 +583,19 @@ namespace gameplay
 			switch (state)
 			{
 			case PST_PRONE:
-				state = PST_STAND;
-
 				if (keydown[MIN_LEFT])
 				{
-					fleft = true;
+					fleft = true; 
+					setstate(PST_WALK);
 				}
-
-				if (keydown[MIN_RIGHT])
+				else if (keydown[MIN_RIGHT])
 				{
 					fleft = false;
+					setstate(PST_WALK);
+				}
+				else
+				{
+					setstate(PST_STAND);
 				}
 				break;
 			}
@@ -564,30 +608,23 @@ namespace gameplay
 	{
 		if (kst)
 		{
-			if (state != PST_LADDER && state != PST_ROPE)
+			if (!limitstate())
 			{
-				ladrrope = cache.getmap()->getlandr()->getlr(getposition(), true);
-
-				if (ladrrope)
-				{
-					fleft = true;
-					fx = static_cast<float>(ladrrope->x);
-					hspeed = 0;
-					if (vspeed > 0)
-					{
-						vspeed = 0;
-					}
-					state = ladrrope->ladder ? PST_LADDER : PST_ROPE;
-				}
+				tryclimb(true);
 			}
 		}
 
 		keydown[MIN_UP] = kst;
 	}
 
+	bool player::limitstate()
+	{
+		return state == PST_SKILL || state == PST_LADDER || state == PST_ROPE || state == PST_SIT || state == PST_DIED || state == PST_ALERT;
+	}
+
 	bool player::tryattack(attackinfo* info, int skillid, short hpcost, short mpcost)
 	{
-		bool stateok = state != PST_SKILL && state != PST_LADDER && state != PST_ROPE;
+		bool stateok = !limitstate();
 		bool nocd = skills.getcd(skillid) == 0;
 		bool hpmpok = stats->getstat(MS_HP) >= hpcost && stats->getstat(MS_MP) >= mpcost;
 
@@ -609,14 +646,15 @@ namespace gameplay
 			{
 				if (state == PST_PRONE)
 				{
-					state = PST_SKILL;
+					info->maxdamage /= 10;
+					info->mindamage /= 10;
 					look->setstate("proneStab", getattspeed());
 				}
 				else
 				{
-					state = PST_SKILL;
 					look->setstate("attack", getattspeed());
 				}
+				setstate(PST_SKILL);
 			}
 		}
 
@@ -625,7 +663,7 @@ namespace gameplay
 
 	void player::setaction(string act)
 	{
-		state = PST_SKILL;
+		setstate(PST_SKILL);
 		look->setaction(act, getattspeed());
 	}
 

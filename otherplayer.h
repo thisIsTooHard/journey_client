@@ -16,30 +16,37 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "maplelook.h"
-#include "playereffects.h"
-#include "moveobject.h"
+#include "vplayer.h"
 
 using namespace action;
 
 namespace gameplay
 {
-	class otherplayer : public moveobject
+	class otherplayer : public vplayer
 	{
 	public:
-		otherplayer(maplelook, byte, short, string, vector2d);
+		otherplayer(maplelook, int, byte, short, string, vector2d);
 		otherplayer() {}
 		~otherplayer() {}
 		void draw(vector2d);
 		bool update();
 		void addmoves(vector<movefragment>);
+		void updatemoves();
+		void resolvestate(playerstate);
+		int getid() { return id; }
+		string getname() { return name.gettext(); }
+		playereffects* geteffects() { return &effects; }
+		maplelook* getlook() { return &look; }
 	private:
 		maplelook look;
 		textlabel name;
+		int id;
 		playereffects effects;
 		byte level;
 		short job;
 		vector<movefragment> movements;
+		playerstate state;
+		short duration;
 		short elapsed;
 	};
 }

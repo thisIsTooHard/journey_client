@@ -19,7 +19,7 @@
 
 namespace gameplay
 {
-	void playereffects::add(sprite efc)
+	void playereffects::add(effect efc)
 	{
 		effects.add(top, efc);
 		top++;
@@ -27,7 +27,7 @@ namespace gameplay
 
 	void playereffects::draw(vector2d playerpos)
 	{
-		for (smit<int, sprite> efit = effects.getit(); efit.belowtop(); ++efit)
+		for (smit<int, effect> efit = effects.getit(); efit.belowtop(); ++efit)
 		{
 			efit->draw(playerpos);
 		}
@@ -37,7 +37,7 @@ namespace gameplay
 	{
 		vector<int> toremove;
 
-		for (smit<int, sprite> efit = effects.getit(); efit.belowtop(); ++efit)
+		for (smit<int, effect> efit = effects.getit(); efit.belowtop(); ++efit)
 		{
 			bool remove = efit->update();
 

@@ -21,15 +21,16 @@
 
 namespace gameplay
 {
-	playfield::playfield()
-	{
-		active = false;
-	}
-
 	void playfield::init()
 	{
 		drops.init();
 		portals.init();
+
+		audioplayerbass* apb = app.getaudio();
+		audio loginbgm = nx::nodes["Sound"]["BgmUI.img"]["Title"].get_audio();
+		int bgmvolume = config.getconfig()->bgmvolume;
+		apb->setvolume0(bgmvolume);
+		apb->playbgm((void*)loginbgm.data(), loginbgm.length());
 	}
 
 	bool playfield::moveup(bool keydown)
@@ -178,7 +179,6 @@ namespace gameplay
 	{
 		inventorytype type = playerchar.getinventory()->gettypebyid(itemid);
 		short slot = playerchar.getinventory()->finditem(type, itemid);
-
 		if (slot >= 0)
 		{
 			if (type == IVT_USE)
@@ -188,12 +188,53 @@ namespace gameplay
 		}
 	}
 
+	void playfield::pickup()
+	{
+		drop* drp = drops.trypickup(playerchar.bounds());
+		if (drp)
+		{
+			packet_c.pickupitem(drp->getid(), drp->getposition());
+		}
+	}
+
+	void playfield::showchareffect(char effid)
+	{
+		playerchar.geteffects()->add(cache.geteffects()->geteffect(effid));
+		if (effid == 0)
+		{
+			cache.getsounds()->play(MSN_LEVELUP);
+		}
+	}
+
+	void playfield::showchareffect(int cid, char effid)
+	{
+		vplayer* vpl = chars.getchar(cid);
+		if (vpl)
+		{
+			vpl->geteffects()->add(cache.geteffects()->geteffect(effid));
+			if (effid == 0)
+			{
+				cache.getsounds()->play(MSN_LEVELUP);
+			}
+		}
+	}
+
+	vplayer* playfield::getchar(int cid)
+	{
+		if (cid == playerchar.getid())
+		{
+			return &playerchar;
+		}
+		else
+		{
+			return chars.getchar(cid);
+		}
+	}
+
 	void playfield::draw()
 	{
 		if (active)
 		{
-			cam.update(playerchar.getposition());
-
 			vector2d viewpos = cam.getposition();
 			backgrounds.drawbackgrounds(viewpos);
 			layers[0].draw(viewpos);
@@ -225,6 +266,7 @@ namespace gameplay
 			chars.update();
 			playerchar.update();
 			portals.update(playerchar.bounds());
+			cam.update(playerchar.getposition());
 
 			for (int i = 0; i < 8; i++)
 			{
@@ -238,7 +280,7 @@ namespace gameplay
 		playerchar = player(login.getacc()->getplayer());
 	}
 
-	void playfield::setfield(int mapid, char pid)
+	void playfield::clear()
 	{
 		active = false;
 
@@ -249,17 +291,28 @@ namespace gameplay
 		chars.clear();
 
 		cache.getmobs()->clear();
+	}
 
+	void playfield::setfield(int mapid, char pid)
+	{
 		mapdata* mdata = cache.getmap();
 
 		mdata->load(mapid);
 
+		if (mdata->hasnewbgm())
+		{
+			audio toplay = nx::nodes["Sound"].resolve(mdata->getinfo()->getbgm()).get_audio();
+			if (toplay.data())
+			{
+				app.getaudio()->playbgm((void*)toplay.data(), toplay.length());
+			}
+		}
+
 		app.getimgcache()->setmode(ict_map);
-		nl::nx::view_file("Map");
 
 		string strid = to_string(mapid);
 		strid.insert(0, 9 - strid.length(), '0');
-		node src = nl::nx::nodes["Map"]["Map"]["Map" + to_string(mapid / 100000000)][strid + ".img"];
+		node src = nx::nodes["Map"]["Map"]["Map" + to_string(mapid / 100000000)][strid + ".img"];
 
 		backgrounds = mapbackgrounds(src["back"]);
 
@@ -270,7 +323,6 @@ namespace gameplay
 			layers[i] = maplayer(src[to_string(i)]);
 		}
 
-		nl::nx::unview_file("Map");
 		app.getimgcache()->unlock();
 
 		vector2d startpos = portals.getspawnpoint(pid);
@@ -282,5 +334,6 @@ namespace gameplay
 		cam.updateview();
 
 		active = true;
+		app.fadein();
 	}
 }

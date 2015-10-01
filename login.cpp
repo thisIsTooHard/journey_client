@@ -42,8 +42,8 @@ namespace io
 		buttons[BT_LOGINLOST] = button(title["BtLoginIDLost"], 395, 300);
 		buttons[BT_SAVEID] = button(title["BtLoginIDSave"], 325, 300);
 
-		string defaultacc = config.getdefaultacc();
-		saveid = config.getsaveid();
+		string defaultacc = config.getconfig()->defaultacc;
+		saveid = config.getconfig()->saveid;
 
 		saveidcheck[false] = texture(title["check"]["0"]);
 		saveidcheck[true] = texture(title["check"]["1"]);
@@ -53,6 +53,7 @@ namespace io
 
 		textfields[TXT_PASS] = textfield(TXT_PASS, DWF_14L, TXC_WHITE, "", vector2d(315, 275), 12);
 		textfields[TXT_PASS].setbg(texture(title["PW"]), -5, 0);
+		textfields[TXT_PASS].setcrypt('*');
 
 		if (saveid)
 		{
@@ -93,15 +94,15 @@ namespace io
 			textfields[TXT_ACC].setfocus(false);
 			textfields[TXT_PASS].setfocus(false);
 			app.getui()->add(UI_LOGINWAIT);
-			packet_c.c_login(textfields[TXT_ACC].text(), textfields[TXT_PASS].text());
+			packet_c.c_login(textfields[TXT_ACC].gettext(), textfields[TXT_PASS].gettext());
 			return;
 		case BT_QUIT:
 			quit();
 			return;
 		case BT_SAVEID:
 			saveid = !saveid;
-			config.setsaveid(saveid);
-			buttons[BT_SAVEID].setstate("mouseOver");
+			config.getconfig()->saveid = saveid;
+			buttons[BT_SAVEID].setstate(BTS_MOUSEOVER);
 			return;
 		}
 	}

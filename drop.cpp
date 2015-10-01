@@ -19,7 +19,44 @@
 
 namespace maplemap
 {
-	void drop::expire(char type)
+	void drop::init(char mod)
+	{
+		dalpha = 1.0f;
+		moved = 0.0f;
+		looter = 0;
+
+		fx = static_cast<float>(pos.x());
+		fy = static_cast<float>(pos.y());
+
+		updatefht();
+
+		switch (mod)
+		{
+		case 0:
+		case 1:
+			state = DST_DROPPED;
+			vspeed = -6.0f;
+			hspeed = static_cast<float>(dest.x() - pos.x()) / 16;
+			if (fy >= fh.resolvex(pos.x()))
+			{
+				fy -= 1.0f;
+			}
+			break;
+		case 2:
+			state = DST_FLOATING;
+			vspeed = 0.0f;
+			hspeed = 0.0f;
+			basey = fy;
+			break;
+		case 3:
+			state = DST_EXPIRE;
+			vspeed = -6.0f;
+			hspeed = 0.0f;
+			break;
+		}
+	}
+
+	void drop::expire(char type, moveobject* lt)
 	{
 		switch (type)
 		{
@@ -31,6 +68,8 @@ namespace maplemap
 			break;
 		case 2:
 			state = DST_PICKEDUP;
+			looter = lt;
+			vspeed = -6.0f;
 			break;
 		}
 	}
@@ -59,8 +98,19 @@ namespace maplemap
 
 		if (state == DST_PICKEDUP)
 		{
-			dalpha -= 0.025f;
-			if (dalpha < 0.025f)
+			if (looter)
+			{
+				hspeed = looter->gethspeed() + static_cast<float>(looter->getposition().x() - fx) / 10;
+			}
+			else
+			{
+				hspeed = 0.0f;
+			}
+
+			gravityobject::update();
+
+			dalpha -= 1.0f / 32;
+			if (dalpha <= 1.0f / 32)
 			{
 				dalpha = 0.0f;
 				state = DST_INACTIVE;

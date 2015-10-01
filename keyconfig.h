@@ -19,6 +19,8 @@
 #include "uielement.h"
 #include "keyboard.h"
 #include "inventory.h"
+#include "keyicon.h"
+#include "dragitemicon.h"
 
 using namespace gameplay;
 
@@ -30,8 +32,8 @@ namespace io
 		keyconfig(map<char, pair<keytype, int>>, inventory*);
 		~keyconfig() {}
 		void buttonpressed(short);
-		void sendicon(dragicon*, vector2d);
-		void oniteminfo(dragicon*);
+		void sendicon(icon*, vector2d);
+		void oninfo(icon*);
 		rectangle2d dragarea();
 	private:
 		map<char, pair<keytype, int>> keymap;

@@ -54,7 +54,7 @@ namespace character
 								z = CL_ARMOHAIR;
 							else if (zs == "handOverHair")
 								z = CL_RHAND;
-							else if (zs == "body")
+							else if (zs == "body" || zs == "backBody")
 								z = CL_BODY;
 							else if (zs == "handBelowWeapon")
 								z = CL_LHAND;

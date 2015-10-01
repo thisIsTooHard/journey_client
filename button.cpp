@@ -21,37 +21,37 @@ namespace io
 {
 	button::button(node src)
 	{
-		textures["pressed"] = texture(src["pressed"]["0"]);
-		textures["mouseOver"] = texture(src["mouseOver"]["0"]);
-		textures["normal"] = texture(src["normal"]["0"]);
-		textures["disabled"] = texture(src["disabled"]["0"]);
+		textures[BTS_PRESSED] = texture(src["pressed"]["0"]);
+		textures[BTS_MOUSEOVER] = texture(src["mouseOver"]["0"]);
+		textures[BTS_NORMAL] = texture(src["normal"]["0"]);
+		textures[BTS_DISABLED] = texture(src["disabled"]["0"]);
 		position = vector2d();
 
-		state = "normal";
+		state = BTS_NORMAL;
 		bttype = BTT_REGULAR;
 		active = true;
 	}
 
 	button::button(node src, int x, int y)
 	{
-		textures["pressed"] = texture(src["pressed"]["0"]);
-		textures["mouseOver"] = texture(src["mouseOver"]["0"]);
-		textures["normal"] = texture(src["normal"]["0"]);
-		textures["disabled"] = texture(src["disabled"]["0"]);
+		textures[BTS_PRESSED] = texture(src["pressed"]["0"]);
+		textures[BTS_MOUSEOVER] = texture(src["mouseOver"]["0"]);
+		textures[BTS_NORMAL] = texture(src["normal"]["0"]);
+		textures[BTS_DISABLED] = texture(src["disabled"]["0"]);
 		position = vector2d(x, y);
 
-		state = "normal";
+		state = BTS_NORMAL;
 		bttype = BTT_REGULAR;
 		active = true;
 	}
 	
 	button::button(texture s1, texture s2, int x, int y)
 	{
-		textures["normal"] = s1;
-		textures["select"] = s2;
+		textures[BTS_NORMAL] = s1;
+		textures[BTS_SELECT] = s2;
 		position = vector2d(x, y);
 
-		state = "normal";
+		state = BTS_NORMAL;
 		bttype = BTT_ONESPRITE;
 		active = true;
 	}
@@ -61,7 +61,7 @@ namespace io
 		position = pos;
 		dimension = dim;
 
-		state = "normal";
+		state = BTS_NORMAL;
 		bttype = BTT_AREA;
 		active = true;
 	}
@@ -75,8 +75,8 @@ namespace io
 		}
 		else
 		{
-			vector2d absp = parentpos + position - textures["normal"].getorigin();
-			return rectangle2d(absp, absp + textures["normal"].getdimension());
+			vector2d absp = parentpos + position - textures[BTS_NORMAL].getorigin();
+			return rectangle2d(absp, absp + textures[BTS_NORMAL].getdimension());
 		}
 	}
 
@@ -92,10 +92,10 @@ namespace io
 				textures[state].draw(absp);
 				break;
 			case BTT_ONESPRITE:
-				textures["normal"].draw(absp);
-				if (state == "pressed" || state == "mouseOver")
+				textures[BTS_NORMAL].draw(absp);
+				if (state == BTS_PRESSED || state == BTS_MOUSEOVER)
 				{
-					textures["select"].draw(absp);
+					textures[BTS_SELECT].draw(absp);
 				}
 				break;
 			}

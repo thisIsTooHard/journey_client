@@ -18,7 +18,6 @@
 #pragma once
 #include "mob.h"
 #include "Journey.h"
-#include "nxfile.h"
 
 namespace gameplay
 {
@@ -33,8 +32,7 @@ namespace gameplay
 		team = t;
 
 		mdata = cache.getmobs()->getmob(mid);
-		state = "stand";
-		
+
 		elapsed = 0;
 		frame = 0;
 		alpha = (fadein) ? 0.0f : 1.0f;
@@ -54,6 +52,9 @@ namespace gameplay
 		speed = mdata->getspeed() + 100;
 		fade = false;
 		dead = false;
+
+		state = "move";
+		nextmove();
 	}
 
 	void mob::damage(attackinfo* attack)
@@ -86,6 +87,7 @@ namespace gameplay
 				hspeed = froml ? -0.15f : 0.15f;
 				fleft = !froml;
 				moved = 0;
+				mdata->playsound("Damage");
 				setstate("hit1");
 			}
 
@@ -140,6 +142,7 @@ namespace gameplay
 			active = false;
 			break;
 		case 1:
+			mdata->playsound("Die");
 			setstate("die1");
 			dead = true;
 			break;
@@ -204,94 +207,38 @@ namespace gameplay
 				}
 				else if (control)
 				{
-					float fspeed = static_cast<float>(speed) / 100;
-
-					if (state == "stand")
+					if (state != "stand")
 					{
-						if (moved < 100)
-						{
-							moved += 1;
-						}
-						else if (aniend || !(ani->isanimated()))
-						{
-							moved = 0;
-							setstate("move");
-
-							fleft = random.nextbool();
-							hspeed = (fleft) ? -fspeed : fspeed;
-						}
-					}
-					else
-					{
-						if (moved < 100)
-						{
-							moved += 1;
-						}
-						else if (aniend || !(ani->isanimated()))
-						{
-							moved = 0;
-
-							if (random.nextbool())
-							{
-								hspeed = 0;
-								setstate("stand");
-							}
-							else
-							{
-								fleft = random.nextbool();
-								hspeed = (fleft) ? -fspeed : fspeed;
-							}
-						}
-
 						if (hspeed != 0)
 						{
+							float fspeed = static_cast<float>(speed) / 100;
 							int posx = static_cast<int>(fx + hspeed);
 							int mobwidth = mdata->getani(state)->getdimension(frame).x() / 2;
-							if (posx + mobwidth >= walls.y())
+							if (posx + mobwidth + hspeed >= walls.y())
 							{
 								fleft = true;
 								hspeed = -fspeed;
 							}
-							else if (posx - mobwidth <= walls.x())
+							else if (posx - mobwidth - hspeed <= walls.x())
 							{
 								fleft = false;
 								hspeed = fspeed;
 							}
 						}
 
-						if (moved == 0)
+						if (moved % 100 == 0)
 						{
-							movefragment firstmove;
-							firstmove.type = MVT_ABSOLUTE;
-							firstmove.command = 0;
-							firstmove.newstate = 1;
-							firstmove.xpps = 0;
-							firstmove.ypps = 0;
-							firstmove.xpos = static_cast<short>(fx);
-							firstmove.ypos = static_cast<short>(fy);
-							firstmove.unk = 0;
-							firstmove.duration = 50;
-
-							moves.push_back(firstmove);
+							sendmoves(moved == 0);
 						}
-						else if (moved == 100)
-						{
-							movefragment lastmove;
-							lastmove.type = MVT_ABSOLUTE;
-							lastmove.command = 0;
-							lastmove.newstate = 1;
-							lastmove.xpps = static_cast<short>(hspeed * 3);
-							lastmove.ypps = static_cast<short>(vspeed * 3);
-							lastmove.xpos = static_cast<short>(fx);
-							lastmove.ypos = static_cast<short>(fy);
-							lastmove.unk = 0;
-							lastmove.duration = 50;
+					}
 
-							moves.push_back(lastmove);
-							packet_c.movemonster(oid, 1, 0, 0, 0, 0, 0, 0, getposition(), &moves);
-
-							moves.clear();
-						}
+					if (moved < 100)
+					{
+						moved += 1;
+					}
+					else if (aniend || !(ani->isanimated()))
+					{
+						nextmove();
 					}
 				}
 
@@ -320,8 +267,62 @@ namespace gameplay
 		return false;
 	}
 
-	void mob::sendmoves(byte elapsed)
+	void mob::nextmove()
 	{
+		moved = 0;
+
+		if (state == "move" && random.nextbool())
+		{
+			hspeed = 0;
+
+			setstate("stand");
+		}
+		else
+		{
+			float fspeed = static_cast<float>(speed) / 100;
+
+			fleft = random.nextbool();
+			hspeed = (fleft) ? -fspeed : fspeed;
+
+			setstate("move");
+		}
+	}
+
+	void mob::sendmoves(bool first)
+	{
+		if (first)
+		{
+			movefragment firstmove;
+			firstmove.type = MVT_ABSOLUTE;
+			firstmove.command = 0;
+			firstmove.newstate = 1;
+			firstmove.xpps = 0;
+			firstmove.ypps = 0;
+			firstmove.xpos = static_cast<short>(fx);
+			firstmove.ypos = static_cast<short>(fy);
+			firstmove.unk = 0;
+			firstmove.duration = 50;
+
+			moves.push_back(firstmove);
+		}
+		else
+		{
+			movefragment lastmove;
+			lastmove.type = MVT_ABSOLUTE;
+			lastmove.command = 0;
+			lastmove.newstate = 1;
+			lastmove.xpps = static_cast<short>(hspeed * 3);
+			lastmove.ypps = static_cast<short>(vspeed * 3);
+			lastmove.xpos = static_cast<short>(fx);
+			lastmove.ypos = static_cast<short>(fy);
+			lastmove.unk = 0;
+			lastmove.duration = 50;
+
+			moves.push_back(lastmove);
+			packet_c.movemonster(oid, 1, 0, 0, 0, 0, 0, 0, getposition(), moves);
+
+			moves.clear();
+		}
 	}
 
 	void mob::setstate(string st)

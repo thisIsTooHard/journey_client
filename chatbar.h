@@ -37,18 +37,20 @@ namespace io
 		~chatbar() {}
 		void draw();
 		void update();
-		void sendchat(string);
+		void sendtext(string, bool);
 		void buttonpressed(short);
 		rectangle2d bounds();
 	private:
+		vector<string> lines;
+		vector<string> lastentered;
 		map<bool, texture> chatspace;
 		map<chattarget, texture> chattargets;
 		texture chatenter;
 		texture chatcover;
 		textlabel closedtext;
-		vector<string> lines;
-		bool open;
 		chattarget chattarget;
+		bool open;
+		int laepos;
 	};
 }
 

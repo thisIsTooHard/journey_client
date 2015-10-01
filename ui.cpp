@@ -20,6 +20,7 @@
 #include "login.h"
 #include "loginwait.h"
 #include "loginnotice.h"
+#include "softkeyboard.h"
 #include "worldselect.h"
 #include "charselect.h"
 #include "charcreation.h"
@@ -28,6 +29,8 @@
 #include "keyconfig.h"
 #include "statsinfo.h"
 #include "equipinventory.h"
+#include "iteminventory.h"
+#include "skillinventory.h"
 #include "Journey.h"
 
 namespace io
@@ -40,10 +43,10 @@ namespace io
 		mouse.init();
 		equipinfo.init();
 		iteminfo.init();
+		cache.init();
 		app.getimgcache()->unlock();
 
-		cache.getequips()->init();
-
+		focused = 0;
 		activetext = 0;
 		activeicon = 0;
 		activeinfo = 0;
@@ -69,7 +72,9 @@ namespace io
 			case UI_STATSINFO:
 			case UI_EQUIPS:
 			case UI_SYSTEM:
+			case UI_INVENTORY:
 			case UI_KEYCONFIG:
+			case UI_SKILLS:
 				elements.pushtotop(type);
 				elements.get(type)->togglehide();
 				return;
@@ -88,10 +93,15 @@ namespace io
 		case UI_LOGINWAIT:
 			toadd = new loginwait();
 			break;
+		case UI_SOFTKEYBOARD:
+			toadd = new softkeyboard(param);
+			focused = toadd;
+			break;
 		case UI_WORLDSELECT:
 			toadd = new worldselect(field.getlogin()->getworld(0)->getchannels(), field.getlogin()->getworld(0)->getchloads());
 			break;
 		case UI_CHARSEL:
+			//audio_p.playsound(MSN_CHARSEL);
 			toadd = new charselect(field.getlogin()->getacc());
 			break;
 		case UI_CREATECHAR:
@@ -115,12 +125,37 @@ namespace io
 		case UI_EQUIPS:
 			toadd = new equipinventory(field.getplayer());
 			break;
+		case UI_INVENTORY:
+			toadd = new iteminventory(field.getplayer()->getinventory());
+			break;
+		case UI_SKILLS:
+			toadd = new skillinventory(field.getplayer()->getskills(), field.getplayer()->getstats());
+			break;
 		}
 		elements.add(type, toadd);
 	}
 
 	void ui::remove(uielements type)
 	{
+		if (activetext)
+		{
+			activetext->setfocus(false);
+		}
+
+		if (activeicon)
+		{
+			activeicon->resetdrag();
+		}
+
+		if (activeinfo)
+		{
+			activeinfo->setactive(false);
+		}
+
+		activetext = 0;
+		activeinfo = 0;
+		activeicon = 0;
+
 		elements.removekey(type);
 	}
 
@@ -176,6 +211,14 @@ namespace io
 					case VK_BACK:
 						activetext->sendchar(0);
 						break;
+					case VK_TAB:
+						switch (activetext->getid())
+						{
+						case TXT_ACC:
+
+							break;
+						}
+						break;
 					case VK_RETURN:
 						switch (activetext->getid())
 						{
@@ -184,8 +227,16 @@ namespace io
 							elements.get(UI_LOGIN)->buttonpressed(BT_LOGIN);
 							break;
 						case TXT_CHAT:
-							packet_c.general_chat(activetext->text(), true);
+							packet_c.general_chat(activetext->gettext(), true);
 							activetext->settext("");
+							break;
+						}
+						break;
+					case VK_SPACE:
+						switch (activetext->getid())
+						{
+						case TXT_CHAT:
+							activetext->sendchar(' ');
 							break;
 						}
 						break;
@@ -193,11 +244,18 @@ namespace io
 				}
 				else
 				{
+					bool allowspecial = activetext->getid() == TXT_CHAT;
+
 					if (keycode > 47 && keycode < 64)
 					{
 						char letter = static_cast<char>(keycode);
 						if (!shift)
 						{
+							activetext->sendchar(letter);
+						}
+						else if (allowspecial)
+						{
+							letter -= 15;
 							activetext->sendchar(letter);
 						}
 					}
@@ -241,6 +299,9 @@ namespace io
 				case VK_DOWN:
 					field.getplayer()->key_down(down);
 					break;
+				case VK_TAB:
+					app.togglefullscreen();
+					break;
 				default:
 					pair<keytype, int> mapping = keys.getaction(static_cast<char>(keycode));
 					keytype type = mapping.first;
@@ -261,7 +322,7 @@ namespace io
 					case KT_MENU:
 						if (down)
 						{
-							char elemtype = -1;
+							char elemtype = 0;
 							switch (action)
 							{
 							case KA_CHARSTATS:
@@ -270,9 +331,14 @@ namespace io
 							case KA_EQUIPS:
 								elemtype = UI_EQUIPS;
 								break;
+							case KA_INVENTORY:
+								elemtype = UI_INVENTORY;
+								break;
+							case KA_SKILL:
+								elemtype = UI_SKILLS;
+								break;
 							}
-
-							if (elemtype != -1)
+							if (elemtype > 0)
 							{
 								add(static_cast<uielements>(elemtype));
 							}
@@ -285,11 +351,21 @@ namespace io
 							field.getplayer()->key_jump(down);
 							break;
 						case KA_SIT:
+							if (down)
+							{
+								field.getplayer()->trysit();
+							}
 							break;
 						case KA_ATTACK:
 							if (down)
 							{
 								field.useattack(0);
+							}
+							break;
+						case KA_PICKUP:
+							if (down)
+							{
+								field.pickup();
 							}
 							break;
 						}
@@ -309,6 +385,43 @@ namespace io
 	{
 		mouse.setposition(pos);
 
+		if (focused)
+		{
+			if (focused->isactive())
+			{
+				if (focused->bounds().contains(pos))
+				{
+					mouse.setstate(focused->sendmouse(pos, param));
+				}
+				else
+				{
+					mouse.setstate(param);
+
+					if (mouse.getstate() == MST_CANCLICK || mouse.getstate() == MST_CANGRAB)
+					{
+						mouse.setstate(MST_IDLE);
+					}
+
+					if (activeinfo)
+					{
+						activeinfo = 0;
+						equipinfo.clear();
+					}
+
+					if (activetext && param == MST_CLICKING)
+					{
+						activetext->setfocus(false);
+						activetext = 0;
+					}
+				}
+				return;
+			}
+			else
+			{
+				focused = 0;
+			}
+		}
+
 		if (activeicon)
 		{
 			if (param == MST_IDLE)
@@ -325,12 +438,31 @@ namespace io
 				if (front)
 				{
 					front->sendicon(activeicon, pos);
-					activeicon = 0;
 				}
 				else
 				{
-					activeicon->resetdrag();
+					if (activeicon->gettype() == ICN_ITEM)
+					{
+						dragitemicon* dgi = reinterpret_cast<dragitemicon*>(activeicon);
+						switch (dgi->getiitype())
+						{
+						case IICT_INVENT:
+							elements.get(UI_INVENTORY)->sendicon(dgi, pos);
+							break;
+						case IICT_EQUIP:
+							elements.get(UI_EQUIPS)->sendicon(dgi, pos);
+							break;
+						case IICT_KEY:
+							activeicon->ondrop();
+							break;
+						}
+					}
+					else
+					{
+						activeicon->ondrop();
+					}
 				}
+				activeicon = 0;
 			}
 		}
 
@@ -375,6 +507,12 @@ namespace io
 				activeinfo = 0;
 				equipinfo.clear();
 			}
+
+			if (activetext && param == MST_CLICKING)
+			{
+				activetext->setfocus(false);
+				activetext = 0;
+			}
 		}
 	}
 
@@ -399,14 +537,14 @@ namespace io
 		}
 	}
 
-	void ui::showequipinfo(int itemid, short slot)
+	void ui::showequipinfo(int itemid, short slot, bool equipped)
 	{
 		if (itemid > 0)
 		{
 			if (itemid != equipinfo.getid() && slot != equipinfo.getslot())
 			{
 				clothing* cloth = cache.getequips()->getcloth(itemid);
-				mapleequip* equip = field.getplayer()->getinventory()->getequip(IVT_EQUIPPED, slot);
+				mapleequip* equip = field.getplayer()->getinventory()->getequip(equipped ? IVT_EQUIPPED : IVT_EQUIP, slot);
 				if (cloth && equip)
 				{
 					equipinfo.setequip(cloth, equip, field.getplayer()->getstats());
@@ -423,9 +561,23 @@ namespace io
 
 	void ui::sendchat(int cid, bool gm, string txt)
 	{
-		if (elements.contains(UI_CHATBAR))
+		if (txt.size() > 0)
 		{
-			elements.get(UI_CHATBAR)->sendstring(txt);
+			string fulltext = "";
+			vplayer* vpl = field.getchar(cid);
+			if (vpl)
+			{
+				string fulltext = vpl->getname();
+				fulltext.append(": ");
+				fulltext.append(txt);
+
+				chatbar* chat = getelement<chatbar>(UI_CHATBAR);
+				if (chat)
+				{
+					chat->sendtext(fulltext, gm);
+				}
+				base.addchatballoon(cid, 0, fulltext);
+			}
 		}
 	}
 }

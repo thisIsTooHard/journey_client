@@ -31,9 +31,8 @@ namespace nl {
 		}
 		node base, back, bgm, character, effect, etc, item, map, mob, morph, npc, obj, quest, reactor, skill, sound, string, tamingmob, tile, ui;
 		std::map<std::string, node> nodes;
-		void load_all() {
-			if (exists("Base.nx")) {
-				nodes["Bgm"] = add_file("Bgm.nx");
+		bool load_all() {
+			if (exists("UI.nx")) {
 				nodes["Character"] = add_file("Character.nx");
 				nodes["Effect"] = add_file("Effect.nx");
 				nodes["Etc"] = add_file("Etc.nx");
@@ -49,6 +48,7 @@ namespace nl {
 				nodes["String"] = add_file("String.nx");
 				nodes["TamingMob"] = add_file("TamingMob.nx");
 				nodes["UI"] = add_file("UI.nx");
+				return true;
 			}
 			else if (exists("Data.nx")) {
 				base = add_file("Data.nx");
@@ -67,27 +67,11 @@ namespace nl {
 				string = base["String"];
 				tamingmob = base["TamingMob"];
 				ui = base["UI"];
+				return false;
 			}
 			else {
-				throw std::runtime_error("Failed to locate nx files.");
+				return false;
 			}
-		}
-		void view_file(std::string name) 
-		{
-			//nodes[name] = add_file(name + ".nx");
-		}
-		void unview_file(std::string name) 
-		{
-			/*for (std::vector<std::unique_ptr<file>>::iterator ptr = files.begin(); ptr != files.end(); ptr++)
-			{
-				node nn = ptr->get()->root();
-				if (nn == nodes[name])
-				{
-					ptr->get()->close();
-					files.erase(ptr);
-					break;
-				}
-			}*/
 		}
 	}
 }

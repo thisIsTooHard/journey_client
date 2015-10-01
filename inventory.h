@@ -42,6 +42,7 @@ namespace gameplay
 		inventory() {}
 		~inventory() { items.clear(); }
 		void recalcstats();
+		void modify(inventorytype, short, char, short);
 		short countitem(int);
 		short getprimstat(short);
 		short getsecstat(short);
@@ -53,19 +54,15 @@ namespace gameplay
 		void additem(mapleitem* i, inventorytype t) { items[t].add(i->getpos(), i); }
 		void removeitem(inventorytype t, short s) { items[t].removekey(s); }
 		short gettotal(equipstat es) { return totalstats[es]; }
+		void setmeso(int64_t m) { meso = m; }
+		int64_t getmeso() { return meso; }
 		inventorytype gettypebyid(int id) { return static_cast<inventorytype>(id / 1000000); }
 		spmit<short, mapleitem*> getinventory(inventorytype t) { return items[t].getit(); }
 	private:
 		map<inventorytype, safeptrmap<short, mapleitem*>> items;
+		int64_t meso;
 		vector<char> slots;
 		map<equipstat, short> totalstats;
-		map<short, mapleequip> equipped;
-		map<short, mapleequip> equippedcash;
-		map<short, mapleequip> equips;
-		map<char, mapleitem> useitems;
-		map<char, mapleitem> setupitems;
-		map<char, mapleitem> etcitems;
-		map<char, mapleitem> cashitems;
 	};
 }
 

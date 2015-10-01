@@ -30,13 +30,13 @@ namespace gameplay
 		BGT_HTILED,
 		BGT_VTILED,
 		BGT_TILED,
-		BGT_HSTRETCH,
-		BGT_VSTRETCH,
-		BGT_STRETCH,
 		BGT_HMOVEA,
 		BGT_VMOVEA,
 		BGT_HMOVEB,
-		BGT_VMOVEB
+		BGT_VMOVEB,
+		BGT_HSTRETCH,
+		BGT_VSTRETCH,
+		BGT_STRETCH
 	};
 
 	class background : public moveobject, public graphicobject
@@ -47,6 +47,8 @@ namespace gameplay
 		~background() {}
 		void draw(vector2d);
 		bool update();
+		int cshiftx();
+		int cshifty();
 	private:
 		animation ani;
 		bgtype type;

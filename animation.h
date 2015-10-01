@@ -46,7 +46,7 @@ namespace graphics
 		bool update() { return update(DPF); }
 		bool isloaded() { return textures[0].isloaded(); }
 		bool isanimated() { return last_f > 0; }
-		bool hasblending(byte f) { return alphablends.count(f); }
+		bool hasblending(byte f) { return alphablends.count(f) > 0; }
 		texture* gettexture(byte f) { return textures.count(f) ? &textures[f] : 0; }
 	protected:
 		map<byte, texture> textures;

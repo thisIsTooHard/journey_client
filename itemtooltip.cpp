@@ -42,9 +42,16 @@ namespace io
 		item = it;
 		itemid = item->getid();
 
-		filllength = 200;
+		name = textlabel(DWF_14C, TXC_WHITE, item->getname());
 
-		name = textlabel(DWF_20C, TXC_WHITE, item->getname());
+		filllength = 105;
+
+		int infoheight = item->getdtext()->getheight();
+		if (infoheight > 74)
+		{
+			filllength += infoheight - 74;
+		}
+
 		active = true;
 	}
 
@@ -52,25 +59,21 @@ namespace io
 	{
 		if (active)
 		{
-			int bdelta = SCREENW - drawpos.x() - 277;
-			drawpos.shift(min(bdelta, 0), 16);
-
 			top.draw(drawpos);
 			mid.draw(drawpos + vector2d(0, 13), vector2d(0, filllength));
 			bot.draw(drawpos + vector2d(0, filllength + 13));
 
-			line.draw(drawpos + vector2d(0, 48));
+			name.draw(drawpos + vector2d(130, 3));
+			item->getdtext()->draw(drawpos + vector2d(100, 33));
 
-			base.draw(drawpos + vector2d(10, 58));
-			shade.draw(drawpos + vector2d(10, 58));
+			line.draw(drawpos + vector2d(0, 28));
+			base.draw(drawpos + vector2d(10, 38));
+			shade.draw(drawpos + vector2d(10, 38));
 
-			vector2d iconpos = drawpos + vector2d(20, 131);
-
+			vector2d iconpos = drawpos + vector2d(20, 110);
 			item->geticon(true).draw(iconpos, 2.0f, 2.0f);
 
-			cover.draw(drawpos + vector2d(10, 58));
-
-			name.draw(drawpos + vector2d(130, 5));
+			cover.draw(drawpos + vector2d(10, 38));
 		}
 	}
 }

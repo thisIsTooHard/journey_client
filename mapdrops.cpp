@@ -29,7 +29,7 @@ namespace maplemap
 		mesos[MES_BAG] = animation(nx::nodes["Item"]["Special"]["0900.img"]["09000003"]["iconRaw"]);
 	}
 
-	void mapdrops::adddrop(short oid, int itemid, bool meso, int owner, vector2d pos, vector2d dest, char type, bool playerdrop)
+	void mapdrops::adddrop(short oid, int itemid, bool meso, int owner, vector2d pos, vector2d dest, char type, char mod)
 	{
 		if (drops.contains(oid))
 		{
@@ -41,24 +41,8 @@ namespace maplemap
 
 			if (meso)
 			{
-				mesoamount amount;
-				if (itemid > 999)
-				{
-					amount = MES_BAG;
-				}
-				else if (itemid > 99)
-				{
-					amount = MES_BUNDLE;
-				}
-				else if (itemid > 9)
-				{
-					amount = MES_GOLD;
-				}
-				else
-				{
-					amount = MES_BRONZE;
-				}
-				toadd = new mesodrop(oid, &mesos[amount], owner, pos, dest, type, playerdrop);
+				mesoamount amount = (itemid > 999) ? MES_BAG : (itemid > 99) ? MES_BUNDLE : (itemid > 9) ? MES_GOLD : MES_BRONZE;
+				toadd = new mesodrop(oid, &mesos[amount], owner, pos, dest, type, mod);
 			}
 			else
 			{
@@ -80,18 +64,18 @@ namespace maplemap
 						icon = item->geticon(true);
 					}
 				}
-				toadd = new itemdrop(oid, itemid, icon, owner, pos, dest, type, playerdrop);
+				toadd = new itemdrop(oid, itemid, icon, owner, pos, dest, type, mod);
 			}
 
 			drops.add(oid, toadd);
 		}
 	}
 
-	void mapdrops::removedrop(short oid, char mode)
+	void mapdrops::removedrop(short oid, char mode, moveobject* looter)
 	{
 		if (drops.contains(oid))
 		{
-			drops.get(oid)->expire(mode);
+			drops.get(oid)->expire(mode, looter);
 		}
 	}
 
@@ -121,5 +105,17 @@ namespace maplemap
 		{
 			drops.remove(*rmit);
 		}
+	}
+
+	drop* mapdrops::trypickup(rectangle2d range)
+	{
+		for (spmit<short, drop*> drit = drops.getit(); drit.belowtop(); drit++)
+		{
+			if (range.overlaps(drit->bounds()))
+			{
+				return drit.get();
+			}
+		}
+		return 0;
 	}
 }

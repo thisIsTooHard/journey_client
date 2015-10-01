@@ -51,7 +51,8 @@ namespace gameplay
 		bool isalive() { return state != "die1"; }
 		bool isactive() { return active && isalive(); }
 	private:
-		void sendmoves(byte);
+		void sendmoves(bool);
+		void nextmove();
 		mobdata* mdata;
 		randomizer random;
 		int mid;

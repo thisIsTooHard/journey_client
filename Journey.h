@@ -30,10 +30,19 @@ extern session server;
 extern datacache cache;
 extern settings config;
 
-extern int result;
-extern byte mapleversion;
-
 extern void quit();
+
+enum jrerror
+{
+	JRE_NONE,
+	JRE_EXIT,
+	JRE_SERVER_OFFLINE,
+	JRE_WRONG_VERSION,
+	JRE_MISSING_FILES,
+	JRE_WINAPP_FAILURE,
+	JRE_DISCONNECTED,
+	JRE_AUDIOERROR
+};
 
 const int SCREENW = 816;
 const int SCREENH = 624;

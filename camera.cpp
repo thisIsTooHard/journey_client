@@ -91,6 +91,6 @@ namespace gameplay
 		vector2d mapborders = cache.getmap()->getinfo()->getborders();
 
 		hbounds = vector2d(-mapwalls.x(), -mapwalls.y());
-		vbounds = vector2d(-mapborders.x(), -mapborders.y() - 60);
+		vbounds = vector2d(-mapborders.x(), -mapborders.y() - 30);
 	}
 }

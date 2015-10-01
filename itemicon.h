@@ -17,27 +17,35 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "charset.h"
+#include "icon.h"
 
 using namespace graphics;
 
 namespace io
 {
-	class itemicon
+	class itemicon : public icon
 	{
 	public:
-		itemicon(map<bool, texture>, bool, short);
+		itemicon(map<bool, texture>, int, bool, short);
 		itemicon() {}
 		~itemicon() {}
+		void draw(vector2d);
+		void onmouseover();
 		void toggle() { raw = !raw; }
-		void draw(vector2d, float);
-		void setposition(vector2d p) { pos = p; }
-	private:
+		void setqty(short q) { qty = q; showcount = q > 1; }
+		int getid() { return iid; }
+		icontype gettype() { return ICN_ITEM; }
+		virtual void ondrop() { resetdrag(); }
+		virtual bool candrag() { return false; }
+		virtual rectangle2d bounds(vector2d p) { return rectangle2d(p, p + vector2d(32, 32)); }
+	protected:
 		map<bool, texture> textures;
-		charset countset;
-		vector2d pos;
+		charset* countset;
+		int iid;
 		short qty;
 		bool showcount;
 		bool raw;
+		float alpha;
 	};
 }
 

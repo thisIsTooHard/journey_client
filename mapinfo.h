@@ -29,15 +29,14 @@ namespace data
 	class mapinfo
 	{
 	public:
-		mapinfo(int, node, vector2d, vector2d);
+		mapinfo(node, vector2d, vector2d);
 		mapinfo() {}
 		~mapinfo() {}
-		int getid() { return mapid; }
+		vector2d* getseat(vector2d);
 		vector2d getwalls() { return mapwalls; }
 		vector2d getborders() { return mapborders; }
 		string getbgm() { return bgm; }
 	private:
-		int mapid;
 		int fieldlimit;
 		bool cloud;
 		string bgm;
@@ -50,6 +49,7 @@ namespace data
 		bool hideminimap;
 		vector2d mapwalls;
 		vector2d mapborders;
+		vector<vector2d> seats;
 	};
 }
 

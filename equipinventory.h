@@ -18,6 +18,7 @@
 #pragma once
 #include "uielement.h"
 #include "player.h"
+#include "dragitemicon.h"
 
 using namespace gameplay;
 
@@ -29,11 +30,15 @@ namespace io
 		equipinventory(player*);
 		~equipinventory() {}
 		void draw();
+		void modify(short, char, short);
+		void addicon(short);
+		void loadicons();
 		void buttonpressed(short);
-		void oniteminfo(dragicon*);
+		void oninfo(icon*);
+		void sendicon(icon*, vector2d);
 		rectangle2d dragarea();
 	private:
-		map<char, vector2d> iconpositions;
+		map<short, vector2d> iconpositions;
 		maplelook* look;
 		inventory* invent;
 		maplestats* stats;

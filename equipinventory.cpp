@@ -66,26 +66,36 @@ namespace io
 		invent = plc->getinventory();
 		stats = plc->getstats();
 
-		for (spmit<short, mapleitem*> eqit = invent->getinventory(IVT_EQUIPPED); eqit.belowtop(); ++eqit)
-		{
-			short slot = eqit.getkey();
-			if (slot >= 0)
-			{
-				mapleequip* equip = reinterpret_cast<mapleequip*>(eqit.get());
-				int id = equip->getid();
-				clothing* cloth = cache.getequips()->getcloth(id);
-				dragicons.push_back(dragicon(DIT_ITEM, itemicon(cloth->geticons(), false, 1), texture(), iconpositions[slot], slot, id));
-			}
-		}
-
 		app.getimgcache()->unlock();
 
-		position = config.geteqspos();
+		loadicons();
+
+		position = config.getconfig()->equipsinvpos;
 		dimensions = vector2d(184, 290);
 		active = true;
 		dragged = false;
 		buttoncd = 0;
 		showpet = false;
+	}
+
+	void equipinventory::modify(short slot, char mode, short arg)
+	{
+		if (mode == 0 || icons.contains(slot))
+		{
+			switch (mode)
+			{
+			case 0:
+				addicon(slot);
+				break;
+			case 2:
+				icons.changekey(slot, arg);
+				icons.get(arg)->setposition(iconpositions[arg]);
+				break;
+			case 3:
+				icons.removekey(slot);
+				break;
+			}
+		}
 	}
 
 	void equipinventory::draw()
@@ -111,20 +121,57 @@ namespace io
 		{
 		case BT_PETEQUIP:
 			showpet = !showpet;
-			buttons[BT_PETEQUIP].setstate("mouseOver");
+			buttons[BT_PETEQUIP].setstate(BTS_MOUSEOVER);
 			break;
 		}
 	}
 
-	void equipinventory::oniteminfo(dragicon* dgi)
+	void equipinventory::oninfo(icon* ico)
 	{
-		if (dgi)
+		if (ico)
 		{
-			app.getui()->showequipinfo(dgi->getaction(), dgi->getkey());
+			dragitemicon* dgi = reinterpret_cast<dragitemicon*>(ico);
+			app.getui()->showequipinfo(dgi->getid(), dgi->getslot(), true);
 		}
 		else
 		{
-			app.getui()->showequipinfo(0, 0);
+			app.getui()->showequipinfo(0, 0, false);
+		}
+	}
+
+	void equipinventory::sendicon(icon* ico, vector2d pos)
+	{
+		if (bounds().contains(pos))
+		{
+
+		}
+		else
+		{
+			dragitemicon* dgi = reinterpret_cast<dragitemicon*>(ico);
+			char slot = (dgi->getslot() > 0) ? -dgi->getslot() : dgi->getslot();
+			packet_c.moveitem(IVT_EQUIPPED, slot, 0, 1);
+		}
+	}
+
+	void equipinventory::addicon(short slot)
+	{
+		mapleequip* equip = invent->getequip(IVT_EQUIPPED, slot);
+		if (equip)
+		{
+			int id = equip->getid();
+			clothing* cloth = cache.getequips()->getcloth(id);
+			if (cloth)
+			{
+				icons.add(slot, new dragitemicon(IICT_EQUIP, cloth->geticons(), id, slot, 0, iconpositions[slot]));
+			}
+		}
+	}
+
+	void equipinventory::loadicons()
+	{
+		for (spmit<short, mapleitem*> eqit = invent->getinventory(IVT_EQUIPPED); eqit.belowtop(); ++eqit)
+		{
+			addicon(eqit.getkey());
 		}
 	}
 

@@ -19,5 +19,11 @@
 
 namespace program
 {
-
+	void datacache::init()
+	{
+		equips.init();
+		items.init();
+		effects.init();
+		sounds.init();
+	}
 }

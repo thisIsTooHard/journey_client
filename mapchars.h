@@ -17,6 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "safemap.h"
+#include "player.h"
 #include "otherplayer.h"
 
 using namespace gameplay;
@@ -34,6 +35,7 @@ namespace maplemap
 		void draw(vector2d);
 		void update();
 		void clear() { chars.clear(); }
+		otherplayer* getchar(int i) { return chars.contains(i) ? chars.get(i) : 0; }
 	private:
 		safemap<int, otherplayer> chars;
 	};

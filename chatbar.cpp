@@ -28,17 +28,20 @@ namespace io
 		node mainbar = nx::nodes["UI"]["StatusBar2.img"]["mainBar"];
 		node chat = nx::nodes["UI"]["StatusBar2.img"]["chat"];
 
-		open = config.getchatopen();
+		open = config.getconfig()->chatopen;
 
 		buttons[BT_BAR_OPENCHAT] = button(mainbar["chatOpen"]);
 		buttons[BT_BAR_CLOSECHAT] = button(mainbar["chatClose"]);
+		buttons[BT_BAR_SCROLLUP] = button(mainbar["scrollUp"]);
+		buttons[BT_BAR_SCROLLDOWN] = button(mainbar["scrollDown"]);
 		buttons[BT_BAR_CHATTARGET] = button(mainbar["chatTarget"]["base"]);
+		buttons[BT_BAR_CHATTARGET].setactive(open);
 
 		buttons[open ? BT_BAR_OPENCHAT : BT_BAR_CLOSECHAT].setactive(false);
 
 		chatspace[false] = texture(mainbar["chatSpace"]);
-		chatspace[true] = texture(mainbar["chatSpace2"]);
-		chatenter = texture(mainbar["chatEnter"]);
+		chatspace[true] = texture(mainbar["chatEnter"]);
+		chatenter = texture(mainbar["chatSpace2"]);
 		chatcover = texture(mainbar["chatCover"]);
 
 		chattargets[CHT_ALL] = texture(mainbar["chatTarget"]["all"]);
@@ -48,8 +51,8 @@ namespace io
 		chattargets[CHT_PARTY] = texture(mainbar["chatTarget"]["party"]);
 		chattargets[CHT_SQUAD] = texture(mainbar["chatTarget"]["expedition"]);
 
-		textfields[TXT_CHAT] = textfield(TXT_CHAT, DWF_12L, TXC_BLACK, "", vector2d(-430, -60), 32);
-		textfields[TXT_CHAT].setactive(false);
+		textfields[TXT_CHAT] = textfield(TXT_CHAT, DWF_12L, TXC_BLACK, "", vector2d(-430, -60), 64);
+		textfields[TXT_CHAT].setactive(open);
 
 		closedtext = textlabel(DWF_12L, TXC_WHITE, "");
 
@@ -71,16 +74,20 @@ namespace io
 			open = true;
 			buttons[BT_BAR_OPENCHAT].setactive(false);
 			buttons[BT_BAR_CLOSECHAT].setactive(true);
+			buttons[BT_BAR_CHATTARGET].setactive(true);
 			textfields[TXT_CHAT].setactive(true);
+			config.getconfig()->chatopen = true;
 			break;
 		case BT_BAR_CLOSECHAT:
 			open = false;
 			buttons[BT_BAR_OPENCHAT].setactive(true);
 			buttons[BT_BAR_CLOSECHAT].setactive(false);
+			buttons[BT_BAR_CHATTARGET].setactive(false);
 			textfields[TXT_CHAT].setactive(false);
+			config.getconfig()->chatopen = false;
 			break;
 		}
-		buttons[id].setstate("normal");
+		buttons[id].setstate(BTS_NORMAL);
 	}
 
 	void chatbar::draw()
@@ -88,11 +95,7 @@ namespace io
 		if (active)
 		{
 			chatspace[open].draw(position);
-
-			if (open)
-			{
-				chatenter.draw(position);
-			}
+			chatenter.draw(position);
 		}
 
 		uielement::draw();
@@ -101,21 +104,19 @@ namespace io
 		{
 			if (open)
 			{
-
+				chattargets[chattarget].draw(position + vector2d(0, 2));
+				chatcover.draw(position);
 			}
 			else if (lines.size() > 0)
 			{
-				closedtext.draw(lines.back(), position + vector2d(-430, -60));
+				closedtext.drawline(lines.back(), position + vector2d(-500, -60));
 			}
-
-			chattargets[chattarget].draw(position + vector2d(0, 2));
-			chatcover.draw(position);
 		}
 	}
 
-	void chatbar::sendchat(string txt)
+	void chatbar::sendtext(string text, bool gm)
 	{
-		lines.push_back(txt);
+		lines.push_back(text);
 	}
 
 	void chatbar::update()

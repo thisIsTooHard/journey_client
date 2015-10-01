@@ -43,6 +43,7 @@ namespace gameplay
 		account mapleacc;
 		char worldid;
 		char channelid;
+		int charid;
 
 		void addworld(char c, world w) { worlds[c] = w; }
 		world* getworld(char c) { return &worlds[c]; }
@@ -52,17 +53,21 @@ namespace gameplay
 	class playfield
 	{
 	public:
-		playfield();
+		playfield() { active = false; }
 		~playfield() {}
 		void init();
 		void draw();
 		void update();
+		void clear();
 		void setfield(int, char);
 		void changechannel(char) {}
 		bool moveup(bool);
 		void useattack(int);
 		void useitem(int);
 		void buildplayer();
+		void pickup();
+		void showchareffect(char);
+		void showchareffect(int, char);
 		vector2d getviewpos() { return cam.getposition(); }
 		player* getplayer() { return &playerchar; }
 		mapchars* getchars() { return &chars; }
@@ -70,6 +75,7 @@ namespace gameplay
 		mapdrops* getdrops() { return &drops; }
 		mapnpcs* getnpcs() { return &npcs; }
 		logininfo* getlogin() { return &login; }
+		vplayer* getchar(int);
 	private:
 		map<char, maplayer> layers;
 		mapbackgrounds backgrounds;

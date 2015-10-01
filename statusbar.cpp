@@ -24,7 +24,6 @@ namespace io
 	statusbar::statusbar(maplestats* pstats)
 	{
 		app.getimgcache()->setmode(ict_sys);
-		nx::view_file("UI");
 
 		node mainbar = nx::nodes["UI"]["StatusBar2.img"]["mainBar"];
 		node chat = nx::nodes["UI"]["StatusBar2.img"]["chat"];
@@ -52,7 +51,6 @@ namespace io
 		buttons[BT_BAR_TRADE] = button(mainbar["BtMTS"]);
 		buttons[BT_BAR_MENU] = button(mainbar["BtMenu"]);
 		buttons[BT_BAR_SYSOP] = button(mainbar["BtSystem"]);
-		//buttons.insert(make_pair(BT_CHANNEL, button(button(mainbar.resolve("BtChannel")), 0, 0)));
 
 		buttons[BT_BAR_CHARINFO] = button(mainbar["BtCharacter"]);
 		buttons[BT_BAR_STATS] = button(mainbar["BtStat"]);
@@ -60,10 +58,7 @@ namespace io
 		buttons[BT_BAR_INVENTORY] = button(mainbar["BtInven"]);
 		buttons[BT_BAR_EQUIPS] = button(mainbar["BtEquip"]);
 		buttons[BT_BAR_SKILL] = button(mainbar["BtSkill"]);
-		//buttons.insert(make_pair(BT_FARM, button(button(mainbar.resolve("BtFarm")), 0, 0)));
-		//buttons.insert(make_pair(BT_KEYMAP, button(button(mainbar.resolve("BtKeysetting")), 0, 0)));
 
-		nl::nx::unview_file("UI");
 		app.getimgcache()->unlock();
 
 		position = vector2d(512, 590);
@@ -87,7 +82,7 @@ namespace io
 			short maxhp = stats->gettotal(MS_MAXHP);
 			short maxmp = stats->gettotal(MS_MAXMP);
 
-			float expperc = static_cast<double>(cexp) / expneed;
+			float expperc = static_cast<float>(static_cast<double>(cexp) / expneed);
 			float hpperc = static_cast<float>(chp) / maxhp;
 			float mpperc = static_cast<float>(cmp) / maxmp;
 
@@ -100,7 +95,7 @@ namespace io
 			statset.draw("[" + to_string(chp) + "/" + to_string(maxhp) + "]", cha_right, position + vector2d(-124, -29));
 			statset.draw("[" + to_string(cmp) + "/" + to_string(maxmp) + "]", cha_right, position + vector2d(47, -29));
 
-			lvset.draw(to_string(stats->getstat(MS_LEVEL)), cha_left, position + vector2d(-492, -24));
+			lvset.draw(to_string(stats->getstat(MS_LEVEL)), cha_left, position + vector2d(-480, -24));
 			job.draw(stats->getjobname(), position + vector2d(-435, -22));
 			name.draw(stats->getname(), position + vector2d(-435, -37));
 		}
@@ -125,7 +120,7 @@ namespace io
 			app.getui()->add(UI_EQUIPS);
 			break;
 		}
-		buttons[id].setstate("mouseOver");
+		buttons[id].setstate(BTS_MOUSEOVER);
 	}
 
 	rectangle2d statusbar::bounds()

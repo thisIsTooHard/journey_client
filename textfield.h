@@ -31,7 +31,7 @@ namespace io
 		TXT_CHAT
 	};
 
-	class textfield
+	class textfield : public textlabel
 	{
 	public:
 		textfield(textid, dwfonts, textcolor, string, vector2d, int);
@@ -42,20 +42,21 @@ namespace io
 		void setfocus(bool);
 		void sendchar(char);
 		void setbg(texture, int, int);
+		void settext(string);
 		rectangle2d bounds(vector2d);
+		void setcrypt(char c) { crypt = c; }
 		void setactive(bool a) { active = a; }
-		void settext(string s) { content.settext(s); }
 		bool isactive() { return active; }
 		bool isfocused() { return focused; }
 		textid getid() { return id; }
-		string text() { return content.gettext(); }
 	private:
+		textlabel marker;
 		textid id;
 		texture bg;
-		textlabel content;
 		vector2d position;
 		vector2d bgposition;
 		int maxlength;
+		char crypt;
 		bool active;
 		bool focused;
 		bool showmark;

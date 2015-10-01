@@ -22,7 +22,7 @@ namespace net
 {
 	void packetcreator::init(session* srv, byte ver)
 	{
-		server = unique_ptr<session>(srv);
+		server = srv;
 		version = ver;
 	}
 
@@ -31,7 +31,8 @@ namespace net
 		int sendok = server->dispatch(tosend);
 		if (sendok == SOCKET_ERROR)
 		{
-			quit();
+			//throw new runtime_error("Unexpected Disconnect");
+			//quit();
 		}
 	}
 
@@ -40,6 +41,13 @@ namespace net
 		packet p = packet(LOGIN);
 		p.writestr(account);
 		p.writestr(pass);
+		send(&p);
+	}
+
+	void packetcreator::accept_tos()
+	{
+		packet p = packet(ACCEPT_TOS);
+		p.writech(1);
 		send(&p);
 	}
 
@@ -132,11 +140,11 @@ namespace net
 		send(&p);
 	}
 
-	void packetcreator::writemoves(packet* p, vector<movefragment>* moves)
+	void packetcreator::writemoves(packet* p, vector<movefragment> moves)
 	{
-		p->writech(moves->size());
+		p->writech(moves.size());
 
-		for (vector<movefragment>::iterator mvit = moves->begin(); mvit != moves->end(); ++mvit)
+		for (vector<movefragment>::iterator mvit = moves.begin(); mvit != moves.end(); ++mvit)
 		{
 			p->writech(mvit->command);
 
@@ -178,7 +186,7 @@ namespace net
 		}
 	}
 
-	void packetcreator::moveplayer(vector<movefragment>* moves)
+	void packetcreator::moveplayer(vector<movefragment> moves)
 	{
 		packet p = packet(MOVE_PLAYER);
 		p.writelg(0);
@@ -250,6 +258,17 @@ namespace net
 		send(&p);
 	}
 
+	void packetcreator::moveitem(inventorytype type, short slot, char action, short qty)
+	{
+		packet p = packet(MOVE_ITEM);
+		p.writeint(0);
+		p.writech(type);
+		p.writesh(slot);
+		p.writesh(action);
+		p.writesh(qty);
+		send(&p);
+	}
+
 	void packetcreator::useitem(short slot, int itemid)
 	{
 		packet p = packet(USE_ITEM);
@@ -263,11 +282,11 @@ namespace net
 	{
 		packet p = packet(SPEND_AP);
 		p.writeint(0);
-		p.writeint(static_cast<int>(stat));
+		p.writeint(static_cast<int32_t>(stat));
 		send(&p);
 	}
 
-	void packetcreator::movemonster(int oid, short type, byte skillb, byte skill0, byte skill1, byte skill2, byte skill3, byte skill4, vector2d startpos, vector<movefragment>* movements)
+	void packetcreator::movemonster(int oid, short type, byte skillb, byte skill0, byte skill1, byte skill2, byte skill3, byte skill4, vector2d startpos, vector<movefragment> movements)
 	{
 		packet p = packet(MOVE_MONSTER);
 		p.writeint(oid);
@@ -284,6 +303,17 @@ namespace net
 		p.writesh(startpos.x());
 		p.writesh(startpos.y());
 		writemoves(&p, movements);
+		send(&p);
+	}
+
+	void packetcreator::pickupitem(int32_t oid, vector2d pos)
+	{
+		packet p = packet(PICKUP_ITEM);
+		p.writeint(0);
+		p.writech(0);
+		p.writesh(static_cast<int16_t>(pos.x()));
+		p.writesh(static_cast<int16_t>(pos.y()));
+		p.writeint(oid);
 		send(&p);
 	}
 }

@@ -18,7 +18,6 @@
 #pragma once
 #include "vhandler.h"
 #include "ui.h"
-#include "maplechar.h"
 #include "maplelook.h"
 #include "inventory.h"
 #include "mapleitem.h"

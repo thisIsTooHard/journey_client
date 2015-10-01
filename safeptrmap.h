@@ -198,6 +198,22 @@ namespace util
 			}
 		}
 
+		void changekey(K from, K to)
+		{
+			if (contains(from))
+			{
+				if (contains(to))
+				{
+					removekey(to);
+				}
+
+				AcquireSRWLockExclusive(&maplock);
+				stdmap[to] = stdmap[from];
+				stdmap[from] = 0;
+				ReleaseSRWLockExclusive(&maplock);
+			}
+		}
+
 		void clear()
 		{
 			AcquireSRWLockExclusive(&maplock);

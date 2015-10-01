@@ -58,7 +58,15 @@ namespace io
 		size_t bot;
 		size_t shoe;
 		size_t weapon;
-		textlabel setlabel;
+		textlabel facename;
+		textlabel hairname;
+		textlabel haircname;
+		textlabel bodyname;
+		textlabel topname;
+		textlabel botname;
+		textlabel shoename;
+		textlabel wepname;
+		textlabel gendername;
 	};
 }
 

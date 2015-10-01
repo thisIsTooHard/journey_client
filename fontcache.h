@@ -30,8 +30,9 @@ namespace program
 		~fontcache();
 		void init(IDWriteFactory*);
 		IDWriteTextFormat* getfont(dwfonts);
+		IDWriteFactory* getdwrite_f() { return dwrite_f; }
 	private:
-		unique_ptr<IDWriteFactory> fontfactory;
+		IDWriteFactory* dwrite_f;
 		map<dwfonts, IDWriteTextFormat*> fonts;
 	};
 }

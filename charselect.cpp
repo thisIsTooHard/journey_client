@@ -29,8 +29,12 @@ namespace io
 		node charsel = login.resolve("CharSelect");
 
 		char cslots = acc->getslots();
-		vector<maplechar>* chars = acc->getchars();
-		size_t charcount = chars->size();
+		size_t charcount = acc->getchars()->size();
+
+		for (size_t i = 0; i < charcount; i++)
+		{
+			chars.push_back(acc->getchar(i));
+		}
 
 		sprites.push_back(sprite(animation(login.resolve("Title/worldsel")), vector2d()));
 		sprites.push_back(sprite(animation(login.resolve("Common/frame")), vector2d(400, 290)));
@@ -51,8 +55,8 @@ namespace io
 
 		if (charcount + cslots < 9)
 		{
-			buttons[BT_PAGEL].setstate("disabled");
-			buttons[BT_PAGER].setstate("disabled");
+			buttons[BT_PAGEL].setstate(BTS_DISABLED);
+			buttons[BT_PAGER].setstate(BTS_DISABLED);
 		}
 
 		size_t createcount = cslots;
@@ -80,7 +84,7 @@ namespace io
 			charbtcount = 8;
 		}
 
-		selected = config.getdefchar();
+		selected = config.getconfig()->defaultchar;
 		if (selected >= charcount)
 		{
 			selected = 0;
@@ -89,21 +93,18 @@ namespace io
 
 		for (size_t i = 0; i < charbtcount; i++)
 		{
-			nametag charname = nametag(DWF_14C, TXC_WHITE, nttextures, chars->at(i).getstats()->getname(), vector2d(133 + (120 * (i % 4)), 250 + (200 * (i > 3))), (i == selected));
-			nametags.push_back(charname);
-			buttons.insert(make_pair(BT_CHAR0 + i, button(vector2d(105 + (120 * (i % 4)), 170 + (200 * (i > 3))), vector2d(50, 80))));
-			buttons[BT_CHAR0 + selected].setstate("pressed");
+			nametags.push_back(nametag(DWF_14C, TXC_WHITE, nttextures, chars[i]->getstats()->getname(), vector2d(133 + (120 * (i % 4)), 250 + (200 * (i > 3))), (i == selected)));
+			buttons[BT_CHAR0 + i] = button(vector2d(105 + (120 * (i % 4)), 170 + (200 * (i > 3))), vector2d(50, 80));
 		}
+		buttons[BT_CHAR0 + selected].setstate(BTS_PRESSED);
 
 		app.getimgcache()->unlock();
 		app.getimgcache()->setmode(ict_sys);
 
-		lvset = charset(charsel.resolve("lv"));
-		statset = charset(nl::nx::nodes["UI"].resolve("StatusBar2.img/mainBar/gauge/number"));
+		lvset = charset(charsel["lv"]);
+		statset = charset(nx::nodes["UI"]["StatusBar2.img"]["mainBar"]["gauge"]["number"]);
 
-		rankmove['+'] = texture(charsel["icon"]["up"]);
-		rankmove['='] = texture(charsel["icon"]["same"]);
-		rankmove['-'] = texture(charsel["icon"]["down"]);
+		app.getimgcache()->unlock();
 
 		size_t displaycount = charcount;
 		if (displaycount > 8)
@@ -113,27 +114,21 @@ namespace io
 
 		for (size_t i = 0; i < displaycount; i++)
 		{
-			maplelook* plook = chars->at(i).getlook();
-			cache.getequips()->loadcharlook(plook);
-
-			maplelook look = chars->at(i).copylook();
-			look.setposition(vector2d(130 + (120 * (i % 4)), 250 + (200 * (i > 3))));
-			look.setfleft(false);
+			maplelook* look = chars[i]->getlook();
+			cache.getequips()->loadcharlook(look);
+			look->setposition(vector2d(130 + (120 * (i % 4)), 250 + (200 * (i > 3))));
+			look->setfleft(false);
 			if (i == selected)
 			{
-				look.setstate("walk");
+				look->setstate("walk");
 			}
-			looks.push_back(look);
-			stats.push_back(chars->at(i).copystats());
-			rankinfo.push_back(make_pair(chars->at(i).getrank(), chars->at(i).getjobrank()));
 		}
 
-		app.getimgcache()->unlock();
-
-		if (stats.size() > 0)
+		if (chars.size() > 0)
 		{
-			name = textlabel(DWF_20C, TXC_WHITE, stats[selected].getname());
-			job = textlabel(DWF_12R, TXC_WHITE, stats[selected].getjobname());
+			maplestats* stats = chars[selected]->getstats();
+			name = textlabel(DWF_20C, TXC_WHITE, stats->getname());
+			job = textlabel(DWF_12R, TXC_WHITE, stats->getjobname());
 		}
 
 		pic = acc->getpic();
@@ -151,30 +146,32 @@ namespace io
 
 		if (active)
 		{
-			for (vector<maplelook>::iterator itspr = looks.begin(); itspr != looks.end(); itspr++)
+			for (vector<maplechar*>::iterator chit = chars.begin(); chit != chars.end(); ++chit)
 			{
-				itspr->draw(position);
+				(*chit)->getlook()->draw(position);
 			}
-			for (vector<nametag>::iterator itspr = nametags.begin(); itspr != nametags.end(); itspr++)
+			for (vector<nametag>::iterator ntit = nametags.begin(); ntit != nametags.end(); ++ntit)
 			{
-				itspr->draw(position);
+				ntit->draw(position);
 			}
 
-			if (stats.size() > 0)
+			if (chars.size() > 0)
 			{
-				name.draw(vector2d(664, 270));
-				job.draw(vector2d(732, 305));
+				maplestats* stats = chars[selected]->getstats();
 
-				statset.draw(to_string(rankinfo[selected].first.first), cha_right, vector2d(732, 335));
-				statset.draw(to_string(rankinfo[selected].second.first), cha_right, vector2d(732, 355));
+				name.draw(stats->getname(), vector2d(664, 268));
+				job.draw(stats->getjobname(), vector2d(732, 305));
 
-				lvset.draw('l', vector2d(648, 262));
-				lvset.draw(to_string(stats[selected].getstat(MS_LEVEL)), 12, cha_left, vector2d(655, 262));
+				statset.draw(to_string(chars[selected]->getrank().first), cha_right, vector2d(732, 335));
+				statset.draw(to_string(chars[selected]->getjobrank().first), cha_right, vector2d(732, 355));
 
-				statset.draw(to_string(stats[selected].getstat(MS_STR)), cha_right, vector2d(655, 385));
-				statset.draw(to_string(stats[selected].getstat(MS_DEX)), cha_right, vector2d(655, 407));
-				statset.draw(to_string(stats[selected].getstat(MS_INT)), cha_right, vector2d(732, 385));
-				statset.draw(to_string(stats[selected].getstat(MS_LUK)), cha_right, vector2d(732, 407));
+				int lvx = lvset.draw(to_string(stats->getstat(MS_LEVEL)), cha_center, vector2d(685, 262));
+				lvset.draw('l', vector2d(655 - lvx/2, 262));
+
+				statset.draw(to_string(stats->getstat(MS_STR)), cha_right, vector2d(655, 385));
+				statset.draw(to_string(stats->getstat(MS_DEX)), cha_right, vector2d(655, 407));
+				statset.draw(to_string(stats->getstat(MS_INT)), cha_right, vector2d(732, 385));
+				statset.draw(to_string(stats->getstat(MS_LUK)), cha_right, vector2d(732, 407));
 			}
 		}
 	}
@@ -185,9 +182,9 @@ namespace io
 
 		if (active)
 		{
-			for (vector<maplelook>::iterator itspr = looks.begin(); itspr != looks.end(); itspr++)
+			for (vector<maplechar*>::iterator chit = chars.begin(); chit != chars.end(); ++chit)
 			{
-				itspr->update();
+				(*chit)->getlook()->update();
 			}
 		}
 	}
@@ -196,26 +193,18 @@ namespace io
 	{
 		if (id >= BT_CHAR0 && id <= BT_CHAR7)
 		{
-			selected = id - BT_CHAR0;
-			looks[selected].setstate("walk");
-			nametags[selected].setstate(true);
-			name.settext(stats[selected].getname());
-			job.settext(stats[selected].getjobname());
+			buttons[BT_CHAR0 + selected].setstate(BTS_NORMAL);
+			chars[selected]->getlook()->setstate("stand");
+			nametags[selected].setstate(false);
 
-			for (map<short, button>::iterator itbt = buttons.begin(); itbt != buttons.end(); itbt++)
-			{
-				if (itbt->first != id && itbt->first >= BT_CHAR0 && itbt->first <= BT_CHAR7 && itbt->second.getstate() == "pressed")
-				{
-					char deselected = itbt->first - BT_CHAR0;
-					itbt->second.setstate("normal");
-					looks[deselected].setstate("stand");
-					nametags[deselected].setstate(false);
-				}
-			}
+			selected = id - BT_CHAR0;
+			buttons[id].setstate(BTS_PRESSED);
+			chars[selected]->getlook()->setstate("walk");
+			nametags[selected].setstate(true);
 			return;
 		}
 
-		int cid = (stats.size() > 0) ? stats[selected].getid() : -1;
+		int cid = (chars.size() > 0) ? chars[selected]->getstats()->getid() : -1;
 
 		switch (id)
 		{
@@ -228,30 +217,34 @@ namespace io
 		case BT_SELCHAR:
 			if (cid != -1)
 			{
-				app.getui()->disableactions();
-				app.getui()->getfield()->getlogin()->getacc()->selectchar(cid);
-				config.setdefchar(selected);
+				logininfo* login = app.getui()->getfield()->getlogin();
+				login->charid = cid;
+				login->getacc()->selectchar(cid);
+				config.getconfig()->defaultchar = selected;
 				switch (pic)
 				{
 				case 0:
-					packet_c.registerpic(cid, "666666");
+					buttons[id].setstate(BTS_MOUSEOVER);
+					app.getui()->add(UI_SOFTKEYBOARD, 0);
 					break;
 				case 1:
-					packet_c.selectcharpic(cid, "666666");
+					buttons[id].setstate(BTS_MOUSEOVER);
+					app.getui()->add(UI_SOFTKEYBOARD, 1);
 					break;
 				case 2:
+					app.getui()->disableactions();
 					packet_c.selectchar(cid);
 					break;
 				}
 			}
 			else
 			{
-				buttons[id].setstate("mouseOver");
+				buttons[id].setstate(BTS_MOUSEOVER);
 			}
 			break;
 		case BT_PAGEL:
 		case BT_PAGER:
-			buttons[id].setstate("mouseOver");
+			buttons[id].setstate(BTS_MOUSEOVER);
 			break;
 		case BT_NEWCHAR:
 			active = false;

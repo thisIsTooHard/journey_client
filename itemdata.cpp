@@ -23,20 +23,28 @@ namespace data
 {
 	itemdata::itemdata(int id)
 	{
+		int32_t prefix = id / 1000000;
+
+		node strsrc = nx::nodes["String"];
+
 		string category;
-		switch (id / 1000000)
+		switch (prefix)
 		{
 		case 2:
 			category = "Consume";
+			strsrc = strsrc["Consume.img"][to_string(id)];
 			break;
 		case 3:
 			category = "Install";
+			strsrc = strsrc["Ins.img"][to_string(id)];
 			break;
 		case 4:
 			category = "Etc";
+			strsrc = strsrc["Etc.img"]["Etc"][to_string(id)];
 			break;
 		case 5:
 			category = "Cash";
+			strsrc = strsrc["Cash.img"][to_string(id)];
 			break;
 		default:
 			category = "";
@@ -44,23 +52,17 @@ namespace data
 
 		if (category.size() > 0)
 		{
-			nx::view_file("Item");
-
 			node src = nx::nodes["Item"][category]["0" + to_string(id / 10000) + ".img"]["0" + to_string(id)]["info"];
 			icon[false] = texture(src["icon"]);
 			icon[true] = texture(src["iconRaw"]);
 
-			nx::unview_file("Item");
-
-			category = (category == "Install") ? "Ins" : category;
-
-			nx::view_file("String");
-
-			node strsrc = nx::nodes["String"][category + ".img"][to_string(id)];
 			name = strsrc["name"];
 			desc = strsrc["desc"];
 
-			nx::unview_file("String");
+			txtargs descargs;
+			descargs.text = desc;
+			descargs.color = TXC_WHITE;
+			desctext = itemtext(descargs, DWF_12LL, vector2d(150, 0));
 		}
 
 		itemid = id;

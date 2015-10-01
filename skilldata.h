@@ -47,6 +47,7 @@ namespace data
 		bool isattack() { return offensive; }
 		skillinfo getlevel(int l) { return levels[l]; }
 		texture geticon(char c) { return icon[c]; }
+		map<char, texture>* geticons() { return &icon; }
 	private:
 		map<char, texture> icon;
 		map<int, skillinfo> levels;

@@ -55,33 +55,56 @@ namespace graphics
 	enum textbg
 	{
 		TXB_NONE,
-		TXB_NAMETAG
+		TXB_NAMETAG,
+		TXB_GMCHAT
+	};
+
+	struct txtargs
+	{
+		string text;
+		textcolor color;
+		textbg back;
 	};
 
 	class textlabel
 	{
 	public:
-		textlabel(dwfonts, textcolor, string, textbg);
+		textlabel(dwfonts, textcolor, string, vector2d);
 		textlabel(dwfonts, textcolor, string);
-		textlabel() { font = 0; brush = 0; bgbrush = 0; }
+		textlabel() { init(); }
 		~textlabel();
-		void draw(string, vector2d);
+		void getfont(dwfonts);
 		void draw(vector2d);
-		float getlength() { return (font->GetFontSize() - 8.0f) * text.length() + 10.0f; }
-		void settext(string s) { text = s; }
-		void setmarker(bool b) { marker = b; }
+		void draw(string, vector2d);
+		void drawline(string, vector2d);
+		void drawover(string, vector2d);
+		void setcolor(textcolor);
+		void settext(string, vector2d);
+		void settext(string s) { settext(s, vector2d()); }
 		void setalpha(float a) { alpha = a; }
+		void setback(textbg b) { back = b; bgbrush = 0; }
+		int getheight() { return height; }
+		int getwidth() { return width; }
+		vector2d getend() { return endpos; }
 		string gettext() { return text; }
+	protected:
+		int getadvance(short);
+		void init();
+		void getfont();
+		string text;
+		textcolor color;
+		textbg back;
+		int height;
+		int width;
+		vector2d endpos;
+		float alpha;
 	private:
+		int createlayout(vector2d);
+		map<short, float> advances;
 		IDWriteTextFormat* font;
 		ID2D1SolidColorBrush* brush;
 		ID2D1SolidColorBrush* bgbrush;
-		textcolor color;
-		textbg back;
-		string text;
-		float alpha;
-		bool marker;
-		vector2d position;
+		wstring wtext;
 	};
 }
 

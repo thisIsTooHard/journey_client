@@ -27,7 +27,7 @@ namespace maplemap
 		}
 		else
 		{
-			chars.add(cid, otherplayer(toadd, level, job, name, pos));
+			chars.add(cid, otherplayer(toadd, cid, level, job, name, pos));
 		}
 	}
 

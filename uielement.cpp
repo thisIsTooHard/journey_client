@@ -21,15 +21,14 @@
 
 namespace io
 {
-	void uielement::sendicon(dragicon* icon, vector2d pos)
-	{
-		icon->resetdrag();
-	}
-
 	void uielement::draw()
 	{
 		if (active)
 		{
+			for (vector<texture>::iterator ittxt = backgrounds.begin(); ittxt != backgrounds.end(); ++ittxt)
+			{
+				ittxt->draw(position);
+			}
 			for (vector<sprite>::iterator itspr = sprites.begin(); itspr != sprites.end(); ++itspr)
 			{
 				itspr->draw(position);
@@ -42,9 +41,9 @@ namespace io
 			{
 				ittxt->second.draw(position);
 			}
-			for (vector<dragicon>::iterator itdg = dragicons.begin(); itdg != dragicons.end(); ++itdg)
+			for (spmit<short, icon*> icit = icons.getit(); icit.belowtop(); ++icit)
 			{
-				itdg->draw(position);
+				icit->draw(position);
 			}
 		}
 	}
@@ -76,31 +75,35 @@ namespace io
 			mousestate ret = state;
 			bool iteminfo = false;
 
-			for (vector<dragicon>::iterator dgit = dragicons.begin(); dgit != dragicons.end(); ++dgit)
+			for (spmit<short, icon*> icit = icons.getit(); icit.belowtop(); ++icit)
 			{
-				if (dgit->bounds(position).contains(pos))
+				if (icit->bounds(position).contains(pos))
 				{
-					if (!dgit->dragged())
+					switch (state)
 					{
-						switch (state)
+					case MST_IDLE:
+					case MST_CANCLICK:
+					case MST_CANCLICK2:
+					case MST_CANGRAB:
+						if (icit->candrag())
 						{
-						case MST_IDLE:
-						case MST_CANCLICK:
-						case MST_CANCLICK2:
-						case MST_CANGRAB:
 							ret = MST_CANGRAB;
-							if (dgit->gettype() == DIT_ITEM || dgit->gettype() == DIT_ITEMKEY)
-							{
-								oniteminfo(dgit._Ptr);
-								iteminfo = true;
-							}
-							break;
-						case MST_CLICKING:
-							dgit->setdrag(pos, position);
-							app.getui()->seticon(dgit._Ptr);
-							ret = MST_GRABBING;
-							break;
 						}
+						else
+						{
+							ret = MST_IDLE;
+						}
+						oninfo(icit.get());
+						iteminfo = true;
+						break;
+					case MST_CLICKING:
+						if (icit->candrag())
+						{
+							icit->setdrag(pos, position);
+							app.getui()->seticon(icit.get());
+							ret = MST_GRABBING;
+						}
+						break;
 					}
 
 					return ret;
@@ -109,13 +112,13 @@ namespace io
 
 			if (!iteminfo && state != MST_IDLE)
 			{
-				oniteminfo(0);
+				oninfo(0);
 			}
 
 			bool anycoll = false;
 			for (map<short, button>::iterator itbt = buttons.begin(); itbt != buttons.end(); ++itbt)
 			{
-				string btst = itbt->second.getstate();
+				buttonstate btst = itbt->second.getstate();
 				if (itbt->second.bounds(position).contains(pos) && itbt->second.isactive())
 				{
 					anycoll = true;
@@ -123,18 +126,19 @@ namespace io
 					{
 					case MST_IDLE:
 					case MST_CANCLICK:
-						if (btst == "normal")
+						if (btst == BTS_NORMAL)
 						{
-							itbt->second.setstate("mouseOver");
+							cache.getsounds()->play(MSN_MSOVER);
+							itbt->second.setstate(BTS_MOUSEOVER);
 							ret = MST_CANCLICK;
 						}
 						break;
 					case MST_CLICKING:
-						if (btst == "normal" || btst == "mouseOver")
+						if (btst == BTS_NORMAL || btst == BTS_MOUSEOVER)
 						{
 							if (buttoncd <= 0)
 							{
-								itbt->second.setstate("pressed");
+								itbt->second.setstate(BTS_PRESSED);
 								buttonpressed(itbt->first);
 								buttoncd = 60;
 							}
@@ -148,9 +152,9 @@ namespace io
 					{
 					case MST_IDLE:
 					case MST_CANCLICK:
-						if (btst == "mouseOver")
+						if (btst == BTS_MOUSEOVER)
 						{
-							itbt->second.setstate("normal");
+							itbt->second.setstate(BTS_NORMAL);
 						}
 						break;
 					}

@@ -19,10 +19,16 @@
 
 namespace program
 {
+	imagecache::~imagecache()
+	{
+		clearcache(ict_sys);
+		clearcache(ict_login);
+		clearcache(ict_map);
+	}
+
 	void imagecache::init(IWICImagingFactory* imf)
 	{
-		imgfactory = unique_ptr<IWICImagingFactory>(imf);
-		target = 0;
+		imgfactory = imf;
 		imgcon = ict_sys;
 	}
 
@@ -52,7 +58,8 @@ namespace program
 				int result = imgfactory->CreateFormatConverter(&spConverter);
 				if (result == 0)
 				{
-					spConverter->Initialize(wic, GUID_WICPixelFormat32bppPBGRA,
+					spConverter->Initialize(wic, 
+						GUID_WICPixelFormat32bppPBGRA,
 						WICBitmapDitherTypeNone, NULL, 0.f,
 						WICBitmapPaletteTypeMedianCut);
 					imgfactory->CreateBitmapFromSource(spConverter, WICBitmapNoCache, &temp[imgcon][id]);

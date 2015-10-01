@@ -105,9 +105,9 @@ namespace gameplay
 		return static_cast<short>(dexacc + lukacc);
 	}
 
-	const string maplestats::getjobname()
+	string maplestats::getjobname(short job)
 	{
-		switch (stats[MS_JOB])
+		switch (job)
 		{
 		case 0:
 			return "Beginner";

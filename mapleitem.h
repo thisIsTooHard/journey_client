@@ -29,6 +29,7 @@ namespace gameplay
 		~mapleitem() {}
 		mapleitem(int, short, short, char, bool, int64_t, int64_t, string, short);
 		mapleitem(int, short, char, bool, int64_t, int64_t, string, char, short, char);
+		void setcount(short c) { count = c; }
 		bool canrecharge();
 		int getid() { return itemid; }
 		short getcount() { return count; }

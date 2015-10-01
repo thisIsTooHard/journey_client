@@ -32,6 +32,7 @@ namespace maplemap
 		string link = src["info"]["link"].tostr();
 		if (link.size() > 0)
 		{
+			link.append(".img");
 			src = nx::nodes["Npc"][link];
 		}
 
@@ -76,8 +77,10 @@ namespace maplemap
 			}
 		}
 
-		ntag = textlabel(DWF_14BC, TXC_YELLOW, name, TXB_NAMETAG);
-		ftag = textlabel(DWF_14BC, TXC_YELLOW, func, TXB_NAMETAG);
+		ntag = textlabel(DWF_14BC, TXC_YELLOW, name);
+		ftag = textlabel(DWF_14BC, TXC_YELLOW, func);
+		ntag.setback(TXB_NAMETAG);
+		ftag.setback(TXB_NAMETAG);
 
 		oid = o;
 		flip = !fl;
@@ -114,8 +117,11 @@ namespace maplemap
 
 		if (aniend)
 		{
-			int next_s = random.nextint<int>(states.size() - 1);
-			setstate(states[next_s]);
+			if (states.size() > 0)
+			{
+				int next_s = random.nextint<int>(states.size() - 1);
+				setstate(states[next_s]);
+			}
 		}
 	}
 }

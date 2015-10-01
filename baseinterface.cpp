@@ -100,21 +100,42 @@ namespace io
 				ReleaseSRWLockShared(&dmglock);
 			}
 
+			vector2d chatbpos = viewpos - vector2d(0, 90);
+			for (smit<int, chatballoon> cbit = chatballoons.getit(); cbit.belowtop(); ++cbit)
+			{
+				int cid = cbit.getkey();
+
+				if (cid == app.getui()->getfield()->getplayer()->getstats()->getid())
+				{
+					cbit->draw(app.getui()->getfield()->getplayer()->getposition() + chatbpos);
+				}
+				else
+				{
+					otherplayer* otherchar = app.getui()->getfield()->getchars()->getchar(cid);
+					if (otherchar)
+					{
+						cbit->draw(otherchar->getposition() + chatbpos);
+					}
+					else
+					{
+						cbit->expire();
+					}
+				}
+			}
+
 			vector2d infotop = vector2d(790, 510 - (static_cast<int>(statusinfos.size()) * 16));
 			for (char i = 0; i < statusinfos.size(); i++)
 			{
 				statusinfo sfit = statusinfos[i];
 				if (sfit.white)
 				{
-					infotextw.settext(sfit.text);
 					infotextw.setalpha(sfit.alpha);
-					infotextw.draw(infotop + vector2d(0, 16 * i));
+					infotextw.drawline(sfit.text, infotop + vector2d(0, 16 * i));
 				}
 				else
 				{
-					infotexty.settext(sfit.text);
 					infotexty.setalpha(sfit.alpha);
-					infotexty.draw(infotop + vector2d(0, 16 * i));
+					infotexty.drawline(sfit.text, infotop + vector2d(0, 16 * i));
 				}
 			}
 		}
@@ -122,6 +143,7 @@ namespace io
 
 	void baseinterface::update()
 	{
+		vector<int> chatbremove;
 		char dmgremove = 0;
 		char inforemove = 0;
 
@@ -144,6 +166,16 @@ namespace io
 			}
 		}
 
+		for (smit<int, chatballoon> cbit = chatballoons.getit(); cbit.belowtop(); ++cbit)
+		{
+			bool remove = cbit->update();
+
+			if (remove)
+			{
+				chatbremove.push_back(cbit.getindex());
+			}
+		}
+
 		AcquireSRWLockExclusive(&dmglock);
 		for (char i = 0; i < dmgremove; i++)
 		{
@@ -155,6 +187,8 @@ namespace io
 		{
 			statusinfos.erase(statusinfos.begin());
 		}
+
+		chatballoons.removeall(chatbremove);
 	}
 
 	void baseinterface::drawmobhp(char percent, vector2d pos)
@@ -176,6 +210,11 @@ namespace io
 
 	void baseinterface::addnpcbutton(int npcid, vector2d pos, vector2d dim)
 	{
-		npcbuttons[npcid] = button(pos, dim);
+		npcbuttons.add(npcid, button(pos, dim));
+	}
+
+	void baseinterface::addchatballoon(int cid, char type, string text)
+	{
+		chatballoons.add(cid, chatballoon(type, text));
 	}
 }

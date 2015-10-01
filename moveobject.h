@@ -30,6 +30,8 @@ namespace action
 		virtual ~moveobject() {}
 		virtual bool update();
 		virtual vector2d getposition();
+		float gethspeed() { return hspeed; }
+		float getvspeed() { return vspeed; }
 	protected:
 		float fx;
 		float fy;

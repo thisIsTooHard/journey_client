@@ -16,12 +16,24 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "maplechar.h"
-
-using namespace std;
+#include "maplestats.h"
+#include "maplelook.h"
 
 namespace gameplay
 {
+	struct maplechar
+	{
+		maplestats stats;
+		maplelook look;
+		pair<int, char> rank;
+		pair<int, char> jobrank;
+
+		maplelook* getlook() { return &look; }
+		maplestats* getstats() { return &stats; }
+		pair<int, char> getrank() { return rank; }
+		pair<int, char> getjobrank() { return jobrank; }
+	};
+
 	class account
 	{
 	public:
@@ -29,25 +41,26 @@ namespace gameplay
 		~account() {}
 		void init(int, string, char, bool, bool, short);
 		void selectchar(int);
+		maplechar* addchar();
 		void clear() { maplechars.clear(); }
-		char getslots() { return slots; }
+		void setpicslots(char p, char s) { pic = p; slots = s; }
 		bool isfemale() { return female; }
+		char getslots() { return slots; }
 		char getpic() { return pic; }
 		size_t charcount() { return maplechars.size(); }
-		void addchar(maplechar m) { maplechars.push_back(m); }
-		void setpicslots(char p, char s) { pic = p; slots = s; }
 		maplechar* getplayer() { return &maplechars[selected]; }
+		maplechar* getchar(size_t c) { return &maplechars[c]; }
 		vector<maplechar>* getchars() { return &maplechars; }
 	private:
 		vector<maplechar> maplechars;
-		int accid;
 		string accname;
-		char gmlevel;
+		int accid;
+		char selected;
 		bool female;
 		bool muted;
 		short pin;
-		char pic; //0 - pic needed, 1 - has pic, 2 - no pic needed
+		char gmlevel;
+		char pic;
 		char slots;
-		char selected;
 	};
 }

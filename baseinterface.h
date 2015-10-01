@@ -19,13 +19,15 @@
 #include "uielement.h"
 #include "charset.h"
 #include "nametag.h"
+#include "safemap.h"
+#include "chatballoon.h"
 
 namespace io
 {
 	struct dmgeffect
 	{
 		int number;
-		char type; //2 - toplayer, 1 - crit, 0 - normal
+		char type;
 		float fx;
 		float fy;
 		float alpha;
@@ -48,20 +50,22 @@ namespace io
 		void showdamage(vector<pair<int, char>>, vector2d);
 		void drawmobhp(char, vector2d);
 		void addnpcbutton(int, vector2d, vector2d);
+		void addchatballoon(int, char, string);
 		void draw(vector2d);
 		void update();
 		mousestate sendmouse();
 	private:
+		safemap<int, chatballoon> chatballoons;
+		safemap<int, button> npcbuttons;
+		map<string, texture> mobhpbar;
+		vector<dmgeffect> dmgeffects;
+		vector<statusinfo> statusinfos;
 		charset dmgset;
 		charset critset;
 		charset playerdmgset;
 		nametag npctag;
 		textlabel infotextw;
 		textlabel infotexty;
-		map<int, button> npcbuttons;
-		map<string, texture> mobhpbar;
-		vector<dmgeffect> dmgeffects;
-		vector<statusinfo> statusinfos;
 		SRWLOCK dmglock;
 	};
 }
