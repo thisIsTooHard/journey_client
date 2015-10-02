@@ -20,14 +20,24 @@
 
 namespace program
 {
-	audioplayerbass::~audioplayerbass()
-	{
-		BASS_Free();
-	}
-
 	bool audioplayerbass::init(HWND hwnd)
 	{
 		return BASS_Init(1, 44100, 0, hwnd, 0) == TRUE;
+	}
+
+	void audioplayerbass::close()
+	{
+		if (bgm != 0)
+		{
+			BASS_ChannelStop(bgm);
+			BASS_StreamFree(bgm);
+		}
+		for (map<size_t, HSAMPLE>::iterator snit = soundcache.begin(); snit != soundcache.end(); ++snit)
+		{
+			BASS_SampleStop(snit->second);
+			BASS_SampleFree(snit->second);
+		}
+		BASS_Free();
 	}
 
 	void audioplayerbass::playbgm(void* data, size_t length)
@@ -37,7 +47,7 @@ namespace program
 			BASS_ChannelStop(bgm);
 			BASS_StreamFree(bgm);
 		}
-		bgm = BASS_StreamCreateFile(true, data, 82, length, BASS_SAMPLE_LOOP);
+		bgm = BASS_StreamCreateFile(true, data, 82, length, BASS_SAMPLE_FLOAT | BASS_SAMPLE_LOOP);
 		BASS_ChannelPlay(bgm, true);
 	}
 
@@ -45,7 +55,7 @@ namespace program
 	{
 		if (!soundcache.count(id))
 		{
-			soundcache[id] = BASS_SampleLoad(true, data, 0, length, 4, BASS_SAMPLE_OVER_POS);
+			soundcache[id] = BASS_SampleLoad(true, data, 82, length, 4, BASS_SAMPLE_OVER_POS);
 		}
 	}
 
@@ -60,11 +70,11 @@ namespace program
 
 	void audioplayerbass::setvolume0(int v0)
 	{
-		BASS_SetVolume(static_cast<float>(v0) / 100);
+		BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, v0 * 100);
 	}
 
 	void audioplayerbass::setvolume1(int v1)
 	{
-		BASS_SetVolume(static_cast<float>(v1) / 100);
+		BASS_SetConfig(BASS_CONFIG_GVOL_SAMPLE, v1 * 100);
 	}
 }

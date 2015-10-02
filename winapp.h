@@ -53,6 +53,8 @@ namespace program
 		~winapp();
 		long init();
 		void update();
+		void draw();
+		void render();
 		void togglefullscreen();
 		void maptransition(int, int, char);
 		void fadeout() { alphastep.push_back(-0.05f); }
@@ -64,8 +66,8 @@ namespace program
 		imagecache* getimgcache() { return &imgcache; }
 		audioplayerbass* getaudio() { return &audio_pb; }
 	private:
-		void render();
-		long initfactories();
+		HRESULT initfactories();
+		HRESULT inittargets();
 		static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 		ui uinterface;
 		fontcache fonts;
@@ -80,7 +82,9 @@ namespace program
 		ID2D1HwndRenderTarget* d2d_rtarget;
 		ID2D1BitmapRenderTarget* back_rtarget;
 		ID2D1DeviceContext* d2d_device;
-		ID2D1Bitmap* scene;
+		ID2D1Bitmap* scene; 
+		ID2D1Bitmap* dscene;
+		ID2D1BitmapBrush* scenebrush;
 		ID2D1Layer* d2d_layer;
 		transition trans;
 		transinfo tinfo;
@@ -90,6 +94,7 @@ namespace program
 		vector<float> alphastep;
 		short screencd;
 		bool fullscreen;
+		bool draw_finished;
 	};
 }
 

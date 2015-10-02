@@ -26,11 +26,8 @@ namespace gameplay
 		drops.init();
 		portals.init();
 
-		audioplayerbass* apb = app.getaudio();
 		audio loginbgm = nx::nodes["Sound"]["BgmUI.img"]["Title"].get_audio();
-		int bgmvolume = config.getconfig()->bgmvolume;
-		apb->setvolume0(bgmvolume);
-		apb->playbgm((void*)loginbgm.data(), loginbgm.length());
+		app.getaudio()->playbgm((void*)loginbgm.data(), loginbgm.length());
 	}
 
 	bool playfield::moveup(bool keydown)
@@ -77,6 +74,7 @@ namespace gameplay
 					bool left = playerchar.getleft();
 					bool twoh = playerchar.getlook()->getcloth(EQL_WEAPON)->istwo_h();
 
+					touse->playsound("Use");
 					touse->addeffects(playerchar.geteffects(), !left, 16.0f / playerchar.getattspeed(), twoh);
 					playerchar.setaction(touse->getaction(twoh));
 
@@ -139,6 +137,8 @@ namespace gameplay
 				attack.charge = 0;
 				attack.numdamage = 1;
 				attack.skillmult = 1.0f;
+
+				cache.getsounds()->play(weapon->getsfx());
 
 				mobs.sendattack(&attack, range);
 

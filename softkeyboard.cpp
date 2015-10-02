@@ -112,18 +112,20 @@ namespace io
 		case BT_SOFTKEY_OK:
 			if (entered.size() > 5)
 			{
+				int cid = app.getui()->getfield()->getlogin()->charid;
 				switch (mode)
 				{
 				case SFTKB_CHARSELECT:
 					app.getui()->disableactions();
-					packet_c.selectcharpic(app.getui()->getfield()->getlogin()->charid, entered);
+					packet_c.selectcharpic(cid, entered);
+					active = false;
+					break;
+				case SFTKB_REGISTER:
+					app.getui()->disableactions();
+					packet_c.registerpic(cid, entered);
 					active = false;
 					break;
 				}
-			}
-			else if (mode == SFTKB_REGISTER)
-			{
-				//message: not enough characters..
 			}
 			break;
 		}

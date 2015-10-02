@@ -99,6 +99,7 @@ namespace io
 					case MST_CLICKING:
 						if (icit->candrag())
 						{
+							cache.getsounds()->play(MSN_MSGRAB);
 							icit->setdrag(pos, position);
 							app.getui()->seticon(icit.get());
 							ret = MST_GRABBING;

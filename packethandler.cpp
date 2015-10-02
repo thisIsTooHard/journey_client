@@ -1298,7 +1298,6 @@ namespace net
 			{
 				dropfrom = recv.readpoint();
 				recv.readshort();
-				cache.getsounds()->play(MSN_DROP);
 			}
 			else
 			{

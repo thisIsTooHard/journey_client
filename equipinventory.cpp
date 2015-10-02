@@ -143,7 +143,8 @@ namespace io
 	{
 		if (bounds().contains(pos))
 		{
-
+			cache.getsounds()->play(MSN_MSENDGRAB);
+			ico->resetdrag();
 		}
 		else
 		{

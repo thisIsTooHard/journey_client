@@ -44,6 +44,7 @@ namespace data
 		~skilldata() {}
 		string getaction(bool);
 		void addeffects(playereffects*, bool, float, bool);
+		void playsound(string);
 		bool isattack() { return offensive; }
 		skillinfo getlevel(int l) { return levels[l]; }
 		texture geticon(char c) { return icon[c]; }
@@ -55,6 +56,7 @@ namespace data
 		vector<animation> affected;
 		vector<string> actions;
 		string prepare;
+		map<string, size_t> sounds;
 		short prepare_t;
 		bool offensive;
 	};

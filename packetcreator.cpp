@@ -91,7 +91,7 @@ namespace net
 
 	void packetcreator::registerpic(int cid, string pic)
 	{
-		packet p = packet(SELECT_CHAR);
+		packet p = packet(REGISTER_PIC);
 		p.writeint(cid);
 		p.writestr("68-5D-43-F8-B8-6C, 7A-79-19-8B-31-3F");
 		p.writestr("685D43F8_B86C7A79");
@@ -101,7 +101,7 @@ namespace net
 
 	void packetcreator::selectcharpic(int cid, string pic)
 	{
-		packet p = packet(SELECT_CHAR);
+		packet p = packet(SELECT_CHAR_PIC);
 		p.writestr(pic);
 		p.writeint(cid);
 		p.writestr("68-5D-43-F8-B8-6C, 7A-79-19-8B-31-3F");

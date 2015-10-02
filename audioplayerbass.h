@@ -29,8 +29,9 @@ namespace program
 	{
 	public:
 		audioplayerbass() {}
-		~audioplayerbass();
+		~audioplayerbass() {}
 		bool init(HWND);
+		void close();
 		void playbgm(void*, size_t);
 		void cachesound(void*, size_t, size_t);
 		void playsound(size_t);
@@ -39,6 +40,7 @@ namespace program
 	private:
 		HSTREAM bgm;
 		map<size_t, HSAMPLE> soundcache;
+		float volume1;
 	};
 }
 

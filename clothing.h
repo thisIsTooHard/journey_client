@@ -20,9 +20,11 @@
 #include "mapleequip.h"
 #include "maplestats.h"
 #include "itemtext.h"
+#include "soundcache.h"
 
 using namespace gameplay;
 using namespace io;
+using namespace data;
 
 namespace character
 {
@@ -70,6 +72,7 @@ namespace character
 		byte getattack() { return isweapon() ? attack : 0; }
 		rectangle2d getrange();
 		weapontype getweptype() { return isweapon() ? weptype : WEP_NONE; }
+		maplesound getsfx() { return sfx; }
 		byte getslots() { return slots; }
 		int getid() { return itemid; }
 		texture geticon(bool r) { return icon[r]; }
@@ -92,7 +95,7 @@ namespace character
 		map<maplestat, short> reqstats;
 		map<equipstat, short> defstats;
 		string afterimage;
-		string sfx;
+		maplesound sfx;
 		byte attackspeed;
 		byte attack;
 		weapontype weptype;

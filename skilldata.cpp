@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "skilldata.h"
-#include "nxfile.h"
+#include "Journey.h"
 
 namespace data
 {
@@ -112,6 +112,17 @@ namespace data
 
 			levels[level] = info;
 		}
+
+		node sndsrc = nx::nodes["Sound"]["Skill.img"][fullname];
+		for (node sub = sndsrc.begin(); sub != sndsrc.end(); ++sub)
+		{
+			if (sub.data_type() == node::type::audio)
+			{
+				audio snd = sub.get_audio();
+				app.getaudio()->cachesound((void*)snd.data(), snd.length(), snd.id());
+				sounds[sub.name()] = snd.id();
+			}
+		}
 	}
 
 	void skilldata::addeffects(playereffects* effects, bool flip, float speed, bool twoh)
@@ -126,6 +137,14 @@ namespace data
 			{
 				effects->add(effect(&skill_e[0], flip, static_cast<short>(speed)));
 			}
+		}
+	}
+
+	void skilldata::playsound(string snd)
+	{
+		if (sounds.count(snd))
+		{
+			app.getaudio()->playsound(sounds[snd]);
 		}
 	}
 

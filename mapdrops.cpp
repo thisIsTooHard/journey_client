@@ -68,6 +68,10 @@ namespace maplemap
 			}
 
 			drops.add(oid, toadd);
+			if (mod != 2)
+			{
+				cache.getsounds()->play(MSN_DROP);
+			}
 		}
 	}
 

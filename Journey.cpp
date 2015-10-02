@@ -18,11 +18,6 @@
 #pragma once
 #include "Journey.h"
 
-HANDLE gTimerDoneEvent;
-HANDLE audio_closed;
-HANDLE hTimer = NULL;
-HANDLE hTimerQueue = NULL;
-
 packetcreator packet_c;
 winapp app;
 session server;
@@ -37,66 +32,35 @@ void quit()
 	PostQuitMessage(0);
 }
 
-void CALLBACK Update(PVOID lpParam, BOOLEAN TimerOrWaitFired) {
-	if (result == JRE_NONE)
-	{
-		if (WaitForSingleObject(gTimerDoneEvent, DPF) == WAIT_OBJECT_0)
-		{
-			//ResetEvent(gTimerDoneEvent);
-			//app.update();
-		}
-	}
-	SetEvent(gTimerDoneEvent);
-}
-
-void CALLBACK CloseAudio()
-{
-}
-
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	result = nx::load_all() ? JRE_NONE : JRE_MISSING_FILES;
-
 	if (result == JRE_NONE)
 	{
 		result = server.init();
-
 		if (result == 0)
 		{
-			packet_c.init(&server, 83);
-
 			HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 			CoInitialize(NULL);
 
+			packet_c.init(&server, 83);
 			result = app.init();
-
 			if (result == 0)
 			{
-				gTimerDoneEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-				hTimerQueue = CreateTimerQueue();
-				CreateTimerQueueTimer(&hTimer, hTimerQueue, (WAITORTIMERCALLBACK)Update, 0, 60, DPF, 0);
-
 				MSG winmsg;
 				while (result == 0)
 				{
-					if (WaitForSingleObject(gTimerDoneEvent, DPF) == WAIT_OBJECT_0)
+					server.receive();
+					if (GetMessage(&winmsg, 0, 0, 0))
 					{
-						server.receive();
-
-						if (GetMessage(&winmsg, 0, 0, 0))
-						{
-							TranslateMessage(&winmsg);
-							DispatchMessage(&winmsg);
-						}
+						TranslateMessage(&winmsg);
+						DispatchMessage(&winmsg);
 					}
 				}
-
-				WaitForSingleObject(gTimerDoneEvent, 1000);
+				app.getaudio()->close();
 			}
-
 			CoUninitialize();
 		}
-
 		server.close();
 	}
 	

@@ -25,14 +25,14 @@ namespace data
 	{
 		node src = nx::nodes["Sound"];
 		node uisrc = src["UI.img"];
-		node gamesrc = src["Game.img"];
 
 		sounds[MSN_MSCLICK] = cache(uisrc["BtMouseClick"]);
 		sounds[MSN_MSOVER] = cache(uisrc["BtMouseOver"]);
 		sounds[MSN_MSGRAB] = cache(uisrc["DragStart"]);
 		sounds[MSN_MSENDGRAB] = cache(uisrc["DragEnd"]);
-
 		sounds[MSN_CHARSEL] = cache(uisrc["CharSelect"]);
+
+		node gamesrc = src["Game.img"];
 
 		sounds[MSN_GAMEIN] = cache(gamesrc["GameIn"]);
 		sounds[MSN_JUMP] = cache(gamesrc["Jump"]);
@@ -40,6 +40,20 @@ namespace data
 		sounds[MSN_PICKUP] = cache(gamesrc["PickUpItem"]);
 		sounds[MSN_PORTAL] = cache(gamesrc["Portal"]);
 		sounds[MSN_LEVELUP] = cache(gamesrc["LevelUp"]);
+
+		node wepsrc = src["Weapon.img"];
+
+		sounds[MSN_WEP_HANDS] = cache(wepsrc["barehands"]["Attack"]);
+		sounds[MSN_WEP_BOW] = cache(wepsrc["bow"]["Attack2"]);
+		sounds[MSN_WEP_XBOW] = cache(wepsrc["cBow"]["Attack2"]);
+		sounds[MSN_WEP_GUN] = cache(wepsrc["gun"]["Attack2"]);
+		sounds[MSN_WEP_KNUCKLE] = cache(wepsrc["knuckle"]["Attack"]);
+		sounds[MSN_WEP_MACE] = cache(wepsrc["mace"]["Attack"]);
+		sounds[MSN_WEP_POLEARM] = cache(wepsrc["poleArm"]["Attack"]);
+		sounds[MSN_WEP_SPEAR] = cache(wepsrc["spear"]["Attack"]);
+		sounds[MSN_WEP_SWORDL] = cache(wepsrc["swordL"]["Attack"]);
+		sounds[MSN_WEP_SWORDS] = cache(wepsrc["swordS"]["Attack"]);
+		sounds[MSN_WEP_TGLOVE] = cache(wepsrc["tGlove"]["Attack2"]);
 	}
 
 	void soundcache::play(maplesound snd)

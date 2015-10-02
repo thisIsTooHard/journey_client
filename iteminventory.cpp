@@ -227,7 +227,10 @@ namespace io
 				default:
 					tabpos = vector2d();
 				}
-				newitemtab.draw(position + tabpos);
+				if (tabpos != vector2d())
+				{
+					newitemtab.draw(position + tabpos);
+				}
 			}
 
 			meso.drawline(getmesostr(), position + vector2d(124, 262));
@@ -246,7 +249,8 @@ namespace io
 	{
 		if (bounds().contains(pos))
 		{
-
+			cache.getsounds()->play(MSN_MSENDGRAB);
+			ico->resetdrag();
 		}
 		else
 		{

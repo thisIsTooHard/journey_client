@@ -132,18 +132,22 @@ namespace gameplay
 
 			float cfy = (vspeed > 0) ? fy : fy - 35;
 
-			if (cfy > ladrrope->vertical.y())
+			if (cfy > ladrrope->vertical.y() || fy + 5 + vspeed * 2 < ladrrope->vertical.x())
 			{
 				state = PST_FALL;
-			}
-			else if (fy + 5 + vspeed * 2 < ladrrope->vertical.x())
-			{
-				state = PST_FALL;
+				if (keydown[MIN_LEFT])
+				{
+					fleft = true;
+				}
+				else if (keydown[MIN_RIGHT])
+				{
+					fleft = false;
+				}
 			}
 		}
 		else
 		{
-			if (state != PST_SKILL && state != PST_PRONE)
+			if (state != PST_SKILL && state != PST_PRONE && state != PST_SIT)
 			{
 				float fspeed = WALKSPEED * static_cast<float>(speed) / 100;
 				float maxhspeed = (candjump) ? fspeed * 1.5f : fspeed * 4.0f;
@@ -189,10 +193,10 @@ namespace gameplay
 				switch (state)
 				{
 				case PST_SKILL:
-					friction = 0.17f;
+					friction = 0.15f;
 					break;
 				default:
-					friction = 0.1f;
+					friction = 0.08f;
 					break;
 				}
 
@@ -426,6 +430,10 @@ namespace gameplay
 			vspeed = 0.0f;
 			fx = static_cast<float>(seat->x());
 			fy = static_cast<float>(seat->y());
+			if (fy != ground)
+			{
+				fy = ground;
+			}
 			setstate(PST_SIT);
 		}
 	}

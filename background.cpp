@@ -86,16 +86,12 @@ namespace gameplay
 		short htile = 1;
 		short vtile = 1;
 
-		//no1: viewxmin = camera
+		int xcom = -parentpos.x() - mapwalls.x() + 400;
+		//int xcom = -parentpos.x();
+		int ycom = -parentpos.y() + mapborders.y();
 
-		//int viewwidth = mapwalls.y() - mapwalls.x();
-		//int viewheight = mapborders.y() - mapborders.x();
-
-		int viewwidth = 800;
-		int viewheight = 530;
-
-		auto shiftx = 0.5 * rpos.x() * (-parentpos.x() - mapwalls.x() + viewwidth / 2) / 100 + viewwidth / 2;
-		auto shifty = 0.5 * rpos.y() * (-parentpos.y() + mapborders.y() - 300) / 100 + viewheight / 2 + (viewheight - 600) / 2;
+		int shiftx = static_cast<int>(0.5 * rpos.x() * static_cast<float>(xcom) / 100 + 400);
+		int shifty = static_cast<int>(0.5 * rpos.y() * static_cast<float>(ycom - 300) / 100 + 300);
 
 		vector2d absp = pos + vector2d(shiftx, shifty);
 

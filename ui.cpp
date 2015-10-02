@@ -385,6 +385,11 @@ namespace io
 	{
 		mouse.setposition(pos);
 
+		if (param == MST_CLICKING && (mouse.getstate() == MST_CANCLICK || mouse.getstate() == MST_IDLE))
+		{
+			cache.getsounds()->play(MSN_MSCLICK);
+		}
+
 		if (focused)
 		{
 			if (focused->isactive())

@@ -51,26 +51,9 @@ namespace io
 			case MST_CLICKING:
 				if (state == MST_IDLE || state == MST_CANCLICK || state == MST_CANCLICK2)
 				{
-					cache.getsounds()->play(MSN_MSCLICK);
-				}
-				break;
-			case MST_GRABBING:
-				if (state == MST_CANGRAB)
-				{
-					cache.getsounds()->play(MSN_MSGRAB);
-				}
-				break;
-			case MST_CANCLICK:
-			case MST_CANCLICK2:
-			case MST_IDLE:
-			case MST_CANGRAB:
-				if (state == MST_GRABBING)
-				{
-					cache.getsounds()->play(MSN_MSENDGRAB);
 				}
 				break;
 			}
-
 			state = s;
 			resetani();
 		}
